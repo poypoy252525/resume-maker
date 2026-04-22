@@ -134,3 +134,6 @@ MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 AUTH_USER_MODEL = 'user.User'
+
+
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
