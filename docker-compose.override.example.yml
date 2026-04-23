@@ -1,0 +1,11 @@
+# Example local override file. 
+# Copy this to docker-compose.override.yml and modify as needed.
+
+services:
+  db:
+    ports:
+      - "5434:5432" # Change the first number if 5434 is already in use
+
+  redis:
+    ports:
+      - "6379:6379"

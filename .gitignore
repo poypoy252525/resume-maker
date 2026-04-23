@@ -1,0 +1,10 @@
+# Docker local overrides
+docker-compose.override.yml
+
+# Environment variables
+.env*
+!.env.example
+
+# OS files
+.DS_Store
+Thumbs.db

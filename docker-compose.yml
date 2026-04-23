@@ -19,8 +19,7 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
-    ports:
-      - "6379:6379"
+    # Ports moved to docker-compose.override.yml for local development
 
   celery:
     build: ./server
@@ -51,6 +50,7 @@ services:
       retries: 5
     volumes:
       - postgres_db:/var/lib/postgresql/data
+    # Ports moved to docker-compose.override.yml for local development
 
   nginx:
     image: nginx

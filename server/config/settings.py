@@ -19,7 +19,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load .env then override with .env.local if it exists
 load_dotenv()
-load_dotenv(os.path.join(BASE_DIR, '.env.local'), override=True)
+# load_dotenv(os.path.join(BASE_DIR, '.env.local'), override=True)
 
 
 # Quick-start development settings - unsuitable for production
