@@ -11,6 +11,14 @@ services:
       db:
         condition: service_healthy
 
+  client:
+    build: ./client
+    restart: always
+    env_file:
+      - ./client/.env
+    depends_on:
+      - server
+
   redis:
     image: redis:7-alpine
     restart: always
