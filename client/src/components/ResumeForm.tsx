@@ -1,109 +1,149 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Plus, Trash2, CheckCircle2, ChevronRight, ChevronLeft, Briefcase, GraduationCap, User, Wrench } from "lucide-react";
+import {
+  Plus,
+  Trash2,
+  CheckCircle2,
+  ChevronRight,
+  ChevronLeft,
+  Briefcase,
+  GraduationCap,
+  User,
+  Wrench,
+} from "lucide-react";
 import { generateResume, checkTaskStatus } from "@/api";
 import type { ResumeData, Experience, Education } from "@/api";
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
 const ResumeForm = () => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [taskId, setTaskId] = useState<string | null>(null);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
-  const [status, setStatus] = useState<string>('PENDING');
+  const [status, setStatus] = useState<string>("PENDING");
   const [error, setError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<ResumeData>({
-    full_name: '',
-    email: '',
-    phone_number: '',
-    location: '',
+    full_name: "",
+    email: "",
+    phone_number: "",
+    location: "",
     has_skill: true,
-    skill_description: '',
+    skill_description: "",
     has_experience: true,
-    experiences: [{
-      company_name: '',
-      location: '',
-      job_title: '',
-      date_from: '',
-      date_to: '',
-      bullet_points: ['']
-    }],
+    experiences: [
+      {
+        company_name: "",
+        location: "",
+        job_title: "",
+        date_from: "",
+        date_to: "",
+        bullet_points: [""],
+      },
+    ],
     has_education: true,
-    educations: [{
-      school: '',
-      location: '',
-      school_type: '',
-      date_from: '',
-      date_to: '',
-      has_content: false,
-      content: ''
-    }]
+    educations: [
+      {
+        school: "",
+        location: "",
+        school_type: "",
+        date_from: "",
+        date_to: "",
+        has_content: false,
+        content: "",
+      },
+    ],
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleExperienceChange = (index: number, field: keyof Experience, value: string | string[]) => {
+  const handleExperienceChange = (
+    index: number,
+    field: keyof Experience,
+    value: string | string[],
+  ) => {
     const updatedExperiences = [...formData.experiences];
-    updatedExperiences[index] = { ...updatedExperiences[index], [field]: value };
-    setFormData(prev => ({ ...prev, experiences: updatedExperiences }));
+    updatedExperiences[index] = {
+      ...updatedExperiences[index],
+      [field]: value,
+    };
+    setFormData((prev) => ({ ...prev, experiences: updatedExperiences }));
   };
 
   const addExperience = () => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      experiences: [...prev.experiences, {
-        company_name: '',
-        location: '',
-        job_title: '',
-        date_from: '',
-        date_to: '',
-        bullet_points: ['']
-      }]
+      experiences: [
+        ...prev.experiences,
+        {
+          company_name: "",
+          location: "",
+          job_title: "",
+          date_from: "",
+          date_to: "",
+          bullet_points: [""],
+        },
+      ],
     }));
   };
 
   const removeExperience = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      experiences: prev.experiences.filter((_, i) => i !== index)
+      experiences: prev.experiences.filter((_, i) => i !== index),
     }));
   };
 
-  const handleEducationChange = (index: number, field: keyof Education, value: string | boolean) => {
+  const handleEducationChange = (
+    index: number,
+    field: keyof Education,
+    value: string | boolean,
+  ) => {
     const updatedEducations = [...formData.educations];
     updatedEducations[index] = { ...updatedEducations[index], [field]: value };
-    setFormData(prev => ({ ...prev, educations: updatedEducations }));
+    setFormData((prev) => ({ ...prev, educations: updatedEducations }));
   };
 
   const addEducation = () => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      educations: [...prev.educations, {
-        school: '',
-        location: '',
-        school_type: '',
-        date_from: '',
-        date_to: '',
-        has_content: false,
-        content: ''
-      }]
+      educations: [
+        ...prev.educations,
+        {
+          school: "",
+          location: "",
+          school_type: "",
+          date_from: "",
+          date_to: "",
+          has_content: false,
+          content: "",
+        },
+      ],
     }));
   };
 
   const removeEducation = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      educations: prev.educations.filter((_, i) => i !== index)
+      educations: prev.educations.filter((_, i) => i !== index),
     }));
   };
 
@@ -115,15 +155,17 @@ const ResumeForm = () => {
       // or filter out experiences/educations if they are essentially empty.
       const cleanedData = {
         ...formData,
-        experiences: formData.experiences.map(exp => ({
-          ...exp,
-          bullet_points: exp.bullet_points.filter(bp => bp.trim() !== '')
-        })).filter(exp => exp.company_name || exp.job_title) // Optional: filter empty exp
+        experiences: formData.experiences
+          .map((exp) => ({
+            ...exp,
+            bullet_points: exp.bullet_points.filter((bp) => bp.trim() !== ""),
+          }))
+          .filter((exp) => exp.company_name || exp.job_title), // Optional: filter empty exp
       };
 
-      // If backend requires bullet_points to have at least one item, 
+      // If backend requires bullet_points to have at least one item,
       // we should ensure it's not empty if we kept the experience.
-      cleanedData.experiences.forEach(exp => {
+      cleanedData.experiences.forEach((exp) => {
         if (exp.bullet_points.length === 0) {
           exp.bullet_points = ["General duties and responsibilities"]; // Fallback or handle error
         }
@@ -133,24 +175,25 @@ const ResumeForm = () => {
       setTaskId(result.task_id);
       setStep(5); // Success step
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'Something went wrong';
+      const errorMessage =
+        err instanceof Error ? err.message : "Something went wrong";
       setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
-  const nextStep = () => setStep(prev => Math.min(prev + 1, 5));
-  const prevStep = () => setStep(prev => Math.max(prev - 1, 1));
+  const nextStep = () => setStep((prev) => Math.min(prev + 1, 5));
+  const prevStep = () => setStep((prev) => Math.max(prev - 1, 1));
 
   useEffect(() => {
     let interval: number;
-    if (taskId && step === 5 && status !== 'SUCCESS' && status !== 'FAILURE') {
+    if (taskId && step === 5 && status !== "SUCCESS" && status !== "FAILURE") {
       interval = setInterval(async () => {
         try {
           const result = await checkTaskStatus(taskId);
           setStatus(result.status);
-          if (result.status === 'SUCCESS') {
+          if (result.status === "SUCCESS") {
             setFileUrl(result.file_url);
           }
         } catch (err) {
@@ -166,44 +209,52 @@ const ResumeForm = () => {
       <Card className="max-w-2xl mx-auto mt-10 border-accent/20 shadow-xl bg-card/50 backdrop-blur-sm animate-in fade-in zoom-in duration-500">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            {status === 'SUCCESS' ? (
+            {status === "SUCCESS" ? (
               <CheckCircle2 className="w-20 h-20 text-green-500" />
-            ) : status === 'FAILURE' ? (
+            ) : status === "FAILURE" ? (
               <Trash2 className="w-20 h-20 text-destructive" />
             ) : (
               <div className="w-20 h-20 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
             )}
           </div>
           <CardTitle className="text-3xl font-bold">
-            {status === 'SUCCESS' ? "Resume Ready!" : status === 'FAILURE' ? "Generation Failed" : "Generating Resume..."}
+            {status === "SUCCESS"
+              ? "Resume Ready!"
+              : status === "FAILURE"
+                ? "Generation Failed"
+                : "Generating Resume..."}
           </CardTitle>
           <CardDescription className="text-lg">
-            Task ID: <code className="bg-muted px-2 py-1 rounded">{taskId}</code>
+            Task ID:{" "}
+            <code className="bg-muted px-2 py-1 rounded">{taskId}</code>
           </CardDescription>
         </CardHeader>
         <CardContent className="text-center pb-10">
           <p className="text-muted-foreground mb-6">
-            {status === 'SUCCESS' 
-              ? "Your professional resume has been generated successfully." 
-              : status === 'FAILURE' 
-              ? "Something went wrong during the generation process." 
-              : "We are crafting your story. This usually takes a few seconds."}
+            {status === "SUCCESS"
+              ? "Your professional resume has been generated successfully."
+              : status === "FAILURE"
+                ? "Something went wrong during the generation process."
+                : "We are crafting your story. This usually takes a few seconds."}
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            {status === 'SUCCESS' && fileUrl && (
+            {status === "SUCCESS" && fileUrl && (
               <Button asChild className="bg-green-600 hover:bg-green-700">
                 <a href={fileUrl} target="_blank" rel="noopener noreferrer">
                   Download PDF
                 </a>
               </Button>
             )}
-            <Button variant="outline" onClick={() => {
-              setStep(1);
-              setStatus('PENDING');
-              setTaskId(null);
-              setFileUrl(null);
-            }}>
-              {status === 'SUCCESS' ? "Create Another" : "Try Again"}
+            <Button
+              variant="outline"
+              onClick={() => {
+                setStep(1);
+                setStatus("PENDING");
+                setTaskId(null);
+                setFileUrl(null);
+              }}
+            >
+              {status === "SUCCESS" ? "Create Another" : "Try Again"}
             </Button>
           </div>
         </CardContent>
@@ -227,15 +278,17 @@ const ResumeForm = () => {
         <div className="md:col-span-1 space-y-4">
           <div className="sticky top-10 space-y-2">
             {[
-              { id: 1, label: 'Personal', icon: User },
-              { id: 2, label: 'Experience', icon: Briefcase },
-              { id: 3, label: 'Education', icon: GraduationCap },
-              { id: 4, label: 'Skills', icon: Wrench },
+              { id: 1, label: "Personal", icon: User },
+              { id: 2, label: "Experience", icon: Briefcase },
+              { id: 3, label: "Education", icon: GraduationCap },
+              { id: 4, label: "Skills", icon: Wrench },
             ].map((s) => (
               <div
                 key={s.id}
                 className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-300 ${
-                  step === s.id ? 'bg-primary text-primary-foreground shadow-md scale-105' : 'text-muted-foreground hover:bg-muted'
+                  step === s.id
+                    ? "bg-primary text-primary-foreground shadow-md scale-105"
+                    : "text-muted-foreground hover:bg-muted"
                 }`}
               >
                 <s.icon className="w-5 h-5" />
@@ -255,8 +308,10 @@ const ResumeForm = () => {
               {step === 4 && "Skills & Expertise"}
             </CardTitle>
             <CardDescription>
-              {step === 1 && "Start with your contact details so employers can reach you."}
-              {step === 2 && "Highlight your professional achievements and roles."}
+              {step === 1 &&
+                "Start with your contact details so employers can reach you."}
+              {step === 2 &&
+                "Highlight your professional achievements and roles."}
               {step === 3 && "Tell us about your academic background."}
               {step === 4 && "List your core competencies and tools."}
             </CardDescription>
@@ -312,7 +367,10 @@ const ResumeForm = () => {
               {step === 2 && (
                 <div className="space-y-8 animate-in slide-in-from-right-4 duration-300">
                   {formData.experiences.map((exp, index) => (
-                    <div key={index} className="p-4 border rounded-xl relative bg-muted/30 group">
+                    <div
+                      key={index}
+                      className="p-4 border rounded-xl relative bg-muted/30 group"
+                    >
                       <Button
                         variant="ghost"
                         size="icon"
@@ -326,7 +384,13 @@ const ResumeForm = () => {
                           <Label>Company</Label>
                           <Input
                             value={exp.company_name}
-                            onChange={(e) => handleExperienceChange(index, 'company_name', e.target.value)}
+                            onChange={(e) =>
+                              handleExperienceChange(
+                                index,
+                                "company_name",
+                                e.target.value,
+                              )
+                            }
                             placeholder="Acme Inc"
                           />
                         </div>
@@ -334,7 +398,13 @@ const ResumeForm = () => {
                           <Label>Job Title</Label>
                           <Input
                             value={exp.job_title}
-                            onChange={(e) => handleExperienceChange(index, 'job_title', e.target.value)}
+                            onChange={(e) =>
+                              handleExperienceChange(
+                                index,
+                                "job_title",
+                                e.target.value,
+                              )
+                            }
                             placeholder="Senior Developer"
                           />
                         </div>
@@ -342,7 +412,13 @@ const ResumeForm = () => {
                           <Label>Location</Label>
                           <Input
                             value={exp.location}
-                            onChange={(e) => handleExperienceChange(index, 'location', e.target.value)}
+                            onChange={(e) =>
+                              handleExperienceChange(
+                                index,
+                                "location",
+                                e.target.value,
+                              )
+                            }
                             placeholder="Remote"
                           />
                         </div>
@@ -351,7 +427,13 @@ const ResumeForm = () => {
                             <Label>From</Label>
                             <Input
                               value={exp.date_from}
-                              onChange={(e) => handleExperienceChange(index, 'date_from', e.target.value)}
+                              onChange={(e) =>
+                                handleExperienceChange(
+                                  index,
+                                  "date_from",
+                                  e.target.value,
+                                )
+                              }
                               placeholder="Jan 2020"
                             />
                           </div>
@@ -359,7 +441,13 @@ const ResumeForm = () => {
                             <Label>To</Label>
                             <Input
                               value={exp.date_to}
-                              onChange={(e) => handleExperienceChange(index, 'date_to', e.target.value)}
+                              onChange={(e) =>
+                                handleExperienceChange(
+                                  index,
+                                  "date_to",
+                                  e.target.value,
+                                )
+                              }
                               placeholder="Present"
                             />
                           </div>
@@ -375,7 +463,11 @@ const ResumeForm = () => {
                               onChange={(e) => {
                                 const newBullets = [...exp.bullet_points];
                                 newBullets[bpIndex] = e.target.value;
-                                handleExperienceChange(index, 'bullet_points', newBullets);
+                                handleExperienceChange(
+                                  index,
+                                  "bullet_points",
+                                  newBullets,
+                                );
                               }}
                               placeholder="Describe your achievement..."
                             />
@@ -383,8 +475,14 @@ const ResumeForm = () => {
                               variant="ghost"
                               size="icon"
                               onClick={() => {
-                                const newBullets = exp.bullet_points.filter((_, i) => i !== bpIndex);
-                                handleExperienceChange(index, 'bullet_points', newBullets);
+                                const newBullets = exp.bullet_points.filter(
+                                  (_, i) => i !== bpIndex,
+                                );
+                                handleExperienceChange(
+                                  index,
+                                  "bullet_points",
+                                  newBullets,
+                                );
                               }}
                               disabled={exp.bullet_points.length === 1}
                             >
@@ -397,7 +495,10 @@ const ResumeForm = () => {
                           size="sm"
                           className="mt-2"
                           onClick={() => {
-                            handleExperienceChange(index, 'bullet_points', [...exp.bullet_points, '']);
+                            handleExperienceChange(index, "bullet_points", [
+                              ...exp.bullet_points,
+                              "",
+                            ]);
                           }}
                         >
                           <Plus className="w-3 h-3 mr-2" /> Add Bullet Point
@@ -405,7 +506,11 @@ const ResumeForm = () => {
                       </div>
                     </div>
                   ))}
-                  <Button variant="outline" className="w-full border-dashed" onClick={addExperience}>
+                  <Button
+                    variant="outline"
+                    className="w-full border-dashed"
+                    onClick={addExperience}
+                  >
                     <Plus className="w-4 h-4 mr-2" /> Add Experience
                   </Button>
                 </div>
@@ -414,7 +519,10 @@ const ResumeForm = () => {
               {step === 3 && (
                 <div className="space-y-8 animate-in slide-in-from-right-4 duration-300">
                   {formData.educations.map((edu, index) => (
-                    <div key={index} className="p-4 border rounded-xl relative bg-muted/30 group">
+                    <div
+                      key={index}
+                      className="p-4 border rounded-xl relative bg-muted/30 group"
+                    >
                       <Button
                         variant="ghost"
                         size="icon"
@@ -428,7 +536,13 @@ const ResumeForm = () => {
                           <Label>School</Label>
                           <Input
                             value={edu.school}
-                            onChange={(e) => handleEducationChange(index, 'school', e.target.value)}
+                            onChange={(e) =>
+                              handleEducationChange(
+                                index,
+                                "school",
+                                e.target.value,
+                              )
+                            }
                             placeholder="University of Technology"
                           />
                         </div>
@@ -436,7 +550,13 @@ const ResumeForm = () => {
                           <Label>School Type</Label>
                           <Input
                             value={edu.school_type}
-                            onChange={(e) => handleEducationChange(index, 'school_type', e.target.value)}
+                            onChange={(e) =>
+                              handleEducationChange(
+                                index,
+                                "school_type",
+                                e.target.value,
+                              )
+                            }
                             placeholder="Bachelor of Science"
                           />
                         </div>
@@ -444,7 +564,13 @@ const ResumeForm = () => {
                           <Label>Location</Label>
                           <Input
                             value={edu.location}
-                            onChange={(e) => handleEducationChange(index, 'location', e.target.value)}
+                            onChange={(e) =>
+                              handleEducationChange(
+                                index,
+                                "location",
+                                e.target.value,
+                              )
+                            }
                             placeholder="Boston, MA"
                           />
                         </div>
@@ -453,7 +579,13 @@ const ResumeForm = () => {
                             <Label>From</Label>
                             <Input
                               value={edu.date_from}
-                              onChange={(e) => handleEducationChange(index, 'date_from', e.target.value)}
+                              onChange={(e) =>
+                                handleEducationChange(
+                                  index,
+                                  "date_from",
+                                  e.target.value,
+                                )
+                              }
                               placeholder="2016"
                             />
                           </div>
@@ -461,7 +593,13 @@ const ResumeForm = () => {
                             <Label>To</Label>
                             <Input
                               value={edu.date_to}
-                              onChange={(e) => handleEducationChange(index, 'date_to', e.target.value)}
+                              onChange={(e) =>
+                                handleEducationChange(
+                                  index,
+                                  "date_to",
+                                  e.target.value,
+                                )
+                              }
                               placeholder="2020"
                             />
                           </div>
@@ -469,7 +607,11 @@ const ResumeForm = () => {
                       </div>
                     </div>
                   ))}
-                  <Button variant="outline" className="w-full border-dashed" onClick={addEducation}>
+                  <Button
+                    variant="outline"
+                    className="w-full border-dashed"
+                    onClick={addEducation}
+                  >
                     <Plus className="w-4 h-4 mr-2" /> Add Education
                   </Button>
                 </div>
@@ -501,18 +643,26 @@ const ResumeForm = () => {
             >
               <ChevronLeft className="w-4 h-4 mr-2" /> Previous
             </Button>
-            
+
             {step < 4 ? (
               <Button onClick={nextStep}>
                 Next <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
             ) : (
-              <Button onClick={handleSubmit} disabled={loading} className="bg-linear-to-r from-primary to-accent hover:opacity-90">
+              <Button
+                onClick={handleSubmit}
+                disabled={loading}
+                className="bg-linear-to-r from-primary to-accent hover:opacity-90"
+              >
                 {loading ? "Generating..." : "Generate Resume"}
               </Button>
             )}
           </CardFooter>
-          {error && <div className="p-4 text-center text-destructive font-medium bg-destructive/10">{error}</div>}
+          {error && (
+            <div className="p-4 text-center text-destructive font-medium bg-destructive/10">
+              {error}
+            </div>
+          )}
         </Card>
       </div>
     </div>
