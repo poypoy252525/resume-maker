@@ -9,7 +9,8 @@ def generate_document_task(context):
     logger.info(f"Starting resume generation task for {context.get('full_name')}")
     try:
         service = GenerateDocumentService()
-        service.generate(context=context)
+        filename = service.generate(context=context)
         logger.info(f"Successfully generated resume for {context.get('full_name')}")
+        return filename
     except Exception as e:
         logger.error(f"Failed to generate resume: {str(e)}", exc_info=True)

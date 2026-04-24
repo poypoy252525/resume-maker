@@ -143,3 +143,5 @@ AUTH_USER_MODEL = 'user.User'
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
 
 CORS_ALLOW_ALL_ORIGINS = True # For development
+
+SITE_URL = os.getenv("SITE_URL", "http://localhost:8000")

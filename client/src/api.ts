@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/api`;
 
 export interface Experience {
   company_name: string;
@@ -46,5 +46,13 @@ export const generateResume = async (data: ResumeData) => {
     throw new Error(errorData.message || 'Failed to generate resume');
   }
 
+  return response.json();
+};
+
+export const checkTaskStatus = async (taskId: string) => {
+  const response = await fetch(`${API_BASE_URL}/resumes/status/${taskId}/`);
+  if (!response.ok) {
+    throw new Error('Failed to check task status');
+  }
   return response.json();
 };

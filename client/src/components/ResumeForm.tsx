@@ -7,13 +7,16 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Plus, Trash2, CheckCircle2, ChevronRight, ChevronLeft, Briefcase, GraduationCap, User, Wrench } from "lucide-react";
-import { generateResume } from "@/api";
+import { generateResume, checkTaskStatus } from "@/api";
 import type { ResumeData, Experience, Education } from "@/api";
+import { useEffect } from 'react';
 
 const ResumeForm = () => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [taskId, setTaskId] = useState<string | null>(null);
+  const [fileUrl, setFileUrl] = useState<string | null>(null);
+  const [status, setStatus] = useState<string>('PENDING');
   const [error, setError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<ResumeData>({
@@ -140,25 +143,69 @@ const ResumeForm = () => {
   const nextStep = () => setStep(prev => Math.min(prev + 1, 5));
   const prevStep = () => setStep(prev => Math.max(prev - 1, 1));
 
+  useEffect(() => {
+    let interval: number;
+    if (taskId && step === 5 && status !== 'SUCCESS' && status !== 'FAILURE') {
+      interval = setInterval(async () => {
+        try {
+          const result = await checkTaskStatus(taskId);
+          setStatus(result.status);
+          if (result.status === 'SUCCESS') {
+            setFileUrl(result.file_url);
+          }
+        } catch (err) {
+          console.error("Polling error:", err);
+        }
+      }, 2000);
+    }
+    return () => clearInterval(interval);
+  }, [taskId, step, status]);
+
   if (step === 5) {
     return (
       <Card className="max-w-2xl mx-auto mt-10 border-accent/20 shadow-xl bg-card/50 backdrop-blur-sm animate-in fade-in zoom-in duration-500">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <CheckCircle2 className="w-20 h-20 text-green-500" />
+            {status === 'SUCCESS' ? (
+              <CheckCircle2 className="w-20 h-20 text-green-500" />
+            ) : status === 'FAILURE' ? (
+              <Trash2 className="w-20 h-20 text-destructive" />
+            ) : (
+              <div className="w-20 h-20 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            )}
           </div>
-          <CardTitle className="text-3xl font-bold">Resume Generation Started!</CardTitle>
+          <CardTitle className="text-3xl font-bold">
+            {status === 'SUCCESS' ? "Resume Ready!" : status === 'FAILURE' ? "Generation Failed" : "Generating Resume..."}
+          </CardTitle>
           <CardDescription className="text-lg">
-            Your resume is being processed. Task ID: <code className="bg-muted px-2 py-1 rounded">{taskId}</code>
+            Task ID: <code className="bg-muted px-2 py-1 rounded">{taskId}</code>
           </CardDescription>
         </CardHeader>
         <CardContent className="text-center pb-10">
           <p className="text-muted-foreground mb-6">
-            We are generating a professional PDF for you. This might take a few moments.
+            {status === 'SUCCESS' 
+              ? "Your professional resume has been generated successfully." 
+              : status === 'FAILURE' 
+              ? "Something went wrong during the generation process." 
+              : "We are crafting your story. This usually takes a few seconds."}
           </p>
-          <Button variant="outline" onClick={() => setStep(1)}>
-            Create Another Resume
-          </Button>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            {status === 'SUCCESS' && fileUrl && (
+              <Button asChild className="bg-green-600 hover:bg-green-700">
+                <a href={fileUrl} target="_blank" rel="noopener noreferrer">
+                  Download PDF
+                </a>
+              </Button>
+            )}
+            <Button variant="outline" onClick={() => {
+              setStep(1);
+              setStatus('PENDING');
+              setTaskId(null);
+              setFileUrl(null);
+            }}>
+              {status === 'SUCCESS' ? "Create Another" : "Try Again"}
+            </Button>
+          </div>
         </CardContent>
       </Card>
     );

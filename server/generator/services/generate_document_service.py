@@ -22,14 +22,15 @@ class GenerateDocumentService:
             os.makedirs(output_dir)
             
         # Create a safe filename from full_name or use a default
-        full_name = context.get('full_name', 'resume').lower().replace(' ', '_')
-        output_path = os.path.join(output_dir, f'{full_name}.docx')
+        full_name_slug = context.get('full_name', 'resume').lower().replace(' ', '_')
+        output_path = os.path.join(output_dir, f'{full_name_slug}.docx')
         doc.save(output_path)
         logger.info(f"Generated DOCX: {output_path}")
         
         # Convert to PDF
         logger.info(f"Converting {output_path} to PDF")
         self.convert_to_pdf(output_path, output_dir)
+        return full_name_slug
         
     def convert_to_pdf(self, docx_path, output_dir):
         logger.info(f"Converting {docx_path} to PDF...")
