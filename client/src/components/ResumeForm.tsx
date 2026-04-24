@@ -108,7 +108,25 @@ const ResumeForm = () => {
     setLoading(true);
     setError(null);
     try {
-      const result = await generateResume(formData);
+      // Filter out empty bullet points and ensure at least one non-empty string if required,
+      // or filter out experiences/educations if they are essentially empty.
+      const cleanedData = {
+        ...formData,
+        experiences: formData.experiences.map(exp => ({
+          ...exp,
+          bullet_points: exp.bullet_points.filter(bp => bp.trim() !== '')
+        })).filter(exp => exp.company_name || exp.job_title) // Optional: filter empty exp
+      };
+
+      // If backend requires bullet_points to have at least one item, 
+      // we should ensure it's not empty if we kept the experience.
+      cleanedData.experiences.forEach(exp => {
+        if (exp.bullet_points.length === 0) {
+          exp.bullet_points = ["General duties and responsibilities"]; // Fallback or handle error
+        }
+      });
+
+      const result = await generateResume(cleanedData);
       setTaskId(result.task_id);
       setStep(5); // Success step
     } catch (err: unknown) {
@@ -299,6 +317,44 @@ const ResumeForm = () => {
                             />
                           </div>
                         </div>
+                      </div>
+
+                      <div className="mt-4 space-y-2">
+                        <Label>Bullet Points</Label>
+                        {exp.bullet_points.map((bp, bpIndex) => (
+                          <div key={bpIndex} className="flex gap-2 mb-2">
+                            <Input
+                              value={bp}
+                              onChange={(e) => {
+                                const newBullets = [...exp.bullet_points];
+                                newBullets[bpIndex] = e.target.value;
+                                handleExperienceChange(index, 'bullet_points', newBullets);
+                              }}
+                              placeholder="Describe your achievement..."
+                            />
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => {
+                                const newBullets = exp.bullet_points.filter((_, i) => i !== bpIndex);
+                                handleExperienceChange(index, 'bullet_points', newBullets);
+                              }}
+                              disabled={exp.bullet_points.length === 1}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ))}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="mt-2"
+                          onClick={() => {
+                            handleExperienceChange(index, 'bullet_points', [...exp.bullet_points, '']);
+                          }}
+                        >
+                          <Plus className="w-3 h-3 mr-2" /> Add Bullet Point
+                        </Button>
                       </div>
                     </div>
                   ))}
