@@ -27,7 +27,7 @@ class ResumeStatusView(APIView):
             if res.successful():
                 return Response({
                     "status": "SUCCESS",
-                    "file_url": f"{settings.SITE_URL}/static/resumes/{res.result}.pdf"
+                    "file_url": f"{settings.SITE_URL}{settings.MEDIA_URL}resumes/{res.result}.pdf"
                 })
             else:
                 return Response({

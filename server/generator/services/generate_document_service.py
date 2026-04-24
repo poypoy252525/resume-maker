@@ -17,7 +17,7 @@ class GenerateDocumentService:
         doc = DocxTemplate(template_path)
         doc.render(context)
         
-        output_dir = os.path.join(settings.BASE_DIR, 'generator/static/resumes')
+        output_dir = os.path.join(settings.MEDIA_ROOT, 'resumes')
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
             
