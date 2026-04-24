@@ -16,6 +16,8 @@ services:
     restart: always
     env_file:
       - ./client/.env
+    ports:
+      - "5173:80"
     depends_on:
       - server
 
