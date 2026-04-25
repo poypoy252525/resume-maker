@@ -27,9 +27,6 @@ export default function CTA() {
                   <ArrowRight className="w-6 h-6" />
                 </Link>
               </Button>
-              <div className="text-sm font-medium text-white/60">
-                No credit card required. Free forever.
-              </div>
             </div>
           </div>
         </div>

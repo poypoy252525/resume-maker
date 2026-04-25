@@ -45,9 +45,6 @@ export default function Layout({ children }: LayoutProps) {
             <Link to="#" className="hover:text-primary transition-colors">
               Templates
             </Link>
-            <Link to="#" className="hover:text-primary transition-colors">
-              Pricing
-            </Link>
           </nav>
 
           <div className="flex items-center gap-4">

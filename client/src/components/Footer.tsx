@@ -44,11 +44,6 @@ export default function Footer() {
               </li>
               <li>
                 <Link to="#" className="hover:text-primary transition-colors">
-                  Pricing
-                </Link>
-              </li>
-              <li>
-                <Link to="#" className="hover:text-primary transition-colors">
                   Job Tracker
                 </Link>
               </li>
