@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Footer from "./Footer";
 import { Toaster } from "./ui/sonner";
 import { Link } from "react-router-dom";
 import { Sparkles } from "lucide-react";
@@ -17,7 +18,7 @@ export default function Layout({ children }: LayoutProps) {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1/2 h-1/2 rounded-full bg-indigo-500/4 blur-[120px]" />
       </div>
 
-      <header className="relative z-20 border-b border-white/10 bg-background/50 backdrop-blur-xl">
+      <header className="sticky top-0 z-50 border-b border-white/10 bg-background/50 backdrop-blur-xl">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link
             to="/"
@@ -61,6 +62,7 @@ export default function Layout({ children }: LayoutProps) {
       </header>
 
       <main className="relative z-10">{children}</main>
+      <Footer />
       <Toaster />
     </div>
   );
