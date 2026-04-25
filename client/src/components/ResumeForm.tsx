@@ -263,17 +263,7 @@ const ResumeForm = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-10 px-4">
-      <div className="mb-10 text-center space-y-2">
-        <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
-          Resume Architect
-        </h1>
-        <p className="text-xl text-muted-foreground">
-          Craft your professional story in minutes.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {/* Progress Sidebar */}
         <div className="md:col-span-1 space-y-4">
           <div className="sticky top-10 space-y-2">
@@ -664,7 +654,6 @@ const ResumeForm = () => {
             </div>
           )}
         </Card>
-      </div>
     </div>
   );
 };
