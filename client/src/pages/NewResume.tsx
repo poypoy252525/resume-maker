@@ -2,20 +2,31 @@ import React, { useState, useEffect } from "react";
 import {
   ChevronLeft,
   ChevronRight,
-  Wand2,
   AlertCircle,
   Eye,
-  Settings2,
   User,
   Briefcase,
   GraduationCap,
   Wrench,
+  LoaderCircle,
+  Check,
 } from "lucide-react";
+import { Badge } from "@/components/reui/badge";
+import {
+  Stepper,
+  StepperContent,
+  StepperIndicator,
+  StepperItem,
+  StepperNav,
+  StepperPanel,
+  StepperSeparator,
+  StepperTrigger,
+  StepperTitle,
+} from "@/components/reui/stepper";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -37,7 +48,8 @@ import BuilderStatus from "@/components/builder/BuilderStatus";
  * Uses Resizable panels and extracted components for maintainability and premium UX.
  */
 export default function NewResume() {
-  const [step, setStep] = useState("personal");
+  const [step, setStep] = useState(1);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [loading, setLoading] = useState(false);
   const [taskId, setTaskId] = useState<string | null>(null);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
@@ -156,7 +168,8 @@ export default function NewResume() {
   };
 
   const handleReset = () => {
-    setStep("personal");
+    setStep(1);
+    setIsGenerating(false);
     setStatus("PENDING");
     setTaskId(null);
     setFileUrl(null);
@@ -184,7 +197,7 @@ export default function NewResume() {
 
       const result = await generateResume(cleanedData);
       setTaskId(result.task_id);
-      setStep("generating");
+      setIsGenerating(true);
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error ? err.message : "Something went wrong";
@@ -198,7 +211,7 @@ export default function NewResume() {
     let interval: number;
     if (
       taskId &&
-      step === "generating" &&
+      isGenerating &&
       status !== "SUCCESS" &&
       status !== "FAILURE"
     ) {
@@ -215,16 +228,16 @@ export default function NewResume() {
       }, 2000);
     }
     return () => clearInterval(interval);
-  }, [taskId, step, status]);
+  }, [taskId, isGenerating, status]);
 
   const sidebarItems = [
-    { id: "personal", label: "Personal", icon: User },
-    { id: "experience", label: "Experience", icon: Briefcase },
-    { id: "education", label: "Education", icon: GraduationCap },
-    { id: "skills", label: "Skills", icon: Wrench },
+    { step: 1, label: "Personal", icon: User, description: "Contact details & address" },
+    { step: 2, label: "Experience", icon: Briefcase, description: "Work history & achievements" },
+    { step: 3, label: "Education", icon: GraduationCap, description: "Academic background" },
+    { step: 4, label: "Skills", icon: Wrench, description: "Core competencies" },
   ];
 
-  if (step === "generating") {
+  if (isGenerating) {
     return (
       <BuilderStatus
         status={status}
@@ -236,106 +249,124 @@ export default function NewResume() {
   }
 
   return (
-    <div className="h-full w-full">
-      <ResizablePanelGroup
+    <div className="h-full w-full overflow-hidden">
+      <Stepper
+        value={step}
+        onValueChange={setStep}
         orientation="horizontal"
-        className="h-full w-full items-stretch"
+        className="h-full w-full"
+        indicators={{
+          completed: <Check className="size-3.5" />,
+          loading: <LoaderCircle className="size-3.5 animate-spin" />,
+        }}
       >
-        {/* Sidebar Panel */}
-        <ResizablePanel defaultSize="20%" maxSize="30%">
-          <aside className="h-full w-full bg-card/50 backdrop-blur-sm flex flex-col overflow-hidden">
-            <div className="p-4 border-b">
-              <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                <Settings2 className="w-3 h-3" />
-                Configuration
-              </div>
-            </div>
-
-            <Tabs
-              value={step}
-              onValueChange={setStep}
-              orientation="vertical"
-              className="flex-1 flex flex-col overflow-hidden"
-            >
-              <TabsList className="flex flex-col h-auto bg-transparent p-2 gap-1">
-                {sidebarItems.map((item) => (
-                  <TabsTrigger
-                    key={item.id}
-                    value={item.id}
-                    className="w-full justify-start gap-3 h-10 px-3 data-[state=active]:bg-secondary data-[state=active]:text-primary"
-                  >
-                    <item.icon className="w-4 h-4" />
-                    {item.label}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </Tabs>
-
-            <div className="mt-auto p-4 border-t">
-              <Button
-                className="w-full gap-2 shadow-lg shadow-primary/10"
-                onClick={handleSubmit}
-                disabled={loading}
-              >
-                {loading ? (
-                  <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <Wand2 className="w-4 h-4" />
-                )}
-                Generate PDF
-              </Button>
-            </div>
-          </aside>
-        </ResizablePanel>
-
-        <ResizableHandle withHandle />
-
+        <ResizablePanelGroup
+          orientation="horizontal"
+          className="h-full w-full items-stretch"
+        >
         {/* Editor Area Panel */}
-        <ResizablePanel defaultSize="50%">
+        <ResizablePanel defaultSize="65%">
           <main className="h-full bg-muted/5 flex flex-col overflow-hidden">
             <header className="h-14 border-b bg-background/50 px-6 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3">
-                <h2 className="text-sm font-semibold capitalize">{step}</h2>
+                <h2 className="text-sm font-semibold">
+                  {sidebarItems[step - 1]?.label}
+                </h2>
                 <Separator orientation="vertical" className="h-4" />
                 <p className="text-xs text-muted-foreground">
-                  {step === "personal" && "Contact details & address"}
-                  {step === "experience" && "Work history & achievements"}
-                  {step === "education" && "Academic background"}
-                  {step === "skills" && "Core competencies"}
+                  {sidebarItems[step - 1]?.description}
                 </p>
               </div>
             </header>
 
-            <ScrollArea className="flex-1">
-              <div className="max-w-3xl mx-auto p-8 space-y-8">
-                {step === "personal" && (
+            <ScrollArea className="flex-1 min-h-0">
+              <div className="max-w-3xl mx-auto p-8 pb-32 space-y-12">
+                {/* Stepper Navigation - Integrated into content */}
+                <StepperNav className="w-full gap-3">
+                  {sidebarItems.map((item, index) => (
+                    <StepperItem
+                      key={item.step}
+                      step={item.step}
+                      className="relative flex-1 items-start"
+                    >
+                      <StepperTrigger
+                        className="flex grow flex-col items-start justify-center gap-2.5 px-3 py-1.5 rounded-xl transition-colors hover:bg-secondary/20"
+                        asChild
+                      >
+                        <div>
+                          <StepperIndicator className="data-[state=inactive]:border-border data-[state=inactive]:text-muted-foreground data-[state=completed]:bg-success size-8 border-2 data-[state=completed]:text-white data-[state=inactive]:bg-transparent">
+                            <item.icon className="size-4" />
+                          </StepperIndicator>
+                          <div className="flex flex-col items-start gap-1">
+                            <div className="text-muted-foreground text-[10px] font-semibold uppercase tracking-wider">
+                              Step {item.step}
+                            </div>
+                            <StepperTitle className="group-data-[state=inactive]/step:text-muted-foreground text-start text-sm font-semibold">
+                              {item.label}
+                            </StepperTitle>
+                            <div>
+                              <Badge
+                                size="xs"
+                                variant="primary-light"
+                                className="hidden group-data-[state=active]/step:inline-flex"
+                              >
+                                In Progress
+                              </Badge>
+                              <Badge
+                                variant="success-light"
+                                size="xs"
+                                className="hidden group-data-[state=completed]/step:inline-flex"
+                              >
+                                Completed
+                              </Badge>
+                              <Badge
+                                variant="secondary"
+                                size="xs"
+                                className="text-muted-foreground hidden group-data-[state=inactive]/step:inline-flex"
+                              >
+                                Pending
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
+                      </StepperTrigger>
+
+                      {sidebarItems.length > index + 1 && (
+                        <StepperSeparator className="group-data-[state=completed]/step:bg-success absolute inset-x-0 start-9 top-4 m-0 group-data-[orientation=horizontal]/stepper-nav:w-[calc(100%-2rem)] group-data-[orientation=horizontal]/stepper-nav:flex-none" />
+                      )}
+                    </StepperItem>
+                  ))}
+                </StepperNav>
+
+                <StepperPanel className="space-y-8">
+                <StepperContent value={1}>
                   <PersonalInfoSection
                     data={formData}
                     onChange={handleInputChange}
                   />
-                )}
-                {step === "experience" && (
+                </StepperContent>
+                <StepperContent value={2}>
                   <ExperienceSection
                     experiences={formData.experiences}
                     onChange={handleExperienceChange}
                     onAdd={addExperience}
                     onRemove={removeExperience}
                   />
-                )}
-                {step === "education" && (
+                </StepperContent>
+                <StepperContent value={3}>
                   <EducationSection
                     educations={formData.educations}
                     onChange={handleEducationChange}
                     onAdd={addEducation}
                     onRemove={removeEducation}
                   />
-                )}
-                {step === "skills" && (
+                </StepperContent>
+                <StepperContent value={4}>
                   <SkillsSection
                     value={formData.skill_description}
                     onChange={handleInputChange}
                   />
-                )}
+                </StepperContent>
 
                 {/* Navigation buttons at bottom of form */}
                 <div className="flex justify-between pt-8">
@@ -343,34 +374,19 @@ export default function NewResume() {
                     variant="outline"
                     size="lg"
                     onClick={() => {
-                      const sections = [
-                        "personal",
-                        "experience",
-                        "education",
-                        "skills",
-                      ];
-                      const currentIndex = sections.indexOf(step);
-                      if (currentIndex > 0) setStep(sections[currentIndex - 1]);
+                      if (step > 1) setStep(step - 1);
                     }}
-                    disabled={step === "personal"}
+                    disabled={step === 1}
                     className="rounded-xl px-6"
                   >
                     <ChevronLeft className="w-4 h-4 mr-2" /> Previous
                   </Button>
 
-                  {step !== "skills" ? (
+                  {step !== 4 ? (
                     <Button
                       size="lg"
                       onClick={() => {
-                        const sections = [
-                          "personal",
-                          "experience",
-                          "education",
-                          "skills",
-                        ];
-                        const currentIndex = sections.indexOf(step);
-                        if (currentIndex < sections.length - 1)
-                          setStep(sections[currentIndex + 1]);
+                        if (step < 4) setStep(step + 1);
                       }}
                       className="rounded-xl px-8"
                     >
@@ -387,8 +403,9 @@ export default function NewResume() {
                     </Button>
                   )}
                 </div>
-              </div>
-            </ScrollArea>
+              </StepperPanel>
+            </div>
+          </ScrollArea>
           </main>
         </ResizablePanel>
 
@@ -409,14 +426,17 @@ export default function NewResume() {
                 </span>
               </div>
             </header>
-            <div className="flex-1 overflow-hidden p-6 bg-slate-200/50">
-              <div className="h-full shadow-2xl rounded-sm overflow-hidden scale-[0.95] origin-top">
-                <ResumePreview data={formData} />
+            <ScrollArea className="flex-1 bg-slate-200/50">
+              <div className="p-8 flex justify-center">
+                <div className="shadow-2xl rounded-sm bg-white min-h-[1123px] w-full max-w-[794px]">
+                  <ResumePreview data={formData} />
+                </div>
               </div>
-            </div>
+            </ScrollArea>
           </aside>
         </ResizablePanel>
       </ResizablePanelGroup>
+      </Stepper>
 
       {error && (
         <div className="fixed bottom-6 right-6 z-50 w-80 animate-in slide-in-from-bottom-5">
