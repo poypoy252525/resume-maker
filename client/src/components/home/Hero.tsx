@@ -38,7 +38,7 @@ export default function Hero() {
               size="lg"
               className="h-16 px-10 text-xl rounded-2xl gap-3 shadow-2xl shadow-primary/30 transition-transform hover:scale-105 active:scale-95"
             >
-              <Link to="/resumes/new">
+              <Link to="/create">
                 <Wand2 className="w-6 h-6" />
                 Build My Resume
               </Link>

@@ -1,18 +1,13 @@
-import type { ReactNode } from "react";
 import Footer from "../components/Footer";
 import { Toaster } from "../components/ui/sonner";
-import { Link } from "react-router-dom";
+import { Outlet, Link } from "react-router-dom";
 import { Sparkles } from "lucide-react";
-
-interface MainLayoutProps {
-  children: ReactNode;
-}
 
 /**
  * MainLayout - Used for Marketing/Landing pages
  * Includes full navigation and footer
  */
-export default function MainLayout({ children }: MainLayoutProps) {
+export default function MainLayout() {
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
       {/* Ambient background glows */}
@@ -41,7 +36,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
               Home
             </Link>
             <Link
-              to="/resumes/new"
+              to="/create"
               className="hover:text-primary transition-colors"
             >
               Builder
@@ -53,7 +48,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
 
           <div className="flex items-center gap-4">
             <Link
-              to="/resumes/new"
+              to="/create"
               className="text-sm font-medium bg-primary text-primary-foreground px-4 py-2 rounded-xl hover:opacity-90 transition-opacity"
             >
               Get Started
@@ -62,7 +57,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
         </div>
       </header>
 
-      <main className="relative z-10">{children}</main>
+      <main className="relative z-10"><Outlet /></main>
       <Footer />
       <Toaster />
     </div>

@@ -1,18 +1,13 @@
-import type { ReactNode } from "react";
 import { Toaster } from "../components/ui/sonner";
-import { Link } from "react-router-dom";
+import { Outlet, Link } from "react-router-dom";
 import { Sparkles, ArrowLeft, Save, Share2 } from "lucide-react";
 import { Button } from "../components/ui/button";
-
-interface BuilderLayoutProps {
-  children: ReactNode;
-}
 
 /**
  * BuilderLayout - Used for the actual Resume Builder Workspace
  * Minimalist, full-screen, focused on productivity
  */
-export default function BuilderLayout({ children }: BuilderLayoutProps) {
+export default function BuilderLayout() {
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden">
       {/* Workspace Header - Minimal and Functional */}
@@ -63,7 +58,7 @@ export default function BuilderLayout({ children }: BuilderLayoutProps) {
       </header>
 
       {/* Main Workspace Area */}
-      <main className="flex-1 overflow-hidden relative">{children}</main>
+      <main className="flex-1 overflow-hidden relative"><Outlet /></main>
 
       <Toaster />
     </div>

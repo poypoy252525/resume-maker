@@ -22,7 +22,7 @@ export default function CTA() {
                 size="lg"
                 className="h-16 px-12 text-xl rounded-2xl bg-white text-primary hover:bg-white/90 gap-3 border-none"
               >
-                <Link to="/resumes/new">
+                <Link to="/create">
                   Get Started Now
                   <ArrowRight className="w-6 h-6" />
                 </Link>

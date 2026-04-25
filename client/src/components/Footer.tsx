@@ -31,7 +31,7 @@ export default function Footer() {
             <ul className="space-y-4 text-muted-foreground">
               <li>
                 <Link
-                  to="/resumes/new"
+                  to="/create"
                   className="hover:text-primary transition-colors"
                 >
                   Resume Builder
