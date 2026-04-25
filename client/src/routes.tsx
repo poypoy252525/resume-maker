@@ -1,12 +1,13 @@
-import { createBrowserRouter } from 'react-router-dom';
-import MainLayout from './layouts/MainLayout';
-import BuilderLayout from './layouts/BuilderLayout';
-import Home from './pages/Home';
-import NewResume from './pages/NewResume';
+import { createBrowserRouter } from "react-router-dom";
+import MainLayout from "./layouts/MainLayout";
+import BuilderLayout from "./layouts/BuilderLayout";
+import Home from "./pages/Home";
+import NewResume from "./pages/NewResume";
+import Scratch from "./pages/Scratch";
 
 export const router = createBrowserRouter([
   {
-    path: '/',
+    path: "/",
     element: <MainLayout />,
     children: [
       {
@@ -16,7 +17,7 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    path: '/create',
+    path: "/create",
     element: <BuilderLayout />,
     children: [
       {
@@ -24,5 +25,9 @@ export const router = createBrowserRouter([
         element: <NewResume />,
       },
     ],
+  },
+  {
+    path: "/scratch",
+    element: <Scratch />,
   },
 ]);
