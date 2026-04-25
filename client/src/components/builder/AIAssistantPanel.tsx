@@ -1,31 +1,11 @@
-import { CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sparkles, Send, Bot, User, Wand2 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 
 export default function AIAssistantPanel() {
   return (
     <div className="flex h-full flex-col bg-slate-50/50 dark:bg-slate-900/50 border-r backdrop-blur-xl">
-      <CardHeader className="pb-4 border-b bg-background/60 sticky top-0 z-10 backdrop-blur-md">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-lg bg-primary/10 text-primary">
-              <Sparkles className="size-4 animate-pulse" />
-            </div>
-            <CardTitle className="text-base font-semibold tracking-tight">
-              AI Architect
-            </CardTitle>
-          </div>
-          <Badge variant="outline" className="text-[10px] bg-primary/5 text-primary border-primary/20 px-1.5 py-0">
-            PRO
-          </Badge>
-        </div>
-        <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
-          Your personal career coach and content strategist.
-        </p>
-      </CardHeader>
 
       <ScrollArea className="flex-1 min-h-0">
         <div className="px-4 py-6 space-y-6">
