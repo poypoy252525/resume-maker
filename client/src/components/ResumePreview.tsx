@@ -13,7 +13,7 @@ export default function ResumePreview({ data }: ResumePreviewProps) {
         {/* Header */}
         <header className="text-center space-y-2">
           <h1 className="text-3xl font-bold tracking-tight uppercase">
-            {data.full_name || "Your Name"}
+            {data.full_name}
           </h1>
           <div className="flex flex-wrap justify-center gap-4 text-sm text-slate-600">
             {data.email && (
