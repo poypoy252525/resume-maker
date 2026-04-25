@@ -1,4 +1,4 @@
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,14 +16,26 @@ export default function ExperienceSection({ experiences, onChange, onAdd, onRemo
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       {experiences.map((exp, index) => (
-        <Card key={index} className="relative group overflow-hidden border-border/50">
-          <CardHeader className="bg-muted/30 pb-4">
+        <Card key={index} className="relative group overflow-hidden border-border/50 shadow-sm transition-all hover:shadow-md">
+          <CardHeader className="bg-muted/30 pb-4 border-b">
             <div className="flex justify-between items-center">
-              <CardTitle className="text-sm">Experience #{index + 1}</CardTitle>
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                  <Briefcase className="w-4 h-4" />
+                </div>
+                <div>
+                  <CardTitle className="text-sm font-bold">
+                    {exp.company_name || `Experience #${index + 1}`}
+                  </CardTitle>
+                  <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mt-0.5">
+                    Work History
+                  </p>
+                </div>
+              </div>
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                className="h-8 w-8 text-muted-foreground/50 hover:text-destructive hover:bg-destructive/10 transition-colors"
                 onClick={() => onRemove(index)}
               >
                 <Trash2 className="w-4 h-4" />
