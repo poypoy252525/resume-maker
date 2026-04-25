@@ -1,3 +1,4 @@
+import AIAssistantPanel from "@/components/builder/AIAssistantPanel";
 import BuilderStatus from "@/components/builder/BuilderStatus";
 import ResumeEditor from "@/components/builder/ResumeEditor";
 import ResumePreviewPanel from "@/components/builder/ResumePreviewPanel";
@@ -64,7 +65,13 @@ export default function NewResume() {
           orientation="horizontal"
           className="h-full w-full items-stretch"
         >
-          <ResizablePanel defaultSize="65%">
+          <ResizablePanel defaultSize="20%" maxSize="25%">
+            <AIAssistantPanel />
+          </ResizablePanel>
+
+          <ResizableHandle withHandle />
+
+          <ResizablePanel defaultSize="40%" minSize="30%" maxSize="50%">
             <ResumeEditor
               step={step}
               setStep={setStep}
@@ -83,7 +90,7 @@ export default function NewResume() {
 
           <ResizableHandle withHandle />
 
-          <ResizablePanel defaultSize="35%">
+          <ResizablePanel defaultSize="30%" minSize="20%" maxSize="50%">
             <ResumePreviewPanel data={formData} />
           </ResizablePanel>
         </ResizablePanelGroup>
