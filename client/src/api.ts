@@ -34,16 +34,16 @@ export interface ResumeData {
 
 export const generateResume = async (data: ResumeData) => {
   const response = await fetch(`${API_BASE_URL}/resumes/generate/`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(data),
   });
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.message || 'Failed to generate resume');
+    throw new Error(errorData.message || "Failed to generate resume");
   }
 
   return response.json();
@@ -52,7 +52,7 @@ export const generateResume = async (data: ResumeData) => {
 export const checkTaskStatus = async (taskId: string) => {
   const response = await fetch(`${API_BASE_URL}/resumes/status/${taskId}/`);
   if (!response.ok) {
-    throw new Error('Failed to check task status');
+    throw new Error("Failed to check task status");
   }
   return response.json();
 };
