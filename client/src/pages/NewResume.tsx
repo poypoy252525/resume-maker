@@ -8,15 +8,21 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { useResumeBuilder } from "@/hooks/useResumeBuilder";
-import { Check, LoaderCircle } from "lucide-react";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { Check, LoaderCircle, Sparkles, X } from "lucide-react";
 import { toast } from "sonner";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 /**
  * NewResume Page - Modular Workspace
- * Uses Resizable panels and extracted components for maintainability and premium UX.
+ * Uses Resizable panels on desktop and a mobile-optimized layout on smaller screens.
  */
 export default function NewResume() {
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
+  const [showAIAssistant, setShowAIAssistant] = useState(false);
+
   const {
     step,
     setStep,
@@ -65,63 +71,90 @@ export default function NewResume() {
     );
   }
 
+  const editorProps = {
+    step,
+    setStep,
+    formData,
+    handleInputChange,
+    handleExperienceChange,
+    addAndFocusExperience,
+    removeExperience,
+    handleEducationChange,
+    addEducation,
+    removeEducation,
+    handleSubmit,
+    handleSkillsChange,
+    onFocusExperience: setActiveExperienceIndex,
+    onFocusBullet: setActiveBulletIndex,
+    onParaphrase: handleParaphrase,
+    onUpdateBullet: updateBullet,
+    focusedExperienceIndex,
+    setFocusedExperienceIndex,
+    setActiveExperienceIndex,
+    loading,
+  };
+
+  const aiAssistantProps = {
+    formData,
+    onChange: handleInputChange,
+    onSkillsChange: handleSkillsChange,
+    onAnalyze: triggerAIAnalysis,
+    onRecommendAchievements: handleRecommendAchievements,
+    onAddBullet: addBulletToExperience,
+    loading,
+    step,
+    focusedExperienceIndex,
+  };
+
   return (
-    <div className="h-full w-full overflow-hidden">
+    <div className="h-full w-full overflow-hidden flex flex-col">
       <Stepper
         value={step}
         onValueChange={setStep}
         orientation="horizontal"
-        className="h-full w-full"
+        className="flex-1 overflow-hidden"
         indicators={{
           completed: <Check className="size-3.5" />,
           loading: <LoaderCircle className="size-3.5 animate-spin" />,
         }}
       >
-        <ResizablePanelGroup
-          orientation="horizontal"
-          className="h-full w-full items-stretch"
-        >
-          <ResizablePanel defaultSize={65} minSize={40}>
-            <ResumeEditor
-              step={step}
-              setStep={setStep}
-              formData={formData}
-              handleInputChange={handleInputChange}
-              handleExperienceChange={handleExperienceChange}
-              addAndFocusExperience={addAndFocusExperience}
-              removeExperience={removeExperience}
-              handleEducationChange={handleEducationChange}
-              addEducation={addEducation}
-              removeEducation={removeEducation}
-              handleSubmit={handleSubmit}
-              handleSkillsChange={handleSkillsChange}
-              onFocusExperience={setActiveExperienceIndex}
-              onFocusBullet={setActiveBulletIndex}
-              onParaphrase={handleParaphrase}
-              onUpdateBullet={updateBullet}
-              focusedExperienceIndex={focusedExperienceIndex}
-              setFocusedExperienceIndex={setFocusedExperienceIndex}
-              setActiveExperienceIndex={setActiveExperienceIndex}
-              loading={loading}
-            />
-          </ResizablePanel>
+        {isDesktop ? (
+          <ResizablePanelGroup
+            orientation="horizontal"
+            className="h-full w-full items-stretch"
+          >
+            <ResizablePanel defaultSize={65} minSize={40}>
+              <ResumeEditor {...editorProps} />
+            </ResizablePanel>
 
-          <ResizableHandle withHandle />
+            <ResizableHandle withHandle />
 
-          <ResizablePanel defaultSize={35} minSize={25}>
-            <AIAssistantPanel
-              formData={formData}
-              onChange={handleInputChange}
-              onSkillsChange={handleSkillsChange}
-              onAnalyze={triggerAIAnalysis}
-              onRecommendAchievements={handleRecommendAchievements}
-              onAddBullet={addBulletToExperience}
-              loading={loading}
-              step={step}
-              focusedExperienceIndex={focusedExperienceIndex}
-            />
-          </ResizablePanel>
-        </ResizablePanelGroup>
+            <ResizablePanel defaultSize={35} minSize={25}>
+              <AIAssistantPanel {...aiAssistantProps} />
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        ) : (
+          <div className="relative h-full w-full overflow-hidden flex flex-col">
+            <ResumeEditor {...editorProps} />
+
+            {/* Mobile AI Assistant Trigger */}
+            <Sheet open={showAIAssistant} onOpenChange={setShowAIAssistant}>
+              <SheetTrigger asChild>
+                <Button
+                  size="icon"
+                  className="fixed bottom-6 right-6 size-14 rounded-full shadow-2xl shadow-primary/40 z-50 animate-in zoom-in-50 duration-300"
+                >
+                  <Sparkles className="size-6" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="p-0 w-[90%] sm:w-[400px]">
+                <div className="h-full relative">
+                  <AIAssistantPanel {...aiAssistantProps} />
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
+        )}
       </Stepper>
     </div>
   );

@@ -93,37 +93,37 @@ export default function ResumeEditor({
 
   return (
     <main className="h-full bg-muted/5 flex flex-col overflow-hidden">
-      <header className="h-14 border-b bg-background px-6 flex items-center justify-between shrink-0 shadow-sm z-10">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary">
-            {currentStepItem && <currentStepItem.icon className="w-4 h-4" />}
+      <header className="h-14 border-b bg-background px-4 md:px-6 flex items-center justify-between shrink-0 shadow-sm z-10">
+        <div className="flex items-center gap-3 md:gap-4">
+          <div className="flex items-center justify-center w-7 h-7 md:w-8 md:h-8 rounded-lg bg-primary/10 text-primary">
+            {currentStepItem && <currentStepItem.icon className="w-3.5 h-3.5 md:w-4 md:h-4" />}
           </div>
           <div className="flex flex-col">
-            <h2 className="text-sm font-bold leading-none mb-1">
+            <h2 className="text-xs md:text-sm font-bold leading-none mb-0.5 md:mb-1">
               {currentStepItem?.label}
               {isEditingExperience && (
-                <span className="text-muted-foreground font-normal ml-1.5">
+                <span className="text-muted-foreground font-normal ml-1.5 hidden sm:inline">
                   · Adding Experience {focusedExperienceIndex! + 1}
                 </span>
               )}
             </h2>
-            <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-tight">
+            <p className="text-[9px] md:text-[10px] text-muted-foreground font-medium uppercase tracking-tight line-clamp-1">
               {isEditingExperience
-                ? "Fill in details, then click Done to return"
+                ? "Fill in details, then click Done"
                 : currentStepItem?.description}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-          <span className="text-[10px] font-bold text-primary uppercase tracking-widest">
+        <div className="flex items-center gap-2 shrink-0">
+          <div className="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-primary animate-pulse" />
+          <span className="text-[9px] md:text-[10px] font-bold text-primary uppercase tracking-widest hidden xs:inline">
             Editing Mode
           </span>
         </div>
       </header>
 
       <ScrollArea className="flex-1 min-h-0">
-        <div className="max-w-3xl mx-auto p-8 space-y-12">
+        <div className="max-w-3xl mx-auto p-4 md:p-8 space-y-8 md:space-y-12">
           <ResumeStepper />
 
           <StepperPanel className="space-y-8">

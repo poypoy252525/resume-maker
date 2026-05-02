@@ -29,6 +29,7 @@ import {
   Loader2,
   MapPin,
   Plus,
+  RefreshCcw,
   Sparkles,
   Trash2,
 } from "lucide-react";
@@ -435,23 +436,58 @@ export default function ExperienceSection({
                         </p>
                       </div>
                     ) : (
-                      <div className="space-y-2">
-                        {optimizationResults?.map((result, i) => (
-                          <button
-                            key={i}
-                            onClick={() => applyOptimization(result)}
-                            className="w-full text-left p-3 rounded-xl border border-border/50 bg-background hover:border-primary hover:bg-primary/5 hover:shadow-sm transition-all group"
-                          >
-                            <p className="text-[11px] leading-relaxed">
-                              {result}
-                            </p>
-                            <div className="flex justify-end mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <span className="text-[9px] font-bold text-primary uppercase">
-                                Click to use
-                              </span>
+                      <div className="space-y-4">
+                        {optimizationResults && optimizationResults.length > 0 ? (
+                          <div className="space-y-2">
+                            {optimizationResults.map((result, i) => (
+                              <button
+                                key={i}
+                                onClick={() => applyOptimization(result)}
+                                className="w-full text-left p-3 rounded-xl border border-border/50 bg-background hover:border-primary hover:bg-primary/5 hover:shadow-sm transition-all group"
+                              >
+                                <p className="text-[11px] leading-relaxed">
+                                  {result}
+                                </p>
+                                <div className="flex justify-end mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <span className="text-[9px] font-bold text-primary uppercase">
+                                    Click to use
+                                  </span>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center justify-center py-6 text-center space-y-3 bg-muted/30 rounded-xl border border-dashed">
+                            <div className="p-2 rounded-full bg-muted text-muted-foreground">
+                              <RefreshCcw className="w-4 h-4" />
                             </div>
-                          </button>
-                        ))}
+                            <div className="px-4">
+                              <p className="text-[11px] font-semibold">No suggestions found</p>
+                              <p className="text-[10px] text-muted-foreground mt-1">
+                                We couldn't generate variations. This might be due to a temporary API issue.
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full h-9 rounded-xl text-[11px] font-bold"
+                          onClick={() => {
+                            if (optimizingIdx !== null) {
+                              handleOptimizeBullet(
+                                exp.bullet_points[optimizingIdx],
+                                optimizingIdx,
+                              );
+                            }
+                          }}
+                        >
+                          <RefreshCcw className="w-3 h-3 mr-2" />
+                          {optimizationResults && optimizationResults.length > 0
+                            ? "Try again for more variations"
+                            : "Retry Generation"}
+                        </Button>
                       </div>
                     )}
                   </div>

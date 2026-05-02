@@ -27,34 +27,34 @@ export default function BuilderLayout() {
             </Link>
           </Button>
           <Separator orientation="vertical" className="h-6" />
-          <div className="flex items-center gap-2 font-semibold">
-            <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-sm">Untitled Resume</span>
-            <Badge variant="secondary" className="ml-2 h-5 text-[10px] font-bold">
-              AI PROTECTED
+          <div className="flex items-center gap-2 font-semibold min-w-0">
+            <Sparkles className="w-4 h-4 text-primary shrink-0" />
+            <span className="text-xs md:text-sm truncate">Untitled Resume</span>
+            <Badge variant="secondary" className="ml-1 md:ml-2 h-4 md:h-5 text-[8px] md:text-[10px] font-bold shrink-0">
+              AI
             </Badge>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <div className="hidden md:flex items-center gap-2 mr-2 text-[11px] text-muted-foreground">
+        <div className="flex items-center gap-2 md:gap-4">
+          <div className="hidden lg:flex items-center gap-2 mr-2 text-[11px] text-muted-foreground">
             <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
             Auto-saved 2m ago
           </div>
           <Button
             variant="ghost"
             size="sm"
-            className="gap-2"
+            className="h-8 md:h-9 px-2 md:px-3 gap-1 md:gap-2"
           >
             <Save className="w-4 h-4" />
-            <span className="hidden sm:inline">Save</span>
+            <span className="hidden md:inline">Save</span>
           </Button>
           <Button
             size="sm"
-            className="gap-2 shadow-sm"
+            className="h-8 md:h-9 px-3 md:px-4 gap-1 md:gap-2 shadow-sm"
           >
             <Share2 className="w-4 h-4" />
-            <span>Export</span>
+            <span className="text-xs md:text-sm">Export</span>
           </Button>
         </div>
       </header>
