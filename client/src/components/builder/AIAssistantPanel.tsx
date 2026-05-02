@@ -34,6 +34,8 @@ interface AIAssistantPanelProps {
   onAddBullet: (expIndex: number, bullet: string) => void;
   loading: boolean;
   step: number;
+  activeExperienceIndex: number | null;
+  activeBulletIndex: number | null;
 }
 
 export default function AIAssistantPanel({
@@ -47,6 +49,8 @@ export default function AIAssistantPanel({
   onAddBullet,
   loading,
   step,
+  activeExperienceIndex,
+  activeBulletIndex,
 }: AIAssistantPanelProps) {
   const [paraphraseResults, setParaphraseResults] = useState<{ bullet: string; suggestions: string[]; expIdx: number; bpIdx: number } | null>(null);
   const [achievementIdeas, setAchievementIdeas] = useState<{ jobTitle: string; achievements: string[]; expIdx: number } | null>(null);
@@ -175,61 +179,62 @@ export default function AIAssistantPanel({
               )}
 
               {step === 2 && (
-                <div className="space-y-4 animate-in slide-in-from-right-4 duration-500">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-xs font-bold flex items-center gap-2">
-                      <Wand2 className="size-3.5 text-primary" /> Bullet Point Optimizer
-                    </h4>
-                    {loading && <Zap className="size-3 text-primary animate-pulse" />}
-                  </div>
-                  
-                  {paraphraseResults ? (
-                    <div className="space-y-3 bg-primary/5 border border-primary/20 rounded-xl p-3 animate-in fade-in zoom-in-95">
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="text-[10px] font-bold text-primary uppercase">Suggestions</span>
-                        <Button variant="ghost" size="icon" className="h-5 w-5" onClick={() => setParaphraseResults(null)}>
-                          <Plus className="size-3 rotate-45" />
+                <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
+                  {/* Real-time Optimizer */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-xs font-bold flex items-center gap-2">
+                        <Wand2 className="size-3.5 text-primary" /> Bullet Point Optimizer
+                      </h4>
+                      {loading && paraphraseResults && <Zap className="size-3 text-primary animate-pulse" />}
+                    </div>
+                    
+                    {activeExperienceIndex !== null && activeBulletIndex !== null ? (
+                      <div className="space-y-3">
+                        <div className="p-2.5 rounded-xl bg-muted/30 border border-dashed text-[10px] text-muted-foreground italic line-clamp-2">
+                          "{formData.experiences[activeExperienceIndex].bullet_points[activeBulletIndex] || "Focused bullet point..."}"
+                        </div>
+                        
+                        <Button 
+                          onClick={() => {
+                            const bullet = formData.experiences[activeExperienceIndex].bullet_points[activeBulletIndex];
+                            handleParaphraseRequest(bullet, activeExperienceIndex, activeBulletIndex);
+                          }}
+                          disabled={loading || !formData.experiences[activeExperienceIndex].bullet_points[activeBulletIndex].trim()}
+                          className="w-full h-8 text-[10px] rounded-xl shadow-sm"
+                        >
+                          {loading ? "Optimizing..." : "Optimize This Bullet"}
                         </Button>
-                      </div>
-                      <div className="space-y-2">
-                        {paraphraseResults.suggestions.map((s, i) => (
-                          <div 
-                            key={i} 
-                            className="text-[10px] bg-background border rounded-lg p-2 hover:border-primary/50 cursor-pointer transition-colors group"
-                            onClick={() => applyParaphrase(s)}
-                          >
-                            <p className="leading-tight">{s}</p>
-                            <div className="flex justify-end mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <span className="text-[8px] font-bold text-primary uppercase">Click to apply</span>
+
+                        {paraphraseResults && paraphraseResults.expIdx === activeExperienceIndex && paraphraseResults.bpIdx === activeBulletIndex && (
+                          <div className="space-y-2 bg-primary/5 border border-primary/20 rounded-xl p-3 animate-in zoom-in-95">
+                            <span className="text-[10px] font-bold text-primary uppercase">Suggestions</span>
+                            <div className="space-y-2">
+                              {paraphraseResults.suggestions.map((s, i) => (
+                                <div 
+                                  key={i} 
+                                  className="text-[10px] bg-background border rounded-lg p-2 hover:border-primary/50 cursor-pointer transition-colors group"
+                                  onClick={() => applyParaphrase(s)}
+                                >
+                                  <p className="leading-tight">{s}</p>
+                                  <div className="flex justify-end mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <span className="text-[8px] font-bold text-primary uppercase">Click to apply</span>
+                                  </div>
+                                </div>
+                              ))}
                             </div>
                           </div>
-                        ))}
+                        )}
                       </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      <p className="text-[10px] text-muted-foreground leading-tight">
-                        Optimize your achievements for ATS. Select a bullet point from your experience to rewrite.
-                      </p>
-                      <div className="space-y-2">
-                        {formData.experiences.flatMap((exp, expIdx) => 
-                          exp.bullet_points.map((bp, bpIdx) => (
-                            bp.trim() && (
-                              <button
-                                key={`${expIdx}-${bpIdx}`}
-                                onClick={() => handleParaphraseRequest(bp, expIdx, bpIdx)}
-                                disabled={loading}
-                                className="w-full text-left p-2.5 rounded-xl border bg-background/50 hover:border-primary/40 hover:bg-primary/5 transition-all group relative overflow-hidden"
-                              >
-                                <p className="text-[10px] line-clamp-2 pr-6">{bp}</p>
-                                <Wand2 className="size-3 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground group-hover:text-primary transition-colors" />
-                              </button>
-                            )
-                          ))
-                        ).slice(0, 5)}
+                    ) : (
+                      <div className="bg-muted/50 rounded-xl p-4 border border-dashed text-center">
+                        <Bot className="size-6 text-muted-foreground/30 mx-auto mb-2" />
+                        <p className="text-[10px] text-muted-foreground italic">
+                          Click on a bullet point in the editor to see optimization suggestions.
+                        </p>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
 
                   {/* Achievement Ideas Section */}
                   <div className="space-y-4 pt-4 border-t border-dashed">
@@ -237,53 +242,45 @@ export default function AIAssistantPanel({
                       <h4 className="text-xs font-bold flex items-center gap-2">
                         <Plus className="size-3.5 text-primary" /> Achievement Ideas
                       </h4>
-                      {loading && !paraphraseResults && <Zap className="size-3 text-primary animate-pulse" />}
+                      {loading && achievementIdeas && <Zap className="size-3 text-primary animate-pulse" />}
                     </div>
 
-                    {achievementIdeas ? (
-                      <div className="space-y-3 bg-muted/30 border border-dashed rounded-xl p-3 animate-in fade-in slide-in-from-bottom-2">
-                        <div className="flex justify-between items-center mb-1">
-                          <span className="text-[10px] font-bold text-muted-foreground uppercase">For: {achievementIdeas.jobTitle}</span>
-                          <Button variant="ghost" size="icon" className="h-5 w-5" onClick={() => setAchievementIdeas(null)}>
-                            <Plus className="size-3 rotate-45" />
-                          </Button>
-                        </div>
-                        <div className="space-y-2">
-                          {achievementIdeas.achievements.map((a, i) => (
-                            <div 
-                              key={i} 
-                              className="text-[10px] bg-background border rounded-lg p-2.5 hover:border-primary/50 cursor-pointer transition-all group relative"
-                              onClick={() => handleAddAchievement(a)}
-                            >
-                              <p className="leading-tight pr-4">{a}</p>
-                              <Plus className="size-3 absolute right-2 top-2 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
-                            </div>
-                          ))}
-                          {achievementIdeas.achievements.length === 0 && (
-                            <p className="text-[10px] text-center text-muted-foreground italic py-2">All suggestions added!</p>
-                          )}
-                        </div>
+                    {activeExperienceIndex !== null ? (
+                      <div className="space-y-3">
+                        <p className="text-[10px] text-muted-foreground leading-tight">
+                          Suggestions for <span className="font-bold text-foreground truncate max-w-[150px] inline-block align-bottom">{formData.experiences[activeExperienceIndex].job_title || "your role"}</span>.
+                        </p>
+                        
+                        <Button 
+                          variant="outline"
+                          onClick={() => handleGetAchievementIdeas(formData.experiences[activeExperienceIndex].job_title, activeExperienceIndex)}
+                          disabled={loading || !formData.experiences[activeExperienceIndex].job_title.trim()}
+                          className="w-full h-8 text-[10px] rounded-xl border-primary/20 hover:bg-primary/5"
+                        >
+                          Generate Achievement Ideas
+                        </Button>
+
+                        {achievementIdeas && achievementIdeas.expIdx === activeExperienceIndex && (
+                          <div className="space-y-2 pt-2">
+                            {achievementIdeas.achievements.map((a, i) => (
+                              <div 
+                                key={i} 
+                                className="text-[10px] bg-background border rounded-lg p-2.5 hover:border-primary/50 cursor-pointer transition-all group relative"
+                                onClick={() => handleAddAchievement(a)}
+                              >
+                                <p className="leading-tight pr-4">{a}</p>
+                                <Plus className="size-3 absolute right-2 top-2 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     ) : (
-                      <div className="space-y-2">
-                        <p className="text-[10px] text-muted-foreground leading-tight mb-3">
-                          Don't know what to write? Get AI-powered achievement suggestions for your roles.
+                      <div className="bg-muted/50 rounded-xl p-4 border border-dashed text-center">
+                        <Lightbulb className="size-6 text-muted-foreground/30 mx-auto mb-2" />
+                        <p className="text-[10px] text-muted-foreground italic">
+                          Select an experience card to get tailored achievement ideas.
                         </p>
-                        {formData.experiences.map((exp, idx) => (
-                          exp.job_title && (
-                            <Button 
-                              key={idx}
-                              variant="outline" 
-                              size="sm" 
-                              onClick={() => handleGetAchievementIdeas(exp.job_title, idx)}
-                              disabled={loading}
-                              className="w-full h-9 text-[10px] justify-between rounded-xl border-primary/20 hover:bg-primary/5 group"
-                            >
-                              <span className="truncate">Ideas for {exp.job_title}</span>
-                              <ArrowRight className="size-3 opacity-50 group-hover:opacity-100 transition-all group-hover:translate-x-1" />
-                            </Button>
-                          )
-                        ))}
                       </div>
                     )}
                   </div>

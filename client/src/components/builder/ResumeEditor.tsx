@@ -34,6 +34,8 @@ interface ResumeEditorProps {
   removeEducation: (index: number) => void;
   handleSubmit: () => void;
   handleSkillsChange: (skills: string[]) => void;
+  onFocusExperience: (index: number) => void;
+  onFocusBullet: (index: number, bulletIndex: number) => void;
   loading: boolean;
 }
 
@@ -50,6 +52,8 @@ export default function ResumeEditor({
   removeEducation,
   handleSubmit,
   handleSkillsChange,
+  onFocusExperience,
+  onFocusBullet,
   loading,
 }: ResumeEditorProps) {
   const currentStepItem = sidebarItems[step - 1];
@@ -95,6 +99,8 @@ export default function ResumeEditor({
                 onChange={handleExperienceChange}
                 onAdd={addExperience}
                 onRemove={removeExperience}
+                onFocusExperience={onFocusExperience}
+                onFocusBullet={onFocusBullet}
               />
             </StepperContent>
             <StepperContent value={3}>

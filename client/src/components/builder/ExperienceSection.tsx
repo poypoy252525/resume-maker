@@ -10,9 +10,18 @@ interface ExperienceSectionProps {
   onChange: (index: number, field: keyof Experience, value: string | string[]) => void;
   onAdd: () => void;
   onRemove: (index: number) => void;
+  onFocusExperience: (index: number) => void;
+  onFocusBullet: (index: number, bulletIndex: number) => void;
 }
 
-export default function ExperienceSection({ experiences, onChange, onAdd, onRemove }: ExperienceSectionProps) {
+export default function ExperienceSection({ 
+  experiences, 
+  onChange, 
+  onAdd, 
+  onRemove,
+  onFocusExperience,
+  onFocusBullet
+}: ExperienceSectionProps) {
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       {experiences.map((exp, index) => (
@@ -49,6 +58,7 @@ export default function ExperienceSection({ experiences, onChange, onAdd, onRemo
                 <Input
                   value={exp.company_name}
                   onChange={(e) => onChange(index, "company_name", e.target.value)}
+                  onFocus={() => onFocusExperience(index)}
                   placeholder="Acme Inc"
                 />
               </div>
@@ -57,6 +67,7 @@ export default function ExperienceSection({ experiences, onChange, onAdd, onRemo
                 <Input
                   value={exp.job_title}
                   onChange={(e) => onChange(index, "job_title", e.target.value)}
+                  onFocus={() => onFocusExperience(index)}
                   placeholder="Senior Developer"
                 />
               </div>
@@ -100,6 +111,10 @@ export default function ExperienceSection({ experiences, onChange, onAdd, onRemo
                       const newBullets = [...exp.bullet_points];
                       newBullets[bpIndex] = e.target.value;
                       onChange(index, "bullet_points", newBullets);
+                    }}
+                    onFocus={() => {
+                      onFocusExperience(index);
+                      onFocusBullet(index, bpIndex);
                     }}
                     placeholder="Describe your achievement..."
                   />

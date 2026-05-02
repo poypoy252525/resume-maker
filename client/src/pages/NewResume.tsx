@@ -42,6 +42,10 @@ export default function NewResume() {
     updateBullet,
     handleRecommendAchievements,
     addBulletToExperience,
+    activeExperienceIndex,
+    setActiveExperienceIndex,
+    activeBulletIndex,
+    setActiveBulletIndex,
   } = useResumeBuilder();
 
   if (isGenerating) {
@@ -71,24 +75,7 @@ export default function NewResume() {
           orientation="horizontal"
           className="h-full w-full items-stretch"
         >
-          <ResizablePanel defaultSize="25%" minSize="20%" maxSize="35%">
-            <AIAssistantPanel 
-              formData={formData}
-              onChange={handleInputChange}
-              onSkillsChange={handleSkillsChange}
-              onAnalyze={triggerAIAnalysis}
-              onParaphrase={handleParaphrase}
-              onUpdateBullet={updateBullet}
-              onRecommendAchievements={handleRecommendAchievements}
-              onAddBullet={addBulletToExperience}
-              loading={loading}
-              step={step}
-            />
-          </ResizablePanel>
-
-          <ResizableHandle withHandle />
-
-          <ResizablePanel defaultSize="60%" minSize="30%" maxSize="70%">
+          <ResizablePanel defaultSize={65} minSize={40}>
             <ResumeEditor
               step={step}
               setStep={setStep}
@@ -102,14 +89,29 @@ export default function NewResume() {
               removeEducation={removeEducation}
               handleSubmit={handleSubmit}
               handleSkillsChange={handleSkillsChange}
+              onFocusExperience={setActiveExperienceIndex}
+              onFocusBullet={setActiveBulletIndex}
               loading={loading}
             />
           </ResizablePanel>
 
           <ResizableHandle withHandle />
 
-          <ResizablePanel defaultSize="40%" minSize="30%" maxSize="50%">
-            <ResumePreviewPanel data={formData} />
+          <ResizablePanel defaultSize={35} minSize={25}>
+            <AIAssistantPanel 
+              formData={formData}
+              onChange={handleInputChange}
+              onSkillsChange={handleSkillsChange}
+              onAnalyze={triggerAIAnalysis}
+              onParaphrase={handleParaphrase}
+              onUpdateBullet={updateBullet}
+              onRecommendAchievements={handleRecommendAchievements}
+              onAddBullet={addBulletToExperience}
+              loading={loading}
+              step={step}
+              activeExperienceIndex={activeExperienceIndex}
+              activeBulletIndex={activeBulletIndex}
+            />
           </ResizablePanel>
         </ResizablePanelGroup>
       </Stepper>

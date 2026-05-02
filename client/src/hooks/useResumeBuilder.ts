@@ -4,6 +4,8 @@ import type { ResumeData, Experience, Education } from "@/api";
 
 export function useResumeBuilder() {
   const [step, setStep] = useState(1);
+  const [activeExperienceIndex, setActiveExperienceIndex] = useState<number | null>(null);
+  const [activeBulletIndex, setActiveBulletIndex] = useState<number | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [loading, setLoading] = useState(false);
   const [taskId, setTaskId] = useState<string | null>(null);
@@ -304,5 +306,9 @@ export function useResumeBuilder() {
     updateBullet,
     handleRecommendAchievements,
     addBulletToExperience,
+    activeExperienceIndex,
+    setActiveExperienceIndex,
+    activeBulletIndex,
+    setActiveBulletIndex,
   };
 }
