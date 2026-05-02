@@ -2,14 +2,15 @@ import BuilderStatus from "@/components/builder/BuilderStatus";
 import ResumeEditor from "@/components/builder/ResumeEditor";
 import AIAssistantPanel from "@/components/builder/AIAssistantPanel";
 import { Stepper } from "@/components/reui/stepper";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { useResumeBuilder } from "@/hooks/useResumeBuilder";
-import { AlertCircle, Check, LoaderCircle } from "lucide-react";
+import { Check, LoaderCircle } from "lucide-react";
+import { toast } from "sonner";
+import { useEffect } from "react";
 
 /**
  * NewResume Page - Modular Workspace
@@ -46,6 +47,12 @@ export default function NewResume() {
     focusedExperienceIndex,
     setFocusedExperienceIndex,
   } = useResumeBuilder();
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
 
   if (isGenerating) {
     return (
@@ -116,16 +123,6 @@ export default function NewResume() {
           </ResizablePanel>
         </ResizablePanelGroup>
       </Stepper>
-
-      {error && (
-        <div className="fixed bottom-6 right-6 z-50 w-80 animate-in slide-in-from-bottom-5">
-          <Alert variant="destructive" className="shadow-2xl">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        </div>
-      )}
     </div>
   );
 }
