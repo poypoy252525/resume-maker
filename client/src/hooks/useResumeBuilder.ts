@@ -88,7 +88,7 @@ export function useResumeBuilder() {
     try {
       const result = await paraphraseBullet(
         bulletPoint,
-        formData.job_description,
+        formData.job_description || "",
         formData.target_role || ""
       );
       return result.suggestions;
@@ -107,7 +107,7 @@ export function useResumeBuilder() {
     try {
       const result = await recommendAchievements(
         jobTitle,
-        formData.job_description,
+        formData.job_description || "",
         formData.target_role || ""
       );
       return result.achievements;

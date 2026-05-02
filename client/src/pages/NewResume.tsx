@@ -1,6 +1,5 @@
 import BuilderStatus from "@/components/builder/BuilderStatus";
 import ResumeEditor from "@/components/builder/ResumeEditor";
-import ResumePreviewPanel from "@/components/builder/ResumePreviewPanel";
 import AIAssistantPanel from "@/components/builder/AIAssistantPanel";
 import { Stepper } from "@/components/reui/stepper";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
