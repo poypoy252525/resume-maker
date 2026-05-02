@@ -1,33 +1,35 @@
-import { useState } from "react";
-import {
-  Plus,
-  Trash2,
-  Briefcase,
-  ChevronRight,
-  CheckCircle2,
-  ArrowLeft,
-  Building2,
-  MapPin,
-  Calendar,
-  ClipboardList,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import type { Experience } from "@/api";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import type { Experience } from "@/api";
+import {
+  ArrowLeft,
+  Briefcase,
+  Building2,
+  CheckCircle2,
+  ChevronRight,
+  ClipboardList,
+  MapPin,
+  Plus,
+  Trash2,
+} from "lucide-react";
 
 interface ExperienceSectionProps {
   experiences: Experience[];
-  onChange: (index: number, field: keyof Experience, value: string | string[]) => void;
+  onChange: (
+    index: number,
+    field: keyof Experience,
+    value: string | string[],
+  ) => void;
   onAdd: () => void;
   onRemove: (index: number) => void;
   onFocusExperience: (index: number) => void;
@@ -224,7 +226,9 @@ export default function ExperienceSection({
                 <Label>Company Name</Label>
                 <Input
                   value={exp.company_name}
-                  onChange={(e) => onChange(focusedIndex, "company_name", e.target.value)}
+                  onChange={(e) =>
+                    onChange(focusedIndex, "company_name", e.target.value)
+                  }
                   onFocus={() => onFocusExperience(focusedIndex)}
                   placeholder="Acme Inc."
                   autoFocus
@@ -234,7 +238,9 @@ export default function ExperienceSection({
                 <Label>Job Title</Label>
                 <Input
                   value={exp.job_title}
-                  onChange={(e) => onChange(focusedIndex, "job_title", e.target.value)}
+                  onChange={(e) =>
+                    onChange(focusedIndex, "job_title", e.target.value)
+                  }
                   onFocus={() => onFocusExperience(focusedIndex)}
                   placeholder="Senior Developer"
                 />
@@ -253,7 +259,9 @@ export default function ExperienceSection({
                 <Label>Location</Label>
                 <Input
                   value={exp.location}
-                  onChange={(e) => onChange(focusedIndex, "location", e.target.value)}
+                  onChange={(e) =>
+                    onChange(focusedIndex, "location", e.target.value)
+                  }
                   placeholder="Remote"
                 />
               </div>
@@ -261,7 +269,9 @@ export default function ExperienceSection({
                 <Label>From</Label>
                 <Input
                   value={exp.date_from}
-                  onChange={(e) => onChange(focusedIndex, "date_from", e.target.value)}
+                  onChange={(e) =>
+                    onChange(focusedIndex, "date_from", e.target.value)
+                  }
                   placeholder="Jan 2020"
                 />
               </div>
@@ -269,7 +279,9 @@ export default function ExperienceSection({
                 <Label>To</Label>
                 <Input
                   value={exp.date_to}
-                  onChange={(e) => onChange(focusedIndex, "date_to", e.target.value)}
+                  onChange={(e) =>
+                    onChange(focusedIndex, "date_to", e.target.value)
+                  }
                   placeholder="Present"
                 />
               </div>
@@ -305,7 +317,9 @@ export default function ExperienceSection({
                     size="icon"
                     className="shrink-0 h-9 w-9 text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10"
                     onClick={() => {
-                      const newBullets = exp.bullet_points.filter((_, i) => i !== bpIndex);
+                      const newBullets = exp.bullet_points.filter(
+                        (_, i) => i !== bpIndex,
+                      );
                       onChange(focusedIndex, "bullet_points", newBullets);
                     }}
                     disabled={exp.bullet_points.length === 1}
@@ -319,7 +333,10 @@ export default function ExperienceSection({
                 size="sm"
                 className="border-dashed w-full mt-1 hover:bg-primary/5 hover:border-primary/30 hover:text-primary"
                 onClick={() =>
-                  onChange(focusedIndex, "bullet_points", [...exp.bullet_points, ""])
+                  onChange(focusedIndex, "bullet_points", [
+                    ...exp.bullet_points,
+                    "",
+                  ])
                 }
               >
                 <Plus className="w-3 h-3 mr-2" /> Add Achievement
