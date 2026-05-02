@@ -71,7 +71,15 @@ export const checkTaskStatus = async (taskId: string) => {
   return response.json();
 };
 
-export const analyzeResume = async (resumeData: ResumeData, jobDescription: string, targetRole: string): Promise<AIFeedback> => {
+export const checkTaskResult = async (taskId: string) => {
+  const response = await fetch(`${API_BASE_URL}/resumes/task-status/${taskId}/`);
+  if (!response.ok) {
+    throw new Error("Failed to check task result");
+  }
+  return response.json();
+};
+
+export const analyzeResume = async (resumeData: ResumeData, jobDescription: string, targetRole: string): Promise<{ task_id: string }> => {
   const response = await fetch(`${API_BASE_URL}/resumes/analyze/`, {
     method: "POST",
     headers: {
@@ -92,7 +100,7 @@ export const analyzeResume = async (resumeData: ResumeData, jobDescription: stri
   return response.json();
 };
 
-export const paraphraseBullet = async (bulletPoint: string, jobDescription: string, targetRole: string): Promise<{ suggestions: string[] }> => {
+export const paraphraseBullet = async (bulletPoint: string, jobDescription: string, targetRole: string): Promise<{ task_id: string }> => {
   const response = await fetch(`${API_BASE_URL}/resumes/paraphrase/`, {
     method: "POST",
     headers: {
@@ -113,7 +121,7 @@ export const paraphraseBullet = async (bulletPoint: string, jobDescription: stri
   return response.json();
 };
 
-export const recommendAchievements = async (jobTitle: string, jobDescription: string, targetRole: string): Promise<{ achievements: string[] }> => {
+export const recommendAchievements = async (jobTitle: string, jobDescription: string, targetRole: string): Promise<{ task_id: string }> => {
   const response = await fetch(`${API_BASE_URL}/resumes/recommend_achievements/`, {
     method: "POST",
     headers: {

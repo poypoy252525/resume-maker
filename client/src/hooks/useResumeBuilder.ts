@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { generateResume, checkTaskStatus, analyzeResume, paraphraseBullet, recommendAchievements } from "@/api";
+import { generateResume, checkTaskStatus, analyzeResume, paraphraseBullet, recommendAchievements, checkTaskResult } from "@/api";
 import type { ResumeData, Experience, Education } from "@/api";
 
 export function useResumeBuilder() {
@@ -42,6 +42,20 @@ export function useResumeBuilder() {
   const handleSkillsChange = (skills: string[]) => {
     setFormData((prev) => ({ ...prev, skills }));
   };
+  
+  const pollTask = async (taskId: string, interval = 2000, maxRetries = 30) => {
+    for (let i = 0; i < maxRetries; i++) {
+      const result = await checkTaskResult(taskId);
+      if (result.status === "SUCCESS") {
+        return result.result;
+      }
+      if (result.status === "FAILURE") {
+        throw new Error(result.error || "Task failed");
+      }
+      await new Promise(resolve => setTimeout(resolve, interval));
+    }
+    throw new Error("Task timed out");
+  };
 
   const triggerAIAnalysis = async () => {
     if (!formData.job_description) {
@@ -51,11 +65,12 @@ export function useResumeBuilder() {
     setLoading(true);
     setError(null);
     try {
-      const feedback = await analyzeResume(
+      const { task_id } = await analyzeResume(
         formData,
         formData.job_description,
         formData.target_role || ""
       );
+      const feedback = await pollTask(task_id);
       setFormData((prev) => ({ ...prev, ai_feedback: feedback }));
     } catch (err: unknown) {
       const errorMessage =
@@ -69,11 +84,12 @@ export function useResumeBuilder() {
   const handleParaphrase = async (bulletPoint: string) => {
     setLoading(true);
     try {
-      const result = await paraphraseBullet(
+      const { task_id } = await paraphraseBullet(
         bulletPoint,
         formData.job_description || "",
         formData.target_role || ""
       );
+      const result = await pollTask(task_id);
       return result.suggestions;
     } catch (err: unknown) {
       const errorMessage =
@@ -88,11 +104,12 @@ export function useResumeBuilder() {
   const handleRecommendAchievements = async (jobTitle: string) => {
     setLoading(true);
     try {
-      const result = await recommendAchievements(
+      const { task_id } = await recommendAchievements(
         jobTitle,
         formData.job_description || "",
         formData.target_role || ""
       );
+      const result = await pollTask(task_id);
       return result.achievements;
     } catch (err: unknown) {
       const errorMessage =
