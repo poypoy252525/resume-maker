@@ -28,7 +28,6 @@ export default function NewResume() {
     error,
     handleInputChange,
     handleExperienceChange,
-    addExperience,
     addAndFocusExperience,
     removeExperience,
     handleEducationChange,
@@ -42,9 +41,7 @@ export default function NewResume() {
     updateBullet,
     handleRecommendAchievements,
     addBulletToExperience,
-    activeExperienceIndex,
     setActiveExperienceIndex,
-    activeBulletIndex,
     setActiveBulletIndex,
     focusedExperienceIndex,
     setFocusedExperienceIndex,
@@ -84,7 +81,6 @@ export default function NewResume() {
               formData={formData}
               handleInputChange={handleInputChange}
               handleExperienceChange={handleExperienceChange}
-              addExperience={addExperience}
               addAndFocusExperience={addAndFocusExperience}
               removeExperience={removeExperience}
               handleEducationChange={handleEducationChange}
@@ -111,14 +107,10 @@ export default function NewResume() {
               onChange={handleInputChange}
               onSkillsChange={handleSkillsChange}
               onAnalyze={triggerAIAnalysis}
-              onParaphrase={handleParaphrase}
-              onUpdateBullet={updateBullet}
               onRecommendAchievements={handleRecommendAchievements}
               onAddBullet={addBulletToExperience}
               loading={loading}
               step={step}
-              activeExperienceIndex={activeExperienceIndex}
-              activeBulletIndex={activeBulletIndex}
               focusedExperienceIndex={focusedExperienceIndex}
             />
           </ResizablePanel>

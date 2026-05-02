@@ -23,7 +23,6 @@ interface ResumeEditorProps {
     field: keyof Experience,
     value: string | string[],
   ) => void;
-  addExperience: () => void;
   addAndFocusExperience: () => void;
   removeExperience: (index: number) => void;
   handleEducationChange: (
@@ -55,7 +54,6 @@ export default function ResumeEditor({
   formData,
   handleInputChange,
   handleExperienceChange,
-  addExperience,
   addAndFocusExperience,
   removeExperience,
   handleEducationChange,

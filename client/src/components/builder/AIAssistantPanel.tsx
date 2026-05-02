@@ -15,10 +15,8 @@ import {
   Target,
   Settings,
   Lightbulb,
-  Wand2,
   ClipboardCheck,
   Zap,
-  ArrowRight,
 } from "lucide-react";
 import type { ResumeData } from "@/api";
 
@@ -29,18 +27,10 @@ interface AIAssistantPanelProps {
   ) => void;
   onSkillsChange: (skills: string[]) => void;
   onAnalyze: () => void;
-  onParaphrase: (bullet: string) => Promise<string[] | null>;
-  onUpdateBullet: (
-    expIndex: number,
-    bulletIndex: number,
-    newValue: string,
-  ) => void;
   onRecommendAchievements: (jobTitle: string) => Promise<string[] | null>;
   onAddBullet: (expIndex: number, bullet: string) => void;
   loading: boolean;
   step: number;
-  activeExperienceIndex: number | null;
-  activeBulletIndex: number | null;
   /** The index of the experience open in the focused editor (null = list view) */
   focusedExperienceIndex: number | null;
 }
@@ -50,22 +40,12 @@ export default function AIAssistantPanel({
   onChange,
   onSkillsChange,
   onAnalyze,
-  onParaphrase,
-  onUpdateBullet,
   onRecommendAchievements,
   onAddBullet,
   loading,
   step,
-  activeExperienceIndex,
-  activeBulletIndex,
   focusedExperienceIndex,
 }: AIAssistantPanelProps) {
-  const [paraphraseResults, setParaphraseResults] = useState<{
-    bullet: string;
-    suggestions: string[];
-    expIdx: number;
-    bpIdx: number;
-  } | null>(null);
   const [achievementIdeas, setAchievementIdeas] = useState<{
     jobTitle: string;
     achievements: string[];
@@ -79,29 +59,6 @@ export default function AIAssistantPanel({
     const currentSkills = formData.skills || [];
     if (!currentSkills.includes(skill)) {
       onSkillsChange([...currentSkills, skill]);
-    }
-  };
-
-  const handleParaphraseRequest = async (
-    bullet: string,
-    expIdx: number,
-    bpIdx: number,
-  ) => {
-    if (!bullet.trim()) return;
-    const suggestions = await onParaphrase(bullet);
-    if (suggestions) {
-      setParaphraseResults({ bullet, suggestions, expIdx, bpIdx });
-    }
-  };
-
-  const applyParaphrase = (optimized: string) => {
-    if (paraphraseResults) {
-      onUpdateBullet(
-        paraphraseResults.expIdx,
-        paraphraseResults.bpIdx,
-        optimized,
-      );
-      setParaphraseResults(null);
     }
   };
 
