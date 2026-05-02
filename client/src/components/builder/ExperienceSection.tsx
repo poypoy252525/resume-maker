@@ -17,6 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -341,47 +342,60 @@ export default function ExperienceSection({
             </div>
             <div className="space-y-3">
               {exp.bullet_points.map((bp, bpIndex) => (
-                <div key={bpIndex} className="flex gap-2 items-center">
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary/50 shrink-0 mt-px" />
-                  <Input
-                    value={bp}
-                    onChange={(e) => {
-                      const newBullets = [...exp.bullet_points];
-                      newBullets[bpIndex] = e.target.value;
-                      onChange(focusedIndex, "bullet_points", newBullets);
-                    }}
-                    onFocus={() => {
-                      onFocusExperience(focusedIndex);
-                      onFocusBullet(focusedIndex, bpIndex);
-                    }}
-                    placeholder="Describe an achievement or responsibility..."
-                    className="flex-1"
-                  />
-                  <div className="flex items-center gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="shrink-0 h-9 w-9 text-primary/40 hover:text-primary hover:bg-primary/10"
-                      onClick={() => handleOptimizeBullet(bp, bpIndex)}
-                      disabled={!bp.trim()}
-                      title="Optimize with AI"
-                    >
-                      <Sparkles className="w-3.5 h-3.5" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="shrink-0 h-9 w-9 text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10"
-                      onClick={() => {
-                        const newBullets = exp.bullet_points.filter(
-                          (_, i) => i !== bpIndex,
-                        );
-                        onChange(focusedIndex, "bullet_points", newBullets);
-                      }}
-                      disabled={exp.bullet_points.length === 1}
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
+                <div key={bpIndex} className="group relative">
+                  <div className="flex gap-3 items-start">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary/40 shrink-0 mt-4" />
+                    <div className="flex-1 min-w-0 relative">
+                      <Textarea
+                        value={bp}
+                        onChange={(e) => {
+                          const newBullets = [...exp.bullet_points];
+                          newBullets[bpIndex] = e.target.value;
+                          onChange(focusedIndex, "bullet_points", newBullets);
+                        }}
+                        onFocus={() => {
+                          onFocusExperience(focusedIndex);
+                          onFocusBullet(focusedIndex, bpIndex);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && !e.shiftKey) {
+                            e.preventDefault();
+                            const newBullets = [...exp.bullet_points];
+                            newBullets.splice(bpIndex + 1, 0, "");
+                            onChange(focusedIndex, "bullet_points", newBullets);
+                          }
+                        }}
+                        placeholder="Describe an achievement or responsibility..."
+                        className="w-full min-h-[38px] py-2 resize-none overflow-hidden field-sizing-content transition-all pr-4 group-hover:pr-20 group-focus-within:pr-20"
+                        rows={1}
+                      />
+                      <div className="absolute right-2 top-1.5 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity bg-background/90 backdrop-blur-sm p-0.5 rounded-lg border shadow-sm z-10">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="shrink-0 h-7 w-7 text-primary/40 hover:text-primary hover:bg-primary/10"
+                          onClick={() => handleOptimizeBullet(bp, bpIndex)}
+                          disabled={!bp.trim()}
+                          title="Optimize with AI"
+                        >
+                          <Sparkles className="w-3 h-3" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="shrink-0 h-7 w-7 text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10"
+                          onClick={() => {
+                            const newBullets = exp.bullet_points.filter(
+                              (_, i) => i !== bpIndex,
+                            );
+                            onChange(focusedIndex, "bullet_points", newBullets);
+                          }}
+                          disabled={exp.bullet_points.length === 1}
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               ))}

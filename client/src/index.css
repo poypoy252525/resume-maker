@@ -155,3 +155,8 @@
     @apply font-sans;
   }
 }
+
+@utility field-sizing-content {
+  field-sizing: content;
+}
+
