@@ -37,6 +37,12 @@ interface ResumeEditorProps {
   handleSkillsChange: (skills: string[]) => void;
   onFocusExperience: (index: number) => void;
   onFocusBullet: (index: number, bulletIndex: number) => void;
+  onParaphrase: (bullet: string) => Promise<string[] | null>;
+  onUpdateBullet: (
+    expIndex: number,
+    bulletIndex: number,
+    newValue: string,
+  ) => void;
   focusedExperienceIndex: number | null;
   setFocusedExperienceIndex: (index: number | null) => void;
   setActiveExperienceIndex: (index: number) => void;
@@ -59,6 +65,8 @@ export default function ResumeEditor({
   handleSkillsChange,
   onFocusExperience,
   onFocusBullet,
+  onParaphrase,
+  onUpdateBullet,
   focusedExperienceIndex,
   setFocusedExperienceIndex,
   setActiveExperienceIndex,
@@ -135,6 +143,8 @@ export default function ResumeEditor({
                 onRemove={removeExperience}
                 onFocusExperience={onFocusExperience}
                 onFocusBullet={onFocusBullet}
+                onParaphrase={onParaphrase}
+                onUpdateBullet={onUpdateBullet}
                 focusedIndex={focusedExperienceIndex}
                 onOpenExperience={handleOpenExperience}
                 onDoneEditing={handleDoneEditing}

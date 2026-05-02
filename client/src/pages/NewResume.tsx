@@ -94,6 +94,8 @@ export default function NewResume() {
               handleSkillsChange={handleSkillsChange}
               onFocusExperience={setActiveExperienceIndex}
               onFocusBullet={setActiveBulletIndex}
+              onParaphrase={handleParaphrase}
+              onUpdateBullet={updateBullet}
               focusedExperienceIndex={focusedExperienceIndex}
               setFocusedExperienceIndex={setFocusedExperienceIndex}
               setActiveExperienceIndex={setActiveExperienceIndex}

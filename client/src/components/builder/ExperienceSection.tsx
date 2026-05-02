@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { Experience } from "@/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -18,8 +26,10 @@ import {
   CheckCircle2,
   ChevronRight,
   ClipboardList,
+  Loader2,
   MapPin,
   Plus,
+  Sparkles,
   Trash2,
 } from "lucide-react";
 
@@ -34,6 +44,12 @@ interface ExperienceSectionProps {
   onRemove: (index: number) => void;
   onFocusExperience: (index: number) => void;
   onFocusBullet: (index: number, bulletIndex: number) => void;
+  onParaphrase: (bullet: string) => Promise<string[] | null>;
+  onUpdateBullet: (
+    expIndex: number,
+    bulletIndex: number,
+    newValue: string,
+  ) => void;
   /** Index of the experience currently being focused/edited, or null for list view */
   focusedIndex: number | null;
   onOpenExperience: (index: number) => void;
@@ -47,10 +63,38 @@ export default function ExperienceSection({
   onRemove,
   onFocusExperience,
   onFocusBullet,
+  onParaphrase,
+  onUpdateBullet,
   focusedIndex,
   onOpenExperience,
   onDoneEditing,
 }: ExperienceSectionProps) {
+  const [optimizingIdx, setOptimizingIdx] = useState<number | null>(null);
+  const [optimizationResults, setOptimizationResults] = useState<string[] | null>(
+    null,
+  );
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isOptimizing, setIsOptimizing] = useState(false);
+
+  const handleOptimizeBullet = async (bullet: string, bulletIdx: number) => {
+    if (!bullet.trim()) return;
+    setOptimizingIdx(bulletIdx);
+    setIsOptimizing(true);
+    setIsModalOpen(true);
+    setOptimizationResults(null);
+
+    const results = await onParaphrase(bullet);
+    setOptimizationResults(results);
+    setIsOptimizing(false);
+  };
+
+  const applyOptimization = (optimizedValue: string) => {
+    if (focusedIndex !== null && optimizingIdx !== null) {
+      onUpdateBullet(focusedIndex, optimizingIdx, optimizedValue);
+      setIsModalOpen(false);
+      setOptimizingIdx(null);
+    }
+  };
   // ─── LIST VIEW ──────────────────────────────────────────────────────────────
   if (focusedIndex === null) {
     return (
@@ -312,20 +356,32 @@ export default function ExperienceSection({
                     placeholder="Describe an achievement or responsibility..."
                     className="flex-1"
                   />
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="shrink-0 h-9 w-9 text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10"
-                    onClick={() => {
-                      const newBullets = exp.bullet_points.filter(
-                        (_, i) => i !== bpIndex,
-                      );
-                      onChange(focusedIndex, "bullet_points", newBullets);
-                    }}
-                    disabled={exp.bullet_points.length === 1}
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </Button>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="shrink-0 h-9 w-9 text-primary/40 hover:text-primary hover:bg-primary/10"
+                      onClick={() => handleOptimizeBullet(bp, bpIndex)}
+                      disabled={!bp.trim()}
+                      title="Optimize with AI"
+                    >
+                      <Sparkles className="w-3.5 h-3.5" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="shrink-0 h-9 w-9 text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10"
+                      onClick={() => {
+                        const newBullets = exp.bullet_points.filter(
+                          (_, i) => i !== bpIndex,
+                        );
+                        onChange(focusedIndex, "bullet_points", newBullets);
+                      }}
+                      disabled={exp.bullet_points.length === 1}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
                 </div>
               ))}
               <Button
@@ -342,6 +398,66 @@ export default function ExperienceSection({
                 <Plus className="w-3 h-3 mr-2" /> Add Achievement
               </Button>
             </div>
+
+            {/* AI Optimization Modal */}
+            <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+              <DialogContent className="sm:max-w-md rounded-2xl">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-primary" />
+                    AI Bullet Optimizer
+                  </DialogTitle>
+                  <DialogDescription className="text-xs">
+                    Choose the best version for your resume.
+                  </DialogDescription>
+                </DialogHeader>
+
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label className="text-[10px] uppercase font-bold text-muted-foreground">
+                      Original
+                    </Label>
+                    <div className="p-3 rounded-xl bg-muted/50 text-[11px] italic border border-dashed">
+                      "{optimizingIdx !== null ? exp.bullet_points[optimizingIdx] : ""}"
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label className="text-[10px] uppercase font-bold text-primary flex items-center gap-1.5">
+                      AI Suggestions
+                    </Label>
+
+                    {isOptimizing ? (
+                      <div className="flex flex-col items-center justify-center py-8 space-y-3">
+                        <Loader2 className="w-6 h-6 text-primary animate-spin" />
+                        <p className="text-[10px] font-medium text-muted-foreground">
+                          Generating better versions...
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {optimizationResults?.map((result, i) => (
+                          <button
+                            key={i}
+                            onClick={() => applyOptimization(result)}
+                            className="w-full text-left p-3 rounded-xl border border-border/50 bg-background hover:border-primary hover:bg-primary/5 hover:shadow-sm transition-all group"
+                          >
+                            <p className="text-[11px] leading-relaxed">
+                              {result}
+                            </p>
+                            <div className="flex justify-end mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <span className="text-[9px] font-bold text-primary uppercase">
+                                Click to use
+                              </span>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </CardContent>
       </Card>
