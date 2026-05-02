@@ -11,15 +11,15 @@ import { sidebarItems } from "@/constants/builder";
 
 export default function ResumeStepper() {
   return (
-    <StepperNav className="w-full gap-2 md:gap-3">
+    <StepperNav className="w-full gap-2 md:gap-3 min-w-0">
       {sidebarItems.map((item, index) => (
         <StepperItem
           key={item.step}
           step={item.step}
-          className="relative flex-1 items-start"
+          className="relative flex-1 items-start min-w-0"
         >
           <StepperTrigger
-            className="flex grow flex-col items-center md:items-start justify-center gap-1.5 md:gap-2.5 px-2 md:px-3 py-1.5 rounded-xl transition-colors hover:bg-secondary/20"
+            className="flex grow flex-col items-center md:items-start justify-center gap-1.5 md:gap-2.5 px-2 md:px-3 py-1.5 rounded-xl transition-colors hover:bg-secondary/20 min-w-0 w-full"
             asChild
           >
             <div>

@@ -100,12 +100,12 @@ export default function ExperienceSection({
   // ─── LIST VIEW ──────────────────────────────────────────────────────────────
   if (focusedIndex === null) {
     return (
-      <div className="space-y-4 animate-in fade-in duration-300">
+      <div className="space-y-4 animate-in fade-in duration-300 w-full max-w-full min-w-0 overflow-hidden">
         {/* Section header */}
         <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-sm font-bold">Work Experience</h3>
-            <p className="text-[11px] text-muted-foreground mt-0.5">
+          <div className="min-w-0 flex-1">
+            <h3 className="text-sm font-bold truncate">Work Experience</h3>
+            <p className="text-[11px] text-muted-foreground mt-0.5 truncate">
               {experiences.length === 0
                 ? "No experience added yet"
                 : `${experiences.length} experience${experiences.length > 1 ? "s" : ""} added`}
@@ -120,7 +120,7 @@ export default function ExperienceSection({
 
         {/* Experience cards in list */}
         {experiences.length > 0 && (
-          <div className="space-y-2">
+          <div className="space-y-2 px-1">
             {experiences.map((exp, index) => {
               const isComplete =
                 exp.company_name.trim() &&
@@ -137,20 +137,20 @@ export default function ExperienceSection({
                   }}
                   className="w-full text-left group"
                 >
-                  <Card className="border-border/50 transition-all hover:border-primary/30 hover:shadow-md group-focus-visible:ring-2 group-focus-visible:ring-primary/50">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
+                  <Card className="border-border/50 transition-all hover:border-primary/30 hover:shadow-md group-focus-visible:ring-2 group-focus-visible:ring-primary/50 w-full overflow-hidden">
+                    <CardContent className="px-4 py-0 w-full overflow-hidden">
+                      <div className="flex items-center gap-3 min-w-0 w-full">
                         <div className="p-2 rounded-lg bg-primary/10 text-primary shrink-0">
                           <Briefcase className="w-4 h-4" />
                         </div>
-                        <div className="flex-1 min-w-0">
+                        <div className="flex-1 min-w-0 w-0">
                           <p className="text-sm font-semibold truncate">
                             {exp.company_name || `Experience #${index + 1}`}
                           </p>
                           <p className="text-[11px] text-muted-foreground truncate">
                             {exp.job_title || "No title yet"}{" "}
                             {exp.date_from && (
-                              <span className="opacity-60">
+                              <span className="opacity-60 block sm:inline">
                                 · {exp.date_from} – {exp.date_to || "Present"}
                               </span>
                             )}
@@ -200,7 +200,8 @@ export default function ExperienceSection({
             // The parent handles this via onAdd + openExperience
           }}
         >
-          <Plus className="w-4 h-4 mr-2" /> Add Work Experience
+          <Plus className="w-4 h-4" />
+          Add Work Experience
         </Button>
       </div>
     );
