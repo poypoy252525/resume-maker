@@ -4,9 +4,10 @@ from django.conf import settings
 from google import genai
 from google.genai import types
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Any, Optional
 
-# Define schemas for structured output
+# --- Schemas ---
+
 class ATSEvaluation(BaseModel):
     ats_score: int = Field(..., description="An integer from 0 to 100 representing how well the resume matches the JD.")
     keyword_match: List[str] = Field(..., description="List of important keywords from the JD that are present in the resume.")
@@ -20,107 +21,95 @@ class SkillRecommendation(BaseModel):
 class ParaphraseResult(BaseModel):
     suggestions: List[str] = Field(..., description="A list of 3 paraphrased versions of the bullet point.")
 
+class AchievementRecommendation(BaseModel):
+    achievements: List[str] = Field(..., description="A list of 5 recommended achievement bullet points.")
 
-class AIService:
-    def __init__(self):
-        # Initialize Gemini client
-        # Note: client automatically looks for GEMINI_API_KEY in environment variables.
+# --- Core Agent ---
+
+class AIAgent:
+    """
+    A reusable AI Agent that can be instantiated with its own system prompt and response schema.
+    """
+    def __init__(self, prompt_file: str, response_schema: Any, temperature: float = 0.3):
+        self.prompt_file = prompt_file
+        self.response_schema = response_schema
+        self.temperature = temperature
+        
         api_key = getattr(settings, 'GEMINI_API_KEY', os.environ.get('GEMINI_API_KEY'))
         if not api_key:
-            raise ValueError("GEMINI_API_KEY not found in settings or environment variables.")
-        
+            raise ValueError("GEMINI_API_KEY not found.")
+            
         self.client = genai.Client(api_key=api_key)
-        self.model_name = 'gemma-4-31b-it' # Using Flash for speed and cost
+        # Load model from environment or default to what was initially there
+        self.model_name = os.getenv('GEMINI_MODEL', 'gemma-4-31b-it')
 
-    def _load_prompt(self, filename: str) -> str:
-        prompt_path = os.path.join(settings.BASE_DIR, 'generator', 'prompts', filename)
+    def _load_prompt(self) -> str:
+        prompt_path = os.path.join(settings.BASE_DIR, 'generator', 'prompts', self.prompt_file)
         with open(prompt_path, 'r', encoding='utf-8') as f:
             return f.read()
 
+    def generate(self, **kwargs) -> dict:
+        """
+        Generates content using the agent's specific prompt and schema.
+        """
+        template = self._load_prompt()
+        
+        # Ensure all expected variables are present in kwargs, default to "Not provided"
+        # This is a safety measure to allow optional fields like job_description
+        formatted_kwargs = {k: (v if v else "Not provided") for k, v in kwargs.items()}
+        
+        prompt = template.format(**formatted_kwargs)
+
+        try:
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    response_schema=self.response_schema,
+                    temperature=self.temperature
+                )
+            )
+            return json.loads(response.text)
+        except Exception as e:
+            print(f"AI Agent Error ({self.prompt_file}): {str(e)}")
+            raise e
+
+# --- Service Registry ---
+
+class AIService:
+    """
+    Facade for all AI-powered features, delegating tasks to specific agents.
+    """
+    def __init__(self):
+        self.ats_evaluator = AIAgent('ats_evaluator.txt', ATSEvaluation, temperature=0.2)
+        self.skill_recommender = AIAgent('skill_recommender.txt', SkillRecommendation)
+        self.paraphraser = AIAgent('paraphraser.txt', ParaphraseResult, temperature=0.4)
+        self.achievement_recommender = AIAgent('achievement_recommender.txt', AchievementRecommendation, temperature=0.5)
+
     def evaluate_ats(self, resume_data: dict, job_description: str) -> dict:
-        """
-        Evaluates the resume against a job description and returns score + suggestions.
-        """
-        template = self._load_prompt('ats_evaluator.txt')
-        prompt = template.format(
+        return self.ats_evaluator.generate(
             resume_data=json.dumps(resume_data, indent=2),
             job_description=job_description
         )
 
-        try:
-            response = self.client.models.generate_content(
-                model=self.model_name,
-                contents=prompt,
-                config=types.GenerateContentConfig(
-                    response_mime_type="application/json",
-                    response_schema=ATSEvaluation,
-                    temperature=0.2 # Lower temperature for more deterministic evaluation
-                )
-            )
-            return json.loads(response.text)
-        except Exception as e:
-            # Fallback/Error handling
-            return {
-                "ats_score": 0,
-                "keyword_match": [],
-                "missing_keywords": [],
-                "suggestions": [f"Error communicating with AI: {str(e)}"]
-            }
-
-    def recommend_skills(self, target_role: str, job_description: str) -> dict:
-        """
-        Recommends skills based on the role and JD.
-        """
-        template = self._load_prompt('skill_recommender.txt')
-        prompt = template.format(
+    def recommend_skills(self, target_role: str, job_description: Optional[str]) -> dict:
+        return self.skill_recommender.generate(
             target_role=target_role,
             job_description=job_description
         )
 
-        try:
-            response = self.client.models.generate_content(
-                model=self.model_name,
-                contents=prompt,
-                config=types.GenerateContentConfig(
-                    response_mime_type="application/json",
-                    response_schema=SkillRecommendation,
-                    temperature=0.3
-                )
-            )
-            return json.loads(response.text)
-        except Exception as e:
-            return {
-                "recommended_skills": [],
-                "reasoning": f"Error: {str(e)}"
-            }
-
-    def paraphrase_bullet(self, bullet_point: str, target_role: str, job_description: str) -> dict:
-        """
-        Paraphrases a single bullet point for ATS optimization.
-        """
-        template = self._load_prompt('paraphraser.txt')
-        prompt = template.format(
+    def paraphrase_bullet(self, bullet_point: str, target_role: str, job_description: Optional[str], job_title: str = "") -> dict:
+        return self.paraphraser.generate(
             bullet_point=bullet_point,
             target_role=target_role,
+            job_title=job_title,
             job_description=job_description
         )
 
-        try:
-            response = self.client.models.generate_content(
-                model=self.model_name,
-                contents=prompt,
-                config=types.GenerateContentConfig(
-                    response_mime_type="application/json",
-                    response_schema=ParaphraseResult,
-                    temperature=0.4
-                )
-            )
-            return json.loads(response.text)
-        except Exception as e:
-            return {
-                "suggestions": [
-                    f"Error: {str(e)}",
-                    "Try again later.",
-                    "Optimization failed."
-                ]
-            }
+    def recommend_achievements(self, job_title: str, target_role: str, job_description: Optional[str]) -> dict:
+        return self.achievement_recommender.generate(
+            job_title=job_title,
+            target_role=target_role,
+            job_description=job_description
+        )

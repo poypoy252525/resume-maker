@@ -30,6 +30,8 @@ interface AIAssistantPanelProps {
   onAnalyze: () => void;
   onParaphrase: (bullet: string) => Promise<string[] | null>;
   onUpdateBullet: (expIndex: number, bulletIndex: number, newValue: string) => void;
+  onRecommendAchievements: (jobTitle: string) => Promise<string[] | null>;
+  onAddBullet: (expIndex: number, bullet: string) => void;
   loading: boolean;
   step: number;
 }
@@ -41,10 +43,13 @@ export default function AIAssistantPanel({
   onAnalyze,
   onParaphrase,
   onUpdateBullet,
+  onRecommendAchievements,
+  onAddBullet,
   loading,
   step,
 }: AIAssistantPanelProps) {
   const [paraphraseResults, setParaphraseResults] = useState<{ bullet: string; suggestions: string[]; expIdx: number; bpIdx: number } | null>(null);
+  const [achievementIdeas, setAchievementIdeas] = useState<{ jobTitle: string; achievements: string[]; expIdx: number } | null>(null);
   const [activeTab, setActiveTab] = useState("insights");
   
   const feedback = formData.ai_feedback;
@@ -68,6 +73,25 @@ export default function AIAssistantPanel({
     if (paraphraseResults) {
       onUpdateBullet(paraphraseResults.expIdx, paraphraseResults.bpIdx, optimized);
       setParaphraseResults(null);
+    }
+  };
+
+  const handleGetAchievementIdeas = async (jobTitle: string, expIdx: number) => {
+    if (!jobTitle.trim()) return;
+    const achievements = await onRecommendAchievements(jobTitle);
+    if (achievements) {
+      setAchievementIdeas({ jobTitle, achievements, expIdx });
+    }
+  };
+
+  const handleAddAchievement = (achievement: string) => {
+    if (achievementIdeas) {
+      onAddBullet(achievementIdeas.expIdx, achievement);
+      // Remove the added one from local state to avoid duplicates
+      setAchievementIdeas({
+        ...achievementIdeas,
+        achievements: achievementIdeas.achievements.filter(a => a !== achievement)
+      });
     }
   };
 
@@ -206,6 +230,63 @@ export default function AIAssistantPanel({
                       </div>
                     </div>
                   )}
+
+                  {/* Achievement Ideas Section */}
+                  <div className="space-y-4 pt-4 border-t border-dashed">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-xs font-bold flex items-center gap-2">
+                        <Plus className="size-3.5 text-primary" /> Achievement Ideas
+                      </h4>
+                      {loading && !paraphraseResults && <Zap className="size-3 text-primary animate-pulse" />}
+                    </div>
+
+                    {achievementIdeas ? (
+                      <div className="space-y-3 bg-muted/30 border border-dashed rounded-xl p-3 animate-in fade-in slide-in-from-bottom-2">
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="text-[10px] font-bold text-muted-foreground uppercase">For: {achievementIdeas.jobTitle}</span>
+                          <Button variant="ghost" size="icon" className="h-5 w-5" onClick={() => setAchievementIdeas(null)}>
+                            <Plus className="size-3 rotate-45" />
+                          </Button>
+                        </div>
+                        <div className="space-y-2">
+                          {achievementIdeas.achievements.map((a, i) => (
+                            <div 
+                              key={i} 
+                              className="text-[10px] bg-background border rounded-lg p-2.5 hover:border-primary/50 cursor-pointer transition-all group relative"
+                              onClick={() => handleAddAchievement(a)}
+                            >
+                              <p className="leading-tight pr-4">{a}</p>
+                              <Plus className="size-3 absolute right-2 top-2 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </div>
+                          ))}
+                          {achievementIdeas.achievements.length === 0 && (
+                            <p className="text-[10px] text-center text-muted-foreground italic py-2">All suggestions added!</p>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        <p className="text-[10px] text-muted-foreground leading-tight mb-3">
+                          Don't know what to write? Get AI-powered achievement suggestions for your roles.
+                        </p>
+                        {formData.experiences.map((exp, idx) => (
+                          exp.job_title && (
+                            <Button 
+                              key={idx}
+                              variant="outline" 
+                              size="sm" 
+                              onClick={() => handleGetAchievementIdeas(exp.job_title, idx)}
+                              disabled={loading}
+                              className="w-full h-9 text-[10px] justify-between rounded-xl border-primary/20 hover:bg-primary/5 group"
+                            >
+                              <span className="truncate">Ideas for {exp.job_title}</span>
+                              <ArrowRight className="size-3 opacity-50 group-hover:opacity-100 transition-all group-hover:translate-x-1" />
+                            </Button>
+                          )
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 

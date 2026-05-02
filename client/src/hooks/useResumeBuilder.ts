@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { generateResume, checkTaskStatus, analyzeResume, paraphraseBullet } from "@/api";
+import { generateResume, checkTaskStatus, analyzeResume, paraphraseBullet, recommendAchievements } from "@/api";
 import type { ResumeData, Experience, Education } from "@/api";
 
 export function useResumeBuilder() {
@@ -82,10 +82,6 @@ export function useResumeBuilder() {
   };
 
   const handleParaphrase = async (bulletPoint: string) => {
-    if (!formData.job_description) {
-      setError("Job description is required for optimization.");
-      return null;
-    }
     setLoading(true);
     try {
       const result = await paraphraseBullet(
@@ -97,6 +93,25 @@ export function useResumeBuilder() {
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error ? err.message : "Paraphrasing failed";
+      setError(errorMessage);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRecommendAchievements = async (jobTitle: string) => {
+    setLoading(true);
+    try {
+      const result = await recommendAchievements(
+        jobTitle,
+        formData.job_description,
+        formData.target_role || ""
+      );
+      return result.achievements;
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to generate recommendations";
       setError(errorMessage);
       return null;
     } finally {
@@ -149,6 +164,19 @@ export function useResumeBuilder() {
       ...updatedExperiences[expIndex],
       bullet_points: updatedBullets,
     };
+    setFormData((prev) => ({ ...prev, experiences: updatedExperiences }));
+  };
+
+  const addBulletToExperience = (expIndex: number, bullet: string) => {
+    const updatedExperiences = [...formData.experiences];
+    const currentBullets = updatedExperiences[expIndex].bullet_points;
+    
+    if (currentBullets.length === 1 && currentBullets[0].trim() === "") {
+      updatedExperiences[expIndex].bullet_points = [bullet];
+    } else {
+      updatedExperiences[expIndex].bullet_points = [...currentBullets, bullet];
+    }
+    
     setFormData((prev) => ({ ...prev, experiences: updatedExperiences }));
   };
 
@@ -274,5 +302,7 @@ export function useResumeBuilder() {
     triggerAIAnalysis,
     handleParaphrase,
     updateBullet,
+    handleRecommendAchievements,
+    addBulletToExperience,
   };
 }

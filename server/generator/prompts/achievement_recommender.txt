@@ -1,0 +1,12 @@
+Target Role (for context): {target_role}
+Current Job Title: {job_title}
+Target Job Description: {job_description}
+
+Instructions:
+1. Generate practical, tech-focused bullet points that highlight specific tools and tasks.
+2. Use natural language like "Developed using...", "Utilized [Tech] to...", "Built with...", or "Proficient in...".
+3. Focus on describing technical contributions and tech-stack usage rather than purely metrics-driven business achievements.
+4. If a Job Description is provided, prioritize the technologies mentioned there.
+5. Keep each bullet point under 20 words.
+
+Output must be a JSON object with a list of "achievements".

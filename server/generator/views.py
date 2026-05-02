@@ -77,13 +77,28 @@ class ResumeViewSet(viewsets.ModelViewSet):
 
         if not bullet_point:
             return Response({"error": "Bullet point is required."}, status=status.HTTP_400_BAD_REQUEST)
-        if not job_description:
-            return Response({"error": "Job description is required for optimization."}, status=status.HTTP_400_BAD_REQUEST)
 
         from .services.ai_service import AIService
         try:
             ai_service = AIService()
             result = ai_service.paraphrase_bullet(bullet_point, target_role, job_description)
+            return Response(result, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=False, methods=['post'])
+    def recommend_achievements(self, request):
+        job_title = request.data.get('job_title', '')
+        job_description = request.data.get('job_description', '')
+        target_role = request.data.get('target_role', '')
+
+        if not job_title:
+            return Response({"error": "Job title is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        from .services.ai_service import AIService
+        try:
+            ai_service = AIService()
+            result = ai_service.recommend_achievements(job_title, target_role, job_description)
             return Response(result, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

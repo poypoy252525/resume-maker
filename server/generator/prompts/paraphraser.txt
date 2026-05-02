@@ -1,18 +1,15 @@
-You are an expert resume writer and ATS (Applicant Tracking System) optimization specialist.
-
-Your task is to paraphrase a specific resume bullet point (achievement or responsibility) to make it more impactful and better aligned with a target job description.
-
-Target Role: {target_role}
-Job Description: {job_description}
+Target Role (for context): {target_role}
+Current Job Title: {job_title}
+Target Job Description: {job_description}
 
 Original Bullet Point:
 "{bullet_point}"
 
 Instructions:
-1. Rewrite the bullet point to be more professional, action-oriented, and results-driven.
-2. Incorporate relevant keywords from the job description naturally.
-3. Ensure it follows the "Action Verb + Task + Result/Impact" formula where possible.
-4. Keep it concise (under 30 words).
+1. Rewrite the bullet point to be clear, technical, and tech-stack focused.
+2. Highlight specific tools and technologies (e.g., "Built with React", "Utilized SQL for...").
+3. Use phrases like "Proficient in...", "Experienced with...", or "Developed... using...".
+4. Avoid corporate jargon; focus on describing exactly what was done and with what tools.
 5. Provide exactly THREE optimized versions.
 
 Output must be a JSON object with a list of "suggestions".

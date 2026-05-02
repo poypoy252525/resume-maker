@@ -112,3 +112,24 @@ export const paraphraseBullet = async (bulletPoint: string, jobDescription: stri
 
   return response.json();
 };
+
+export const recommendAchievements = async (jobTitle: string, jobDescription: string, targetRole: string): Promise<{ achievements: string[] }> => {
+  const response = await fetch(`${API_BASE_URL}/resumes/recommend_achievements/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      job_title: jobTitle,
+      job_description: jobDescription,
+      target_role: targetRole,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to recommend achievements");
+  }
+
+  return response.json();
+};

@@ -40,6 +40,8 @@ export default function NewResume() {
     triggerAIAnalysis,
     handleParaphrase,
     updateBullet,
+    handleRecommendAchievements,
+    addBulletToExperience,
   } = useResumeBuilder();
 
   if (isGenerating) {
@@ -77,6 +79,8 @@ export default function NewResume() {
               onAnalyze={triggerAIAnalysis}
               onParaphrase={handleParaphrase}
               onUpdateBullet={updateBullet}
+              onRecommendAchievements={handleRecommendAchievements}
+              onAddBullet={addBulletToExperience}
               loading={loading}
               step={step}
             />
