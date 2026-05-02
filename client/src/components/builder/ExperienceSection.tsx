@@ -72,9 +72,9 @@ export default function ExperienceSection({
   onDoneEditing,
 }: ExperienceSectionProps) {
   const [optimizingIdx, setOptimizingIdx] = useState<number | null>(null);
-  const [optimizationResults, setOptimizationResults] = useState<string[] | null>(
-    null,
-  );
+  const [optimizationResults, setOptimizationResults] = useState<
+    string[] | null
+  >(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isOptimizing, setIsOptimizing] = useState(false);
 
@@ -366,7 +366,7 @@ export default function ExperienceSection({
                           }
                         }}
                         placeholder="Describe an achievement or responsibility..."
-                        className="w-full min-h-[38px] py-2 resize-none overflow-hidden field-sizing-content transition-all pr-4 group-hover:pr-20 group-focus-within:pr-20"
+                        className="w-full min-h-9.5 py-2 resize-none overflow-hidden field-sizing-content transition-all pr-4 group-hover:pr-20 group-focus-within:pr-20"
                         rows={1}
                       />
                       <div className="absolute right-2 top-1.5 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity bg-background/90 backdrop-blur-sm p-0.5 rounded-lg border shadow-sm z-10">
@@ -433,7 +433,11 @@ export default function ExperienceSection({
                       Original
                     </Label>
                     <div className="p-3 rounded-xl bg-muted/50 text-[11px] italic border border-dashed">
-                      "{optimizingIdx !== null ? exp.bullet_points[optimizingIdx] : ""}"
+                      "
+                      {optimizingIdx !== null
+                        ? exp.bullet_points[optimizingIdx]
+                        : ""}
+                      "
                     </div>
                   </div>
 
@@ -451,7 +455,8 @@ export default function ExperienceSection({
                       </div>
                     ) : (
                       <div className="space-y-4">
-                        {optimizationResults && optimizationResults.length > 0 ? (
+                        {optimizationResults &&
+                        optimizationResults.length > 0 ? (
                           <div className="space-y-2">
                             {optimizationResults.map((result, i) => (
                               <button
@@ -476,9 +481,12 @@ export default function ExperienceSection({
                               <RefreshCcw className="w-4 h-4" />
                             </div>
                             <div className="px-4">
-                              <p className="text-[11px] font-semibold">No suggestions found</p>
+                              <p className="text-[11px] font-semibold">
+                                No suggestions found
+                              </p>
                               <p className="text-[10px] text-muted-foreground mt-1">
-                                We couldn't generate variations. This might be due to a temporary API issue.
+                                We couldn't generate variations. This might be
+                                due to a temporary API issue.
                               </p>
                             </div>
                           </div>

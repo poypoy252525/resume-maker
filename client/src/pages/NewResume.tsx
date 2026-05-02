@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/resizable";
 import { useResumeBuilder } from "@/hooks/useResumeBuilder";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { Check, LoaderCircle, Sparkles, X } from "lucide-react";
+import { Check, LoaderCircle, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -147,7 +147,7 @@ export default function NewResume() {
                   <Sparkles className="size-6" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="p-0 w-[90%] sm:w-[400px]">
+              <SheetContent side="right" className="p-0 w-[90%] sm:w-100">
                 <div className="h-full relative">
                   <AIAssistantPanel {...aiAssistantProps} />
                 </div>
