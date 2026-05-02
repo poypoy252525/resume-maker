@@ -35,6 +35,8 @@ interface AIAssistantPanelProps {
   step: number;
   activeExperienceIndex: number | null;
   activeBulletIndex: number | null;
+  /** The index of the experience open in the focused editor (null = list view) */
+  focusedExperienceIndex: number | null;
 }
 
 export default function AIAssistantPanel({
@@ -50,6 +52,7 @@ export default function AIAssistantPanel({
   step,
   activeExperienceIndex,
   activeBulletIndex,
+  focusedExperienceIndex,
 }: AIAssistantPanelProps) {
   const [paraphraseResults, setParaphraseResults] = useState<{ bullet: string; suggestions: string[]; expIdx: number; bpIdx: number } | null>(null);
   const [achievementIdeas, setAchievementIdeas] = useState<{ jobTitle: string; achievements: string[]; expIdx: number } | null>(null);
@@ -179,87 +182,102 @@ export default function AIAssistantPanel({
 
               {step === 2 && (
                 <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
-                  {/* Real-time Optimizer */}
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-xs font-bold flex items-center gap-2">
-                        <Wand2 className="size-3.5 text-primary" /> Bullet Point Optimizer
-                      </h4>
-                      {loading && paraphraseResults && <Zap className="size-3 text-primary animate-pulse" />}
-                    </div>
-                    
-                    {activeExperienceIndex !== null && activeBulletIndex !== null ? (
+                  {/* Focused experience context header */}
+                  {focusedExperienceIndex !== null ? (
+                    <>
+                      {/* Focused experience banner */}
+                      <div className="bg-primary/5 border border-primary/10 rounded-xl p-3 space-y-0.5">
+                        <p className="text-[10px] font-bold text-primary uppercase tracking-wider">Focused Experience</p>
+                        <p className="text-xs font-semibold truncate">
+                          {formData.experiences[focusedExperienceIndex]?.company_name || `Experience #${focusedExperienceIndex + 1}`}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground">
+                          {formData.experiences[focusedExperienceIndex]?.job_title || "No job title yet"}
+                        </p>
+                      </div>
+
+                      {/* Real-time Optimizer */}
                       <div className="space-y-3">
-                        <div className="p-2.5 rounded-xl bg-muted/30 border border-dashed text-[10px] text-muted-foreground italic line-clamp-2">
-                          "{formData.experiences[activeExperienceIndex].bullet_points[activeBulletIndex] || "Focused bullet point..."}"
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-xs font-bold flex items-center gap-2">
+                            <Wand2 className="size-3.5 text-primary" /> Bullet Optimizer
+                          </h4>
+                          {loading && paraphraseResults && <Zap className="size-3 text-primary animate-pulse" />}
                         </div>
                         
-                        <Button 
-                          onClick={() => {
-                            const bullet = formData.experiences[activeExperienceIndex].bullet_points[activeBulletIndex];
-                            handleParaphraseRequest(bullet, activeExperienceIndex, activeBulletIndex);
-                          }}
-                          disabled={loading || !formData.experiences[activeExperienceIndex].bullet_points[activeBulletIndex].trim()}
-                          className="w-full h-8 text-[10px] rounded-xl shadow-sm"
-                        >
-                          {loading ? "Optimizing..." : "Optimize This Bullet"}
-                        </Button>
-
-                        {paraphraseResults && paraphraseResults.expIdx === activeExperienceIndex && paraphraseResults.bpIdx === activeBulletIndex && (
-                          <div className="space-y-2 bg-primary/5 border border-primary/20 rounded-xl p-3 animate-in zoom-in-95">
-                            <span className="text-[10px] font-bold text-primary uppercase">Suggestions</span>
-                            <div className="space-y-2">
-                              {paraphraseResults.suggestions.map((s, i) => (
-                                <div 
-                                  key={i} 
-                                  className="text-[10px] bg-background border rounded-lg p-2 hover:border-primary/50 cursor-pointer transition-colors group"
-                                  onClick={() => applyParaphrase(s)}
-                                >
-                                  <p className="leading-tight">{s}</p>
-                                  <div className="flex justify-end mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <span className="text-[8px] font-bold text-primary uppercase">Click to apply</span>
-                                  </div>
-                                </div>
-                              ))}
+                        {activeExperienceIndex !== null && activeBulletIndex !== null ? (
+                          <div className="space-y-3">
+                            <div className="p-2.5 rounded-xl bg-muted/30 border border-dashed text-[10px] text-muted-foreground italic line-clamp-2">
+                              "{formData.experiences[activeExperienceIndex].bullet_points[activeBulletIndex] || "Focused bullet point..."}"
                             </div>
+                            
+                            <Button 
+                              onClick={() => {
+                                const bullet = formData.experiences[activeExperienceIndex].bullet_points[activeBulletIndex];
+                                handleParaphraseRequest(bullet, activeExperienceIndex, activeBulletIndex);
+                              }}
+                              disabled={loading || !formData.experiences[activeExperienceIndex].bullet_points[activeBulletIndex].trim()}
+                              className="w-full h-8 text-[10px] rounded-xl shadow-sm"
+                            >
+                              {loading ? "Optimizing..." : "Optimize This Bullet"}
+                            </Button>
+
+                            {paraphraseResults && paraphraseResults.expIdx === activeExperienceIndex && paraphraseResults.bpIdx === activeBulletIndex && (
+                              <div className="space-y-2 bg-primary/5 border border-primary/20 rounded-xl p-3 animate-in zoom-in-95">
+                                <span className="text-[10px] font-bold text-primary uppercase">Suggestions</span>
+                                <div className="space-y-2">
+                                  {paraphraseResults.suggestions.map((s, i) => (
+                                    <div 
+                                      key={i} 
+                                      className="text-[10px] bg-background border rounded-lg p-2 hover:border-primary/50 cursor-pointer transition-colors group"
+                                      onClick={() => applyParaphrase(s)}
+                                    >
+                                      <p className="leading-tight">{s}</p>
+                                      <div className="flex justify-end mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <span className="text-[8px] font-bold text-primary uppercase">Click to apply</span>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="bg-muted/50 rounded-xl p-4 border border-dashed text-center">
+                            <Bot className="size-6 text-muted-foreground/30 mx-auto mb-2" />
+                            <p className="text-[10px] text-muted-foreground italic">
+                              Click on a bullet point to optimize it.
+                            </p>
                           </div>
                         )}
                       </div>
-                    ) : (
-                      <div className="bg-muted/50 rounded-xl p-4 border border-dashed text-center">
-                        <Bot className="size-6 text-muted-foreground/30 mx-auto mb-2" />
-                        <p className="text-[10px] text-muted-foreground italic">
-                          Click on a bullet point in the editor to see optimization suggestions.
-                        </p>
-                      </div>
-                    )}
-                  </div>
 
-                  {/* Achievement Ideas Section */}
-                  <div className="space-y-4 pt-4 border-t border-dashed">
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-xs font-bold flex items-center gap-2">
-                        <Plus className="size-3.5 text-primary" /> Achievement Ideas
-                      </h4>
-                      {loading && achievementIdeas && <Zap className="size-3 text-primary animate-pulse" />}
-                    </div>
+                      {/* Achievement Ideas */}
+                      <div className="space-y-4 pt-4 border-t border-dashed">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-xs font-bold flex items-center gap-2">
+                            <Plus className="size-3.5 text-primary" /> Achievement Ideas
+                          </h4>
+                          {loading && achievementIdeas && <Zap className="size-3 text-primary animate-pulse" />}
+                        </div>
 
-                    {activeExperienceIndex !== null ? (
-                      <div className="space-y-3">
                         <p className="text-[10px] text-muted-foreground leading-tight">
-                          Suggestions for <span className="font-bold text-foreground truncate max-w-[150px] inline-block align-bottom">{formData.experiences[activeExperienceIndex].job_title || "your role"}</span>.
+                          AI suggestions for <span className="font-bold text-foreground">{formData.experiences[focusedExperienceIndex]?.job_title || "your role"}</span>.
                         </p>
                         
                         <Button 
                           variant="outline"
-                          onClick={() => handleGetAchievementIdeas(formData.experiences[activeExperienceIndex].job_title, activeExperienceIndex)}
-                          disabled={loading || !formData.experiences[activeExperienceIndex].job_title.trim()}
+                          onClick={() => handleGetAchievementIdeas(
+                            formData.experiences[focusedExperienceIndex].job_title,
+                            focusedExperienceIndex
+                          )}
+                          disabled={loading || !formData.experiences[focusedExperienceIndex]?.job_title?.trim()}
                           className="w-full h-8 text-[10px] rounded-xl border-primary/20 hover:bg-primary/5"
                         >
                           Generate Achievement Ideas
                         </Button>
 
-                        {achievementIdeas && achievementIdeas.expIdx === activeExperienceIndex && (
+                        {achievementIdeas && achievementIdeas.expIdx === focusedExperienceIndex && (
                           <div className="space-y-2 pt-2">
                             {achievementIdeas.achievements.map((a, i) => (
                               <div 
@@ -274,15 +292,21 @@ export default function AIAssistantPanel({
                           </div>
                         )}
                       </div>
-                    ) : (
-                      <div className="bg-muted/50 rounded-xl p-4 border border-dashed text-center">
-                        <Lightbulb className="size-6 text-muted-foreground/30 mx-auto mb-2" />
-                        <p className="text-[10px] text-muted-foreground italic">
-                          Select an experience card to get tailored achievement ideas.
+                    </>
+                  ) : (
+                    /* No experience focused — show a helpful prompt */
+                    <div className="bg-muted/50 rounded-2xl p-6 border border-dashed text-center space-y-3">
+                      <div className="size-10 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                        <Bot className="size-5 text-primary" />
+                      </div>
+                      <div className="space-y-1">
+                        <h4 className="text-xs font-bold">Add an Experience</h4>
+                        <p className="text-[10px] text-muted-foreground leading-relaxed">
+                          Once you start editing an experience, I'll show you AI optimization tools here — bullet optimizer and achievement ideas.
                         </p>
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               )}
 

@@ -6,6 +6,8 @@ export function useResumeBuilder() {
   const [step, setStep] = useState(1);
   const [activeExperienceIndex, setActiveExperienceIndex] = useState<number | null>(null);
   const [activeBulletIndex, setActiveBulletIndex] = useState<number | null>(null);
+  /** The index of the experience currently open in the focused editor. null = list view. */
+  const [focusedExperienceIndex, setFocusedExperienceIndex] = useState<number | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [loading, setLoading] = useState(false);
   const [taskId, setTaskId] = useState<string | null>(null);
@@ -151,6 +153,29 @@ export function useResumeBuilder() {
     }));
   };
 
+  /** Adds a blank experience and immediately focuses it for editing. */
+  const addAndFocusExperience = () => {
+    setFormData((prev) => {
+      const newIndex = prev.experiences.length;
+      setFocusedExperienceIndex(newIndex);
+      setActiveExperienceIndex(newIndex);
+      return {
+        ...prev,
+        experiences: [
+          ...prev.experiences,
+          {
+            company_name: "",
+            location: "",
+            job_title: "",
+            date_from: "",
+            date_to: "",
+            bullet_points: [""],
+          },
+        ],
+      };
+    });
+  };
+
   const removeExperience = (index: number) => {
     setFormData((prev) => ({
       ...prev,
@@ -294,6 +319,7 @@ export function useResumeBuilder() {
     handleInputChange,
     handleExperienceChange,
     addExperience,
+    addAndFocusExperience,
     removeExperience,
     handleEducationChange,
     addEducation,
@@ -310,5 +336,7 @@ export function useResumeBuilder() {
     setActiveExperienceIndex,
     activeBulletIndex,
     setActiveBulletIndex,
+    focusedExperienceIndex,
+    setFocusedExperienceIndex,
   };
 }

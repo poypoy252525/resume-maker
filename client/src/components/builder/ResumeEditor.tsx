@@ -24,6 +24,7 @@ interface ResumeEditorProps {
     value: string | string[],
   ) => void;
   addExperience: () => void;
+  addAndFocusExperience: () => void;
   removeExperience: (index: number) => void;
   handleEducationChange: (
     index: number,
@@ -36,6 +37,9 @@ interface ResumeEditorProps {
   handleSkillsChange: (skills: string[]) => void;
   onFocusExperience: (index: number) => void;
   onFocusBullet: (index: number, bulletIndex: number) => void;
+  focusedExperienceIndex: number | null;
+  setFocusedExperienceIndex: (index: number | null) => void;
+  setActiveExperienceIndex: (index: number) => void;
   loading: boolean;
 }
 
@@ -46,6 +50,7 @@ export default function ResumeEditor({
   handleInputChange,
   handleExperienceChange,
   addExperience,
+  addAndFocusExperience,
   removeExperience,
   handleEducationChange,
   addEducation,
@@ -54,9 +59,31 @@ export default function ResumeEditor({
   handleSkillsChange,
   onFocusExperience,
   onFocusBullet,
+  focusedExperienceIndex,
+  setFocusedExperienceIndex,
+  setActiveExperienceIndex,
   loading,
 }: ResumeEditorProps) {
   const currentStepItem = sidebarItems[step - 1];
+
+  // When "Add Experience" is clicked in list view, add + immediately focus
+  const handleAddExperience = () => {
+    addAndFocusExperience();
+  };
+
+  // When user opens an existing experience from list
+  const handleOpenExperience = (index: number) => {
+    setFocusedExperienceIndex(index);
+    setActiveExperienceIndex(index);
+  };
+
+  // When user clicks "Done" in the focused form
+  const handleDoneEditing = () => {
+    setFocusedExperienceIndex(null);
+  };
+
+  // Hide the Next/Previous navigation while an experience is being edited
+  const isEditingExperience = step === 2 && focusedExperienceIndex !== null;
 
   return (
     <main className="h-full bg-muted/5 flex flex-col overflow-hidden">
@@ -68,9 +95,16 @@ export default function ResumeEditor({
           <div className="flex flex-col">
             <h2 className="text-sm font-bold leading-none mb-1">
               {currentStepItem?.label}
+              {isEditingExperience && (
+                <span className="text-muted-foreground font-normal ml-1.5">
+                  · Adding Experience {focusedExperienceIndex! + 1}
+                </span>
+              )}
             </h2>
             <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-tight">
-              {currentStepItem?.description}
+              {isEditingExperience
+                ? "Fill in details, then click Done to return"
+                : currentStepItem?.description}
             </p>
           </div>
         </div>
@@ -97,10 +131,13 @@ export default function ResumeEditor({
               <ExperienceSection
                 experiences={formData.experiences}
                 onChange={handleExperienceChange}
-                onAdd={addExperience}
+                onAdd={handleAddExperience}
                 onRemove={removeExperience}
                 onFocusExperience={onFocusExperience}
                 onFocusBullet={onFocusBullet}
+                focusedIndex={focusedExperienceIndex}
+                onOpenExperience={handleOpenExperience}
+                onDoneEditing={handleDoneEditing}
               />
             </StepperContent>
             <StepperContent value={3}>
@@ -120,40 +157,43 @@ export default function ResumeEditor({
               />
             </StepperContent>
 
-            <div className="flex justify-between pt-8">
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={() => {
-                  if (step > 1) setStep(step - 1);
-                }}
-                disabled={step === 1}
-                className="rounded-xl px-6"
-              >
-                <ChevronLeft className="w-4 h-4 mr-2" /> Previous
-              </Button>
-
-              {step !== 4 ? (
+            {/* Navigation — hidden while editing an experience */}
+            {!isEditingExperience && (
+              <div className="flex justify-between pt-8">
                 <Button
+                  variant="outline"
                   size="lg"
                   onClick={() => {
-                    if (step < 4) setStep(step + 1);
+                    if (step > 1) setStep(step - 1);
                   }}
-                  className="rounded-xl px-8"
+                  disabled={step === 1}
+                  className="rounded-xl px-6"
                 >
-                  Next <ChevronRight className="w-4 h-4 ml-2" />
+                  <ChevronLeft className="w-4 h-4 mr-2" /> Previous
                 </Button>
-              ) : (
-                <Button
-                  size="lg"
-                  onClick={handleSubmit}
-                  disabled={loading}
-                  className="rounded-xl px-8 shadow-lg shadow-primary/20"
-                >
-                  {loading ? "Generating..." : "Generate Resume"}
-                </Button>
-              )}
-            </div>
+
+                {step !== 4 ? (
+                  <Button
+                    size="lg"
+                    onClick={() => {
+                      if (step < 4) setStep(step + 1);
+                    }}
+                    className="rounded-xl px-8"
+                  >
+                    Next <ChevronRight className="w-4 h-4 ml-2" />
+                  </Button>
+                ) : (
+                  <Button
+                    size="lg"
+                    onClick={handleSubmit}
+                    disabled={loading}
+                    className="rounded-xl px-8 shadow-lg shadow-primary/20"
+                  >
+                    {loading ? "Generating..." : "Generate Resume"}
+                  </Button>
+                )}
+              </div>
+            )}
           </StepperPanel>
         </div>
       </ScrollArea>

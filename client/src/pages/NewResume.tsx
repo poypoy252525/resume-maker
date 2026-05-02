@@ -29,6 +29,7 @@ export default function NewResume() {
     handleInputChange,
     handleExperienceChange,
     addExperience,
+    addAndFocusExperience,
     removeExperience,
     handleEducationChange,
     addEducation,
@@ -45,6 +46,8 @@ export default function NewResume() {
     setActiveExperienceIndex,
     activeBulletIndex,
     setActiveBulletIndex,
+    focusedExperienceIndex,
+    setFocusedExperienceIndex,
   } = useResumeBuilder();
 
   if (isGenerating) {
@@ -82,6 +85,7 @@ export default function NewResume() {
               handleInputChange={handleInputChange}
               handleExperienceChange={handleExperienceChange}
               addExperience={addExperience}
+              addAndFocusExperience={addAndFocusExperience}
               removeExperience={removeExperience}
               handleEducationChange={handleEducationChange}
               addEducation={addEducation}
@@ -90,6 +94,9 @@ export default function NewResume() {
               handleSkillsChange={handleSkillsChange}
               onFocusExperience={setActiveExperienceIndex}
               onFocusBullet={setActiveBulletIndex}
+              focusedExperienceIndex={focusedExperienceIndex}
+              setFocusedExperienceIndex={setFocusedExperienceIndex}
+              setActiveExperienceIndex={setActiveExperienceIndex}
               loading={loading}
             />
           </ResizablePanel>
@@ -97,7 +104,7 @@ export default function NewResume() {
           <ResizableHandle withHandle />
 
           <ResizablePanel defaultSize={35} minSize={25}>
-            <AIAssistantPanel 
+            <AIAssistantPanel
               formData={formData}
               onChange={handleInputChange}
               onSkillsChange={handleSkillsChange}
@@ -110,6 +117,7 @@ export default function NewResume() {
               step={step}
               activeExperienceIndex={activeExperienceIndex}
               activeBulletIndex={activeBulletIndex}
+              focusedExperienceIndex={focusedExperienceIndex}
             />
           </ResizablePanel>
         </ResizablePanelGroup>
