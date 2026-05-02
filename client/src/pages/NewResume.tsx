@@ -1,6 +1,7 @@
 import BuilderStatus from "@/components/builder/BuilderStatus";
 import ResumeEditor from "@/components/builder/ResumeEditor";
 import ResumePreviewPanel from "@/components/builder/ResumePreviewPanel";
+import AIAssistantPanel from "@/components/builder/AIAssistantPanel";
 import { Stepper } from "@/components/reui/stepper";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
@@ -35,6 +36,10 @@ export default function NewResume() {
     removeEducation,
     handleReset,
     handleSubmit,
+    handleSkillsChange,
+    triggerAIAnalysis,
+    handleParaphrase,
+    updateBullet,
   } = useResumeBuilder();
 
   if (isGenerating) {
@@ -64,9 +69,18 @@ export default function NewResume() {
           orientation="horizontal"
           className="h-full w-full items-stretch"
         >
-          {/* <ResizablePanel defaultSize="20%" maxSize="25%">
-            <AIAssistantPanel />
-          </ResizablePanel> */}
+          <ResizablePanel defaultSize="25%" minSize="20%" maxSize="35%">
+            <AIAssistantPanel 
+              formData={formData}
+              onChange={handleInputChange}
+              onSkillsChange={handleSkillsChange}
+              onAnalyze={triggerAIAnalysis}
+              onParaphrase={handleParaphrase}
+              onUpdateBullet={updateBullet}
+              loading={loading}
+              step={step}
+            />
+          </ResizablePanel>
 
           <ResizableHandle withHandle />
 
@@ -83,6 +97,7 @@ export default function NewResume() {
               addEducation={addEducation}
               removeEducation={removeEducation}
               handleSubmit={handleSubmit}
+              handleSkillsChange={handleSkillsChange}
               loading={loading}
             />
           </ResizablePanel>

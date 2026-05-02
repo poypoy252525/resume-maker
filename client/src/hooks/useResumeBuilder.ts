@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { generateResume, checkTaskStatus } from "@/api";
+import { generateResume, checkTaskStatus, analyzeResume, paraphraseBullet } from "@/api";
 import type { ResumeData, Experience, Education } from "@/api";
 
 export function useResumeBuilder() {
@@ -18,6 +18,7 @@ export function useResumeBuilder() {
     location: "",
     has_skill: true,
     skill_description: "",
+    skills: [],
     has_experience: true,
     experiences: [
       {
@@ -41,6 +42,9 @@ export function useResumeBuilder() {
         content: "",
       },
     ],
+    job_description: "",
+    target_role: "",
+    ai_feedback: undefined,
   });
 
   const handleInputChange = (
@@ -48,6 +52,56 @@ export function useResumeBuilder() {
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSkillsChange = (skills: string[]) => {
+    setFormData((prev) => ({ ...prev, skills }));
+  };
+
+  const triggerAIAnalysis = async () => {
+    if (!formData.job_description) {
+      setError("Job description is required for AI analysis.");
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const feedback = await analyzeResume(
+        formData,
+        formData.job_description,
+        formData.target_role || ""
+      );
+      setFormData((prev) => ({ ...prev, ai_feedback: feedback }));
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : "AI analysis failed";
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleParaphrase = async (bulletPoint: string) => {
+    if (!formData.job_description) {
+      setError("Job description is required for optimization.");
+      return null;
+    }
+    setLoading(true);
+    try {
+      const result = await paraphraseBullet(
+        bulletPoint,
+        formData.job_description,
+        formData.target_role || ""
+      );
+      return result.suggestions;
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Paraphrasing failed";
+      setError(errorMessage);
+      return null;
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleExperienceChange = (
@@ -85,6 +139,17 @@ export function useResumeBuilder() {
       ...prev,
       experiences: prev.experiences.filter((_, i) => i !== index),
     }));
+  };
+
+  const updateBullet = (expIndex: number, bulletIndex: number, newValue: string) => {
+    const updatedExperiences = [...formData.experiences];
+    const updatedBullets = [...updatedExperiences[expIndex].bullet_points];
+    updatedBullets[bulletIndex] = newValue;
+    updatedExperiences[expIndex] = {
+      ...updatedExperiences[expIndex],
+      bullet_points: updatedBullets,
+    };
+    setFormData((prev) => ({ ...prev, experiences: updatedExperiences }));
   };
 
   const handleEducationChange = (
@@ -205,5 +270,9 @@ export function useResumeBuilder() {
     removeEducation,
     handleReset,
     handleSubmit,
+    handleSkillsChange,
+    triggerAIAnalysis,
+    handleParaphrase,
+    updateBullet,
   };
 }

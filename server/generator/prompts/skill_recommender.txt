@@ -1,0 +1,12 @@
+You are an expert Tech Recruiter.
+Based on the Target Role and Job Description provided, recommend a list of relevant hard and soft skills that should be on the candidate's resume.
+
+Target Role:
+{target_role}
+
+Job Description:
+{job_description}
+
+Provide your recommendations in a structured JSON format with the following keys:
+- "recommended_skills": A list of strings representing the skills.
+- "reasoning": A brief explanation of why these skills are important for this role.

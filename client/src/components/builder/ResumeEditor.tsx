@@ -33,6 +33,7 @@ interface ResumeEditorProps {
   addEducation: () => void;
   removeEducation: (index: number) => void;
   handleSubmit: () => void;
+  handleSkillsChange: (skills: string[]) => void;
   loading: boolean;
 }
 
@@ -48,6 +49,7 @@ export default function ResumeEditor({
   addEducation,
   removeEducation,
   handleSubmit,
+  handleSkillsChange,
   loading,
 }: ResumeEditorProps) {
   const currentStepItem = sidebarItems[step - 1];
@@ -105,8 +107,10 @@ export default function ResumeEditor({
             </StepperContent>
             <StepperContent value={4}>
               <SkillsSection
-                value={formData.skill_description}
-                onChange={handleInputChange}
+                skills={formData.skills || []}
+                onChange={handleSkillsChange}
+                skillDescription={formData.skill_description}
+                onDescriptionChange={handleInputChange}
               />
             </StepperContent>
 

@@ -23,12 +23,19 @@ class ResumeDataSerializer(serializers.Serializer):
     email = serializers.EmailField(required=False, allow_blank=True)
     phone_number = serializers.CharField(required=False, allow_blank=True)
     location = serializers.CharField(required=False, allow_blank=True)
+    
     has_skill = serializers.BooleanField(default=True)
     skill_description = serializers.CharField(required=False, allow_blank=True)
+    skills = serializers.ListField(child=serializers.CharField(), required=False, default=list)
+    
     has_experience = serializers.BooleanField(default=True)
     experiences = ExperienceSerializer(many=True, required=False)
     has_education = serializers.BooleanField(default=True)
     educations = EducationSerializer(many=True, required=False)
+
+    job_description = serializers.CharField(required=False, allow_blank=True, default="")
+    target_role = serializers.CharField(required=False, allow_blank=True, default="")
+    ai_feedback = serializers.JSONField(required=False, default=dict)
 
 class ResumeModelSerializer(serializers.ModelSerializer):
     data = ResumeDataSerializer()

@@ -1,0 +1,14 @@
+You are an expert Applicant Tracking System (ATS) and Career Coach.
+Analyze the following Resume against the provided Job Description.
+
+Resume Data:
+{resume_data}
+
+Job Description:
+{job_description}
+
+Provide your assessment in a structured JSON format with the following keys:
+- "ats_score": An integer from 0 to 100 representing how well the resume matches the JD.
+- "keyword_match": List of important keywords from the JD that are present in the resume.
+- "missing_keywords": List of important keywords from the JD that are MISSING from the resume.
+- "suggestions": List of actionable, specific suggestions to improve the resume for this JD.
