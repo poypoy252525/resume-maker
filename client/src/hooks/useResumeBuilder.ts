@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { generateResume, checkTaskStatus, analyzeResume, paraphraseBullet, recommendAchievements, checkTaskResult } from "@/api";
+import { generateResume, checkTaskStatus, analyzeResume, paraphraseBullet, recommendJobDescription, checkTaskResult } from "@/api";
 import type { ResumeData, Experience, Education } from "@/api";
 
 export function useResumeBuilder() {
@@ -101,16 +101,16 @@ export function useResumeBuilder() {
     }
   };
 
-  const handleRecommendAchievements = async (jobTitle: string) => {
+  const handleRecommendJobDescription = async (jobTitle: string) => {
     setLoading(true);
     try {
-      const { task_id } = await recommendAchievements(
+      const { task_id } = await recommendJobDescription(
         jobTitle,
         formData.job_description || "",
         formData.target_role || ""
       );
       const result = await pollTask(task_id);
-      return result.achievements;
+      return result.job_description;
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to generate recommendations";
@@ -145,7 +145,7 @@ export function useResumeBuilder() {
           job_title: "",
           date_from: "",
           date_to: "",
-          bullet_points: [""],
+          job_description: [""],
         },
       ],
     }));
@@ -167,7 +167,7 @@ export function useResumeBuilder() {
             job_title: "",
             date_from: "",
             date_to: "",
-            bullet_points: [""],
+            job_description: [""],
           },
         ],
       };
@@ -183,23 +183,23 @@ export function useResumeBuilder() {
 
   const updateBullet = (expIndex: number, bulletIndex: number, newValue: string) => {
     const updatedExperiences = [...formData.experiences];
-    const updatedBullets = [...updatedExperiences[expIndex].bullet_points];
+    const updatedBullets = [...updatedExperiences[expIndex].job_description];
     updatedBullets[bulletIndex] = newValue;
     updatedExperiences[expIndex] = {
       ...updatedExperiences[expIndex],
-      bullet_points: updatedBullets,
+      job_description: updatedBullets,
     };
     setFormData((prev) => ({ ...prev, experiences: updatedExperiences }));
   };
 
   const addBulletToExperience = (expIndex: number, bullet: string) => {
     const updatedExperiences = [...formData.experiences];
-    const currentBullets = updatedExperiences[expIndex].bullet_points;
+    const currentBullets = updatedExperiences[expIndex].job_description;
     
     if (currentBullets.length === 1 && currentBullets[0].trim() === "") {
-      updatedExperiences[expIndex].bullet_points = [bullet];
+      updatedExperiences[expIndex].job_description = [bullet];
     } else {
-      updatedExperiences[expIndex].bullet_points = [...currentBullets, bullet];
+      updatedExperiences[expIndex].job_description = [...currentBullets, bullet];
     }
     
     setFormData((prev) => ({ ...prev, experiences: updatedExperiences }));
@@ -258,14 +258,14 @@ export function useResumeBuilder() {
         experiences: formData.experiences
           .map((exp) => ({
             ...exp,
-            bullet_points: exp.bullet_points.filter((bp) => bp.trim() !== ""),
+            job_description: exp.job_description.filter((bp) => bp.trim() !== ""),
           }))
           .filter((exp) => exp.company_name || exp.job_title),
       };
 
       cleanedData.experiences.forEach((exp) => {
-        if (exp.bullet_points.length === 0) {
-          exp.bullet_points = ["General duties and responsibilities"];
+        if (exp.job_description.length === 0) {
+          exp.job_description = ["General duties and responsibilities"];
         }
       });
 
@@ -328,7 +328,7 @@ export function useResumeBuilder() {
     triggerAIAnalysis,
     handleParaphrase,
     updateBullet,
-    handleRecommendAchievements,
+    handleRecommendJobDescription,
     addBulletToExperience,
     activeExperienceIndex,
     setActiveExperienceIndex,

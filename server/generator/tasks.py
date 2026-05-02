@@ -48,10 +48,10 @@ def paraphrase_bullet_task(bullet_point, target_role, job_description):
         raise e
 
 @shared_task
-def recommend_achievements_task(job_title, target_role, job_description):
+def recommend_job_description_task(job_title, target_role, job_description):
     try:
         ai_service = AIService()
-        return ai_service.recommend_achievements(job_title, target_role, job_description)
+        return ai_service.recommend_job_description(job_title, target_role, job_description)
     except Exception as e:
-        logger.error(f"Achievement recommendation failed: {str(e)}", exc_info=True)
+        logger.error(f"Job description recommendation failed: {str(e)}", exc_info=True)
         raise e

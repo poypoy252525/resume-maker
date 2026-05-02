@@ -14,7 +14,7 @@ export default function Features() {
             <p className="text-xl text-muted-foreground leading-relaxed">
               Most resumes are rejected within 6 seconds. Our layouts are
               scientifically designed to capture attention and highlight your
-              most relevant achievements immediately.
+              most relevant experience immediately.
             </p>
             <ul className="space-y-4">
               {[

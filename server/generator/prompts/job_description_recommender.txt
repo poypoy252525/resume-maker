@@ -9,4 +9,4 @@ Instructions:
 4. If a Job Description is provided, prioritize the technologies mentioned there.
 5. Keep each bullet point under 20 words.
 
-Output must be a JSON object with a list of "achievements".
+Output must be a JSON object with a list of "job_description".

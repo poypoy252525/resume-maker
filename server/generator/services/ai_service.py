@@ -21,8 +21,8 @@ class SkillRecommendation(BaseModel):
 class ParaphraseResult(BaseModel):
     suggestions: List[str] = Field(..., description="A list of 3 paraphrased versions of the bullet point.")
 
-class AchievementRecommendation(BaseModel):
-    achievements: List[str] = Field(..., description="A list of 5 recommended achievement bullet points.")
+class JobDescriptionRecommendation(BaseModel):
+    job_description: List[str] = Field(..., description="A list of 5 recommended job description bullet points.")
 
 # --- Core Agent ---
 
@@ -85,7 +85,7 @@ class AIService:
         self.ats_evaluator = AIAgent('ats_evaluator.txt', ATSEvaluation, temperature=0.2)
         self.skill_recommender = AIAgent('skill_recommender.txt', SkillRecommendation)
         self.paraphraser = AIAgent('paraphraser.txt', ParaphraseResult, temperature=0.4)
-        self.achievement_recommender = AIAgent('achievement_recommender.txt', AchievementRecommendation, temperature=0.5)
+        self.job_description_recommender = AIAgent('job_description_recommender.txt', JobDescriptionRecommendation, temperature=0.5)
 
     def evaluate_ats(self, resume_data: dict, job_description: str) -> dict:
         return self.ats_evaluator.generate(
@@ -107,8 +107,8 @@ class AIService:
             job_description=job_description
         )
 
-    def recommend_achievements(self, job_title: str, target_role: str, job_description: Optional[str]) -> dict:
-        return self.achievement_recommender.generate(
+    def recommend_job_description(self, job_title: str, target_role: str, job_description: Optional[str]) -> dict:
+        return self.job_description_recommender.generate(
             job_title=job_title,
             target_role=target_role,
             job_description=job_description

@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from celery.result import AsyncResult
 from .models import Resume
-from .tasks import generate_document_task, analyze_resume_task, paraphrase_bullet_task, recommend_achievements_task
+from .tasks import generate_document_task, analyze_resume_task, paraphrase_bullet_task, recommend_job_description_task
 from .serializers import ResumeModelSerializer, ResumeDataSerializer
 
 class ResumeViewSet(viewsets.ModelViewSet):
@@ -68,7 +68,7 @@ class ResumeViewSet(viewsets.ModelViewSet):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @action(detail=False, methods=['post'])
-    def recommend_achievements(self, request):
+    def recommend_job_description(self, request):
         job_title = request.data.get('job_title', '')
         job_description = request.data.get('job_description', '')
         target_role = request.data.get('target_role', '')
@@ -77,7 +77,7 @@ class ResumeViewSet(viewsets.ModelViewSet):
             return Response({"error": "Job title is required."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            task = recommend_achievements_task.delay(job_title, target_role, job_description)
+            task = recommend_job_description_task.delay(job_title, target_role, job_description)
             return Response({"task_id": task.id}, status=status.HTTP_202_ACCEPTED)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

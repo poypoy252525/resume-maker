@@ -6,7 +6,7 @@ export interface Experience {
   job_title: string;
   date_from: string;
   date_to: string;
-  bullet_points: string[];
+  job_description: string[];
 }
 
 export interface Education {
@@ -115,14 +115,14 @@ export const paraphraseBullet = async (bulletPoint: string, jobDescription: stri
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.error || "Failed to paraphrase bullet point");
+    throw new Error(errorData.error || "Failed to paraphrase description");
   }
 
   return response.json();
 };
 
-export const recommendAchievements = async (jobTitle: string, jobDescription: string, targetRole: string): Promise<{ task_id: string }> => {
-  const response = await fetch(`${API_BASE_URL}/resumes/recommend_achievements/`, {
+export const recommendJobDescription = async (jobTitle: string, jobDescription: string, targetRole: string): Promise<{ task_id: string }> => {
+  const response = await fetch(`${API_BASE_URL}/resumes/recommend_job_description/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -136,7 +136,7 @@ export const recommendAchievements = async (jobTitle: string, jobDescription: st
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.error || "Failed to recommend achievements");
+    throw new Error(errorData.error || "Failed to recommend job description");
   }
 
   return response.json();

@@ -125,7 +125,7 @@ export default function ExperienceSection({
               const isComplete =
                 exp.company_name.trim() &&
                 exp.job_title.trim() &&
-                exp.bullet_points.some((bp) => bp.trim());
+                exp.job_description.some((bp) => bp.trim());
 
               return (
                 <button
@@ -339,10 +339,10 @@ export default function ExperienceSection({
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-muted-foreground tracking-wider">
               <ClipboardList className="w-3 h-3" />
-              Key Achievements
+              Job Description
             </div>
             <div className="space-y-3">
-              {exp.bullet_points.map((bp, bpIndex) => (
+              {exp.job_description.map((bp, bpIndex) => (
                 <div key={bpIndex} className="group relative">
                   <div className="flex gap-3 items-start">
                     <div className="w-1.5 h-1.5 rounded-full bg-primary/40 shrink-0 mt-4" />
@@ -350,9 +350,9 @@ export default function ExperienceSection({
                       <Textarea
                         value={bp}
                         onChange={(e) => {
-                          const newBullets = [...exp.bullet_points];
+                          const newBullets = [...exp.job_description];
                           newBullets[bpIndex] = e.target.value;
-                          onChange(focusedIndex, "bullet_points", newBullets);
+                          onChange(focusedIndex, "job_description", newBullets);
                         }}
                         onFocus={() => {
                           onFocusExperience(focusedIndex);
@@ -361,12 +361,12 @@ export default function ExperienceSection({
                         onKeyDown={(e) => {
                           if (e.key === "Enter" && !e.shiftKey) {
                             e.preventDefault();
-                            const newBullets = [...exp.bullet_points];
+                            const newBullets = [...exp.job_description];
                             newBullets.splice(bpIndex + 1, 0, "");
-                            onChange(focusedIndex, "bullet_points", newBullets);
+                            onChange(focusedIndex, "job_description", newBullets);
                           }
                         }}
-                        placeholder="Describe an achievement or responsibility..."
+                        placeholder="Describe a responsibility or task..."
                         className="w-full min-h-9.5 py-2 resize-none overflow-hidden field-sizing-content transition-all pr-4 group-hover:pr-20 group-focus-within:pr-20"
                         rows={1}
                       />
@@ -386,12 +386,12 @@ export default function ExperienceSection({
                           size="icon"
                           className="shrink-0 h-7 w-7 text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10"
                           onClick={() => {
-                            const newBullets = exp.bullet_points.filter(
+                            const newBullets = exp.job_description.filter(
                               (_, i) => i !== bpIndex,
                             );
-                            onChange(focusedIndex, "bullet_points", newBullets);
+                            onChange(focusedIndex, "job_description", newBullets);
                           }}
-                          disabled={exp.bullet_points.length === 1}
+                          disabled={exp.job_description.length === 1}
                         >
                           <Trash2 className="w-3 h-3" />
                         </Button>
@@ -405,13 +405,13 @@ export default function ExperienceSection({
                 size="sm"
                 className="border-dashed w-full mt-1 hover:bg-primary/5 hover:border-primary/30 hover:text-primary"
                 onClick={() =>
-                  onChange(focusedIndex, "bullet_points", [
-                    ...exp.bullet_points,
+                  onChange(focusedIndex, "job_description", [
+                    ...exp.job_description,
                     "",
                   ])
                 }
               >
-                <Plus className="w-3 h-3 mr-2" /> Add Achievement
+                <Plus className="w-3 h-3 mr-2" /> Add Description Line
               </Button>
             </div>
 
@@ -436,7 +436,7 @@ export default function ExperienceSection({
                     <div className="p-3 rounded-xl bg-muted/50 text-[11px] italic border border-dashed">
                       "
                       {optimizingIdx !== null
-                        ? exp.bullet_points[optimizingIdx]
+                        ? exp.job_description[optimizingIdx]
                         : ""}
                       "
                     </div>
@@ -500,7 +500,7 @@ export default function ExperienceSection({
                           onClick={() => {
                             if (optimizingIdx !== null) {
                               handleOptimizeBullet(
-                                exp.bullet_points[optimizingIdx],
+                                exp.job_description[optimizingIdx],
                                 optimizingIdx,
                               );
                             }

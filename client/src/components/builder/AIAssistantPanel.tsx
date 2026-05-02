@@ -27,7 +27,7 @@ interface AIAssistantPanelProps {
   ) => void;
   onSkillsChange: (skills: string[]) => void;
   onAnalyze: () => void;
-  onRecommendAchievements: (jobTitle: string) => Promise<string[] | null>;
+  onRecommendJobDescription: (jobTitle: string) => Promise<string[] | null>;
   onAddBullet: (expIndex: number, bullet: string) => void;
   loading: boolean;
   step: number;
@@ -40,15 +40,15 @@ export default function AIAssistantPanel({
   onChange,
   onSkillsChange,
   onAnalyze,
-  onRecommendAchievements,
+  onRecommendJobDescription,
   onAddBullet,
   loading,
   step,
   focusedExperienceIndex,
 }: AIAssistantPanelProps) {
-  const [achievementIdeas, setAchievementIdeas] = useState<{
+  const [jobDescriptionIdeas, setJobDescriptionIdeas] = useState<{
     jobTitle: string;
-    achievements: string[];
+    jobDescription: string[];
     expIdx: number;
   } | null>(null);
   const [activeTab, setActiveTab] = useState("insights");
@@ -62,25 +62,25 @@ export default function AIAssistantPanel({
     }
   };
 
-  const handleGetAchievementIdeas = async (
+  const handleGetJobDescriptionIdeas = async (
     jobTitle: string,
     expIdx: number,
   ) => {
     if (!jobTitle.trim()) return;
-    const achievements = await onRecommendAchievements(jobTitle);
-    if (achievements) {
-      setAchievementIdeas({ jobTitle, achievements, expIdx });
+    const suggestions = await onRecommendJobDescription(jobTitle);
+    if (suggestions) {
+      setJobDescriptionIdeas({ jobTitle, jobDescription: suggestions, expIdx });
     }
   };
 
-  const handleAddAchievement = (achievement: string) => {
-    if (achievementIdeas) {
-      onAddBullet(achievementIdeas.expIdx, achievement);
+  const handleAddDescription = (description: string) => {
+    if (jobDescriptionIdeas) {
+      onAddBullet(jobDescriptionIdeas.expIdx, description);
       // Remove the added one from local state to avoid duplicates
-      setAchievementIdeas({
-        ...achievementIdeas,
-        achievements: achievementIdeas.achievements.filter(
-          (a) => a !== achievement,
+      setJobDescriptionIdeas({
+        ...jobDescriptionIdeas,
+        jobDescription: jobDescriptionIdeas.jobDescription.filter(
+          (a) => a !== description,
         ),
       });
     }
@@ -189,14 +189,14 @@ export default function AIAssistantPanel({
 
 
 
-                      {/* Achievement Ideas */}
+                      {/* Job Description Ideas */}
                       <div className="space-y-4 pt-4 border-t border-dashed">
                         <div className="flex items-center justify-between">
                           <h4 className="text-xs font-bold flex items-center gap-2">
                             <Plus className="size-3.5 text-primary" />{" "}
-                            Achievement Ideas
+                            Job Description Ideas
                           </h4>
-                          {loading && achievementIdeas && (
+                          {loading && jobDescriptionIdeas && (
                             <Zap className="size-3 text-primary animate-pulse" />
                           )}
                         </div>
@@ -213,7 +213,7 @@ export default function AIAssistantPanel({
                         <Button
                           variant="outline"
                           onClick={() =>
-                            handleGetAchievementIdeas(
+                            handleGetJobDescriptionIdeas(
                               formData.experiences[focusedExperienceIndex]
                                 .job_title,
                               focusedExperienceIndex,
@@ -227,18 +227,18 @@ export default function AIAssistantPanel({
                           }
                           className="w-full h-8 text-[10px] rounded-xl border-primary/20 hover:bg-primary/5"
                         >
-                          Generate Achievement Ideas
+                          Generate Description Ideas
                         </Button>
 
-                        {achievementIdeas &&
-                          achievementIdeas.expIdx ===
+                        {jobDescriptionIdeas &&
+                          jobDescriptionIdeas.expIdx ===
                             focusedExperienceIndex && (
                             <div className="space-y-2 pt-2">
-                              {achievementIdeas.achievements.map((a, i) => (
+                              {jobDescriptionIdeas.jobDescription.map((a, i) => (
                                 <div
                                   key={i}
                                   className="text-[10px] bg-background border rounded-lg p-2.5 hover:border-primary/50 cursor-pointer transition-all group relative"
-                                  onClick={() => handleAddAchievement(a)}
+                                  onClick={() => handleAddDescription(a)}
                                 >
                                   <p className="leading-tight pr-4">{a}</p>
                                   <Plus className="size-3 absolute right-2 top-2 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -259,7 +259,7 @@ export default function AIAssistantPanel({
                         <p className="text-[10px] text-muted-foreground leading-relaxed">
                           Once you start editing an experience, I'll show you AI
                           optimization tools here — bullet optimizer and
-                          achievement ideas.
+                          description ideas.
                         </p>
                       </div>
                     </div>
