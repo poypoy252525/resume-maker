@@ -160,8 +160,6 @@ export default function ResumeEditor({
               <SkillsSection
                 skills={formData.skills || []}
                 onChange={handleSkillsChange}
-                skillDescription={formData.skill_description}
-                onDescriptionChange={handleInputChange}
               />
             </StepperContent>
 

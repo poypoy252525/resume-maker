@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,15 +8,11 @@ import { X, Plus } from "lucide-react";
 interface SkillsSectionProps {
   skills: string[];
   onChange: (skills: string[]) => void;
-  skillDescription: string;
-  onDescriptionChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
 export default function SkillsSection({
   skills,
   onChange,
-  skillDescription,
-  onDescriptionChange,
 }: SkillsSectionProps) {
   const [newSkill, setNewSkill] = useState("");
 
@@ -74,23 +69,6 @@ export default function SkillsSection({
           ))}
         </div>
       )}
-
-      <div className="space-y-2 pt-4">
-        <Label htmlFor="skill_description" className="text-base">
-          Professional Summary
-        </Label>
-        <p className="text-sm text-muted-foreground">
-          Provide a brief paragraph summarizing your background and career goals.
-        </p>
-        <Textarea
-          id="skill_description"
-          name="skill_description"
-          placeholder="e.g. A passionate software architect with 10+ years of experience..."
-          className="min-h-32 rounded-xl resize-none shadow-inner"
-          value={skillDescription}
-          onChange={onDescriptionChange}
-        />
-      </div>
     </div>
   );
 }
