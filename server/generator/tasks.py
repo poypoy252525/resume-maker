@@ -55,3 +55,12 @@ def recommend_job_description_task(job_title, target_role, job_description):
     except Exception as e:
         logger.error(f"Job description recommendation failed: {str(e)}", exc_info=True)
         raise e
+
+@shared_task
+def recommend_skills_task(target_role, job_description):
+    try:
+        ai_service = AIService()
+        return ai_service.recommend_skills(target_role, job_description)
+    except Exception as e:
+        logger.error(f"Skills recommendation failed: {str(e)}", exc_info=True)
+        raise e

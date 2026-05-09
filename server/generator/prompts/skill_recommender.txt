@@ -1,5 +1,5 @@
-You are an expert Tech Recruiter.
-Based on the Target Role and Job Description provided, recommend a list of relevant hard and soft skills that should be on the candidate's resume.
+You are an expert Tech Recruiter and Career Coach.
+Based on the Target Role and Job Description provided, recommend a comprehensive list of up to 100 relevant hard and soft skills that should be on the candidate's resume to pass ATS filters and impress hiring managers.
 
 Target Role:
 {target_role}
@@ -8,5 +8,7 @@ Job Description:
 {job_description}
 
 Provide your recommendations in a structured JSON format with the following keys:
-- "recommended_skills": A list of strings representing the skills.
+- "recommended_skills": A list of strings representing the skills (aim for ~100 if possible).
 - "reasoning": A brief explanation of why these skills are important for this role.
+
+Note: If a job description is not provided, base your recommendations on industry standards for the Target Role. Ensure the list is diverse, including languages, frameworks, tools, soft skills, and domain knowledge.

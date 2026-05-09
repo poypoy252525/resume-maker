@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from celery.result import AsyncResult
 from .models import Resume
-from .tasks import generate_document_task, analyze_resume_task, paraphrase_bullet_task, recommend_job_description_task
+from .tasks import generate_document_task, analyze_resume_task, paraphrase_bullet_task, recommend_job_description_task, recommend_skills_task
 from .serializers import ResumeModelSerializer, ResumeDataSerializer
 
 class ResumeViewSet(viewsets.ModelViewSet):
@@ -78,6 +78,17 @@ class ResumeViewSet(viewsets.ModelViewSet):
 
         try:
             task = recommend_job_description_task.delay(job_title, target_role, job_description)
+            return Response({"task_id": task.id}, status=status.HTTP_202_ACCEPTED)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=False, methods=['post'])
+    def recommend_skills(self, request):
+        target_role = request.data.get('target_role', '')
+        job_description = request.data.get('job_description', '')
+
+        try:
+            task = recommend_skills_task.delay(target_role, job_description)
             return Response({"task_id": task.id}, status=status.HTTP_202_ACCEPTED)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

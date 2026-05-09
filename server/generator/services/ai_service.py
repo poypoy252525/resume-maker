@@ -53,23 +53,30 @@ class AIAgent:
         Generates content using the agent's specific prompt and schema.
         """
         template = self._load_prompt()
-        
-        # Ensure all expected variables are present in kwargs, default to "Not provided"
-        # This is a safety measure to allow optional fields like job_description
         formatted_kwargs = {k: (v if v else "Not provided") for k, v in kwargs.items()}
-        
         prompt = template.format(**formatted_kwargs)
 
         try:
+            # Match the user's working configuration from AI Studio
+            config = types.GenerateContentConfig(
+                response_mime_type="application/json",
+                response_schema=self.response_schema,
+                temperature=self.temperature,
+                tools=[types.Tool(google_search=types.GoogleSearch())],
+                thinking_config=types.ThinkingConfig(include_thoughts=True) if "gemma-4" in self.model_name else None
+            )
+
             response = self.client.models.generate_content(
                 model=self.model_name,
                 contents=prompt,
-                config=types.GenerateContentConfig(
-                    response_mime_type="application/json",
-                    response_schema=self.response_schema,
-                    temperature=self.temperature
-                )
+                config=config
             )
+            
+            if not response.text:
+                # If it's a thinking model, the text might be in a different place or the model might have failed
+                print(f"AI Agent Error ({self.prompt_file}): Empty response. Candidates: {response.candidates}")
+                raise ValueError("The AI model returned an empty response. This can happen if 'Thinking' takes too long or is blocked.")
+
             return json.loads(response.text)
         except Exception as e:
             print(f"AI Agent Error ({self.prompt_file}): {str(e)}")

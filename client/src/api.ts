@@ -141,3 +141,23 @@ export const recommendJobDescription = async (jobTitle: string, jobDescription: 
 
   return response.json();
 };
+
+export const recommendSkills = async (targetRole: string, jobDescription: string): Promise<{ task_id: string }> => {
+  const response = await fetch(`${API_BASE_URL}/resumes/recommend_skills/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      target_role: targetRole,
+      job_description: jobDescription,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to recommend skills");
+  }
+
+  return response.json();
+};

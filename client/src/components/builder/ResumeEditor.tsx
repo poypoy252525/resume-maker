@@ -42,6 +42,7 @@ interface ResumeEditorProps {
     bulletIndex: number,
     newValue: string,
   ) => void;
+  onRecommendSkills: () => Promise<string[] | null>;
   focusedExperienceIndex: number | null;
   setFocusedExperienceIndex: (index: number | null) => void;
   setActiveExperienceIndex: (index: number) => void;
@@ -65,6 +66,7 @@ export default function ResumeEditor({
   onFocusBullet,
   onParaphrase,
   onUpdateBullet,
+  onRecommendSkills,
   focusedExperienceIndex,
   setFocusedExperienceIndex,
   setActiveExperienceIndex,
@@ -160,6 +162,7 @@ export default function ResumeEditor({
               <SkillsSection
                 skills={formData.skills || []}
                 onChange={handleSkillsChange}
+                onRecommendSkills={onRecommendSkills}
               />
             </StepperContent>
 

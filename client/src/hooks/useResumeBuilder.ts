@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { generateResume, checkTaskStatus, analyzeResume, paraphraseBullet, recommendJobDescription, checkTaskResult } from "@/api";
+import { generateResume, checkTaskStatus, analyzeResume, paraphraseBullet, recommendJobDescription, recommendSkills, checkTaskResult } from "@/api";
 import type { ResumeData, Experience, Education } from "@/api";
 
 export function useResumeBuilder() {
@@ -43,7 +43,7 @@ export function useResumeBuilder() {
     setFormData((prev) => ({ ...prev, skills }));
   };
   
-  const pollTask = async (taskId: string, interval = 2000, maxRetries = 30) => {
+  const pollTask = async (taskId: string, interval = 2000, maxRetries = 60) => {
     for (let i = 0; i < maxRetries; i++) {
       const result = await checkTaskResult(taskId);
       if (result.status === "SUCCESS") {
@@ -114,6 +114,25 @@ export function useResumeBuilder() {
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to generate recommendations";
+      setError(errorMessage);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRecommendSkills = async () => {
+    setLoading(true);
+    try {
+      const { task_id } = await recommendSkills(
+        formData.target_role || "Professional",
+        formData.job_description || ""
+      );
+      const result = await pollTask(task_id);
+      return result.recommended_skills;
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to recommend skills";
       setError(errorMessage);
       return null;
     } finally {
@@ -329,6 +348,7 @@ export function useResumeBuilder() {
     handleParaphrase,
     updateBullet,
     handleRecommendJobDescription,
+    handleRecommendSkills,
     addBulletToExperience,
     activeExperienceIndex,
     setActiveExperienceIndex,
