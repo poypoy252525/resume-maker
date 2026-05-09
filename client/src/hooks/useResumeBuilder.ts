@@ -164,7 +164,7 @@ export function useResumeBuilder() {
           job_title: "",
           date_from: "",
           date_to: "",
-          job_description: [""],
+          bullet_points: [""],
         },
       ],
     }));
@@ -186,7 +186,7 @@ export function useResumeBuilder() {
             job_title: "",
             date_from: "",
             date_to: "",
-            job_description: [""],
+            bullet_points: [""],
           },
         ],
       };
@@ -202,23 +202,23 @@ export function useResumeBuilder() {
 
   const updateBullet = (expIndex: number, bulletIndex: number, newValue: string) => {
     const updatedExperiences = [...formData.experiences];
-    const updatedBullets = [...updatedExperiences[expIndex].job_description];
+    const updatedBullets = [...updatedExperiences[expIndex].bullet_points];
     updatedBullets[bulletIndex] = newValue;
     updatedExperiences[expIndex] = {
       ...updatedExperiences[expIndex],
-      job_description: updatedBullets,
+      bullet_points: updatedBullets,
     };
     setFormData((prev) => ({ ...prev, experiences: updatedExperiences }));
   };
 
   const addBulletToExperience = (expIndex: number, bullet: string) => {
     const updatedExperiences = [...formData.experiences];
-    const currentBullets = updatedExperiences[expIndex].job_description;
+    const currentBullets = updatedExperiences[expIndex].bullet_points;
     
     if (currentBullets.length === 1 && currentBullets[0].trim() === "") {
-      updatedExperiences[expIndex].job_description = [bullet];
+      updatedExperiences[expIndex].bullet_points = [bullet];
     } else {
-      updatedExperiences[expIndex].job_description = [...currentBullets, bullet];
+      updatedExperiences[expIndex].bullet_points = [...currentBullets, bullet];
     }
     
     setFormData((prev) => ({ ...prev, experiences: updatedExperiences }));
@@ -277,14 +277,14 @@ export function useResumeBuilder() {
         experiences: formData.experiences
           .map((exp) => ({
             ...exp,
-            job_description: exp.job_description.filter((bp) => bp.trim() !== ""),
+            bullet_points: exp.bullet_points.filter((bp) => bp.trim() !== ""),
           }))
           .filter((exp) => exp.company_name || exp.job_title),
       };
 
       cleanedData.experiences.forEach((exp) => {
-        if (exp.job_description.length === 0) {
-          exp.job_description = ["General duties and responsibilities"];
+        if (exp.bullet_points.length === 0) {
+          exp.bullet_points = ["General duties and responsibilities"];
         }
       });
 

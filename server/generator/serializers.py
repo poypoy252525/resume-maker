@@ -7,7 +7,7 @@ class ExperienceSerializer(serializers.Serializer):
     job_title = serializers.CharField(required=False, allow_blank=True)
     date_from = serializers.CharField(required=False, allow_blank=True)
     date_to = serializers.CharField(required=False, allow_blank=True)
-    job_description = serializers.ListField(child=serializers.CharField(), required=False)
+    bullet_points = serializers.ListField(child=serializers.CharField(), required=False)
 
 class EducationSerializer(serializers.Serializer):
     school = serializers.CharField(required=False, allow_blank=True)

@@ -6,7 +6,7 @@ export interface Experience {
   job_title: string;
   date_from: string;
   date_to: string;
-  job_description: string[];
+  bullet_points: string[];
 }
 
 export interface Education {

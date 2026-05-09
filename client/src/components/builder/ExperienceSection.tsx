@@ -125,7 +125,7 @@ export default function ExperienceSection({
               const isComplete =
                 exp.company_name.trim() &&
                 exp.job_title.trim() &&
-                exp.job_description.some((bp) => bp.trim());
+                exp.bullet_points.some((bp) => bp.trim());
 
               return (
                 <button
@@ -342,7 +342,7 @@ export default function ExperienceSection({
               Job Description
             </div>
             <div className="space-y-3">
-              {exp.job_description.map((bp, bpIndex) => (
+              {exp.bullet_points.map((bp, bpIndex) => (
                 <div key={bpIndex} className="group relative">
                   <div className="flex gap-3 items-start">
                     <div className="w-1.5 h-1.5 rounded-full bg-primary/40 shrink-0 mt-4" />
@@ -350,9 +350,9 @@ export default function ExperienceSection({
                       <Textarea
                         value={bp}
                         onChange={(e) => {
-                          const newBullets = [...exp.job_description];
+                          const newBullets = [...exp.bullet_points];
                           newBullets[bpIndex] = e.target.value;
-                          onChange(focusedIndex, "job_description", newBullets);
+                          onChange(focusedIndex, "bullet_points", newBullets);
                         }}
                         onFocus={() => {
                           onFocusExperience(focusedIndex);
@@ -361,9 +361,9 @@ export default function ExperienceSection({
                         onKeyDown={(e) => {
                           if (e.key === "Enter" && !e.shiftKey) {
                             e.preventDefault();
-                            const newBullets = [...exp.job_description];
+                            const newBullets = [...exp.bullet_points];
                             newBullets.splice(bpIndex + 1, 0, "");
-                            onChange(focusedIndex, "job_description", newBullets);
+                            onChange(focusedIndex, "bullet_points", newBullets);
                           }
                         }}
                         placeholder="Describe a responsibility or task..."
@@ -386,12 +386,12 @@ export default function ExperienceSection({
                           size="icon"
                           className="shrink-0 h-7 w-7 text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10"
                           onClick={() => {
-                            const newBullets = exp.job_description.filter(
+                            const newBullets = exp.bullet_points.filter(
                               (_, i) => i !== bpIndex,
                             );
-                            onChange(focusedIndex, "job_description", newBullets);
+                            onChange(focusedIndex, "bullet_points", newBullets);
                           }}
-                          disabled={exp.job_description.length === 1}
+                          disabled={exp.bullet_points.length === 1}
                         >
                           <Trash2 className="w-3 h-3" />
                         </Button>
@@ -405,8 +405,8 @@ export default function ExperienceSection({
                 size="sm"
                 className="border-dashed w-full mt-1 hover:bg-primary/5 hover:border-primary/30 hover:text-primary"
                 onClick={() =>
-                  onChange(focusedIndex, "job_description", [
-                    ...exp.job_description,
+                  onChange(focusedIndex, "bullet_points", [
+                    ...exp.bullet_points,
                     "",
                   ])
                 }
@@ -436,7 +436,7 @@ export default function ExperienceSection({
                     <div className="p-3 rounded-xl bg-muted/50 text-[11px] italic border border-dashed">
                       "
                       {optimizingIdx !== null
-                        ? exp.job_description[optimizingIdx]
+                        ? exp.bullet_points[optimizingIdx]
                         : ""}
                       "
                     </div>
@@ -500,7 +500,7 @@ export default function ExperienceSection({
                           onClick={() => {
                             if (optimizingIdx !== null) {
                               handleOptimizeBullet(
-                                exp.job_description[optimizingIdx],
+                                exp.bullet_points[optimizingIdx],
                                 optimizingIdx,
                               );
                             }

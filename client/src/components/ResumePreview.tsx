@@ -68,7 +68,7 @@ export default function ResumePreview({ data }: ResumePreviewProps) {
                   </div>
                 </div>
                 <ul className="list-disc list-outside ml-4 text-xs space-y-1 text-slate-800">
-                  {exp.bullet_points.map((bp, j) => (
+                  {exp.bullet_points.map((bp: string, j: number) => (
                     bp.trim() && <li key={j}>{bp}</li>
                   ))}
                 </ul>
