@@ -10,7 +10,7 @@ interface PersonalInfoSectionProps {
 
 export default function PersonalInfoSection({ data, onChange }: PersonalInfoSectionProps) {
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
+    <div className="space-y-6 animate-in fade-in duration-300 px-1">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
           <Label htmlFor="full_name">Full Name</Label>
@@ -20,6 +20,7 @@ export default function PersonalInfoSection({ data, onChange }: PersonalInfoSect
             placeholder="John Doe"
             value={data.full_name}
             onChange={onChange}
+            className="rounded-xl"
           />
         </div>
         <div className="space-y-2">
@@ -31,6 +32,7 @@ export default function PersonalInfoSection({ data, onChange }: PersonalInfoSect
             placeholder="john@example.com"
             value={data.email}
             onChange={onChange}
+            className="rounded-xl"
           />
         </div>
         <div className="space-y-2">
@@ -41,6 +43,7 @@ export default function PersonalInfoSection({ data, onChange }: PersonalInfoSect
             placeholder="+1 (555) 000-0000"
             value={data.phone_number}
             onChange={onChange}
+            className="rounded-xl"
           />
         </div>
         <div className="space-y-2">
@@ -51,6 +54,7 @@ export default function PersonalInfoSection({ data, onChange }: PersonalInfoSect
             placeholder="New York, NY"
             value={data.location}
             onChange={onChange}
+            className="rounded-xl"
           />
         </div>
       </div>
@@ -66,7 +70,7 @@ export default function PersonalInfoSection({ data, onChange }: PersonalInfoSect
           id="skill_description"
           name="skill_description"
           placeholder="e.g. A passionate software architect with 10+ years of experience..."
-          className="min-h-32 rounded-xl resize-none shadow-inner bg-background/50"
+          className="min-h-32 rounded-xl resize-none shadow-inner bg-background/50 focus:bg-background transition-colors"
           value={data.skill_description}
           onChange={onChange}
         />
