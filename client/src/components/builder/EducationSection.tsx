@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Plus, Trash2, GraduationCap, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +15,8 @@ interface EducationSectionProps {
 }
 
 export default function EducationSection({ educations, onChange, onAdd, onRemove }: EducationSectionProps) {
+  const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
+
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       <div className="flex items-center justify-between px-1">
@@ -27,7 +30,19 @@ export default function EducationSection({ educations, onChange, onAdd, onRemove
         </div>
       </div>
 
-      <Accordion type="single" collapsible className="space-y-3">
+      <Accordion 
+        type="single" 
+        collapsible 
+        value={focusedIndex !== null ? `edu-${focusedIndex}` : ""}
+        onValueChange={(value) => {
+          if (value) {
+            setFocusedIndex(parseInt(value.split("-")[1]));
+          } else {
+            setFocusedIndex(null);
+          }
+        }}
+        className="space-y-3"
+      >
         {educations.map((edu, index) => (
           <AccordionItem key={index} value={`edu-${index}`} className="border-none">
             <AccordionTrigger className="hover:no-underline py-0 group [&[data-state=open]>div]:border-primary/20 [&[data-state=open]>div]:bg-primary/5">
@@ -61,6 +76,9 @@ export default function EducationSection({ educations, onChange, onAdd, onRemove
                     onClick={(e) => {
                       e.stopPropagation();
                       onRemove(index);
+                      if (focusedIndex === index) {
+                        setFocusedIndex(null);
+                      }
                     }}
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -137,7 +155,10 @@ export default function EducationSection({ educations, onChange, onAdd, onRemove
       <Button
         variant="outline"
         className="w-full h-12 border-dashed rounded-xl font-semibold hover:bg-primary/5 hover:border-primary/30 hover:text-primary transition-colors"
-        onClick={onAdd}
+        onClick={() => {
+          onAdd();
+          setFocusedIndex(educations.length);
+        }}
       >
         <Plus className="w-4 h-4 mr-2" /> Add Education History
       </Button>
