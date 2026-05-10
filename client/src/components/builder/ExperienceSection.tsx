@@ -121,7 +121,7 @@ export default function ExperienceSection({
       <Accordion
         type="single"
         collapsible
-        value={focusedIndex !== null ? `exp-${focusedIndex}` : undefined}
+        value={focusedIndex !== null ? `exp-${focusedIndex}` : ""}
         onValueChange={(value) => {
           if (value) {
             const index = parseInt(value.split("-")[1]);
