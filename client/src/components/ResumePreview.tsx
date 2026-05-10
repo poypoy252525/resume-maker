@@ -37,15 +37,29 @@ export default function ResumePreview({ data }: ResumePreviewProps) {
           </div>
         </header>
 
-        {/* Summary / Skills */}
+        {/* Professional Summary */}
         {data.skill_description && (
           <section className="space-y-2">
             <h2 className="text-sm font-bold uppercase tracking-wider border-b pb-1">
-              Professional Summary & Skills
+              Professional Summary
             </h2>
             <p className="text-sm leading-relaxed whitespace-pre-wrap">
               {data.skill_description}
             </p>
+          </section>
+        )}
+
+        {/* Skills */}
+        {data.skills && data.skills.length > 0 && (
+          <section className="space-y-2">
+            <h2 className="text-sm font-bold uppercase tracking-wider border-b pb-1">
+              Skills
+            </h2>
+            <ul className="grid grid-cols-2 gap-x-8 gap-y-1 list-disc list-outside ml-4 text-xs text-slate-800 pt-1">
+              {data.skills.map((skill, index) => (
+                <li key={index}>{skill}</li>
+              ))}
+            </ul>
           </section>
         )}
 
