@@ -37,7 +37,7 @@ interface ResumeState {
   // Async Actions
   triggerAIAnalysis: () => Promise<void>;
   handleParaphrase: (bulletPoint: string) => Promise<string[] | null>;
-  handleRecommendJobDescription: (jobTitle: string) => Promise<string | null>;
+  handleRecommendJobDescription: (jobTitle: string) => Promise<string[] | null>;
   handleRecommendSkills: () => Promise<string[] | null>;
   handleSubmit: () => Promise<void>;
   handleReset: () => void;
@@ -177,7 +177,7 @@ export const useResumeStore = create<ResumeState>()(
             formData.job_description || "",
             formData.target_role || ""
           );
-          const result = await pollTask<{ job_description: string }>(task_id);
+          const result = await pollTask<{ job_description: string[] }>(task_id);
           return result.job_description;
         } catch (err: unknown) {
           set({ error: (err as Error).message || "Failed to generate recommendations" });

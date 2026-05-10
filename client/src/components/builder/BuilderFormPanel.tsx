@@ -24,6 +24,7 @@ export default function BuilderFormPanel() {
     triggerAIAnalysis,
     handleParaphrase,
     handleRecommendSkills,
+    handleRecommendJobDescription,
   } = useResumeStore();
 
   const currentStepItem = step > 0 ? sidebarItems[step - 1] : null;
@@ -166,6 +167,7 @@ export default function BuilderFormPanel() {
                         setActiveBulletIndex(bulletIdx);
                       }}
                       onParaphrase={handleParaphrase}
+                      onRecommendJobDescription={handleRecommendJobDescription}
                       onUpdateBullet={(expIndex, bulletIndex, newValue) => {
                         const newExps = [...formData.experiences];
                         const newBullets = [...newExps[expIndex].bullet_points];

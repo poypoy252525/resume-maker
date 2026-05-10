@@ -28,6 +28,7 @@ import {
   RefreshCcw,
   Sparkles,
   Trash2,
+  Wand2,
 } from "lucide-react";
 import {
   Accordion,
@@ -49,6 +50,7 @@ interface ExperienceSectionProps {
   onFocusExperience: (index: number) => void;
   onFocusBullet: (index: number, bulletIndex: number) => void;
   onParaphrase: (bullet: string) => Promise<string[] | null>;
+  onRecommendJobDescription?: (jobTitle: string) => Promise<string[] | null>;
   onUpdateBullet: (
     expIndex: number,
     bulletIndex: number,
@@ -68,6 +70,7 @@ export default function ExperienceSection({
   onFocusExperience,
   onFocusBullet,
   onParaphrase,
+  onRecommendJobDescription,
   onUpdateBullet,
   focusedIndex,
   onOpenExperience,
@@ -79,6 +82,22 @@ export default function ExperienceSection({
   >(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isOptimizing, setIsOptimizing] = useState(false);
+  const [recommendingIdx, setRecommendingIdx] = useState<number | null>(null);
+
+  const handleRecommendJobDescriptionLocal = async (index: number, jobTitle: string) => {
+    if (!onRecommendJobDescription) return;
+    setRecommendingIdx(index);
+    try {
+      const suggestions = await onRecommendJobDescription(jobTitle);
+      if (suggestions && suggestions.length > 0) {
+        const exp = experiences[index];
+        const currentBullets = exp.bullet_points.filter((bp) => bp.trim() !== "");
+        onChange(index, "bullet_points", [...currentBullets, ...suggestions]);
+      }
+    } finally {
+      setRecommendingIdx(null);
+    }
+  };
 
   const handleOptimizeBullet = async (bullet: string, bulletIdx: number) => {
     if (!bullet.trim()) return;
@@ -314,19 +333,37 @@ export default function ExperienceSection({
                             </div>
                           </div>
                         ))}
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="border-dashed w-full mt-1"
-                          onClick={() =>
-                            onChange(index, "bullet_points", [
-                              ...exp.bullet_points,
-                              "",
-                            ])
-                          }
-                        >
-                          <Plus className="w-3 h-3 mr-2" /> Add Description Line
-                        </Button>
+                        <div className="flex gap-2 w-full mt-1">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="border-dashed flex-1"
+                            onClick={() =>
+                              onChange(index, "bullet_points", [
+                                ...exp.bullet_points,
+                                "",
+                              ])
+                            }
+                          >
+                            <Plus className="w-3 h-3 mr-2" /> Add Description Line
+                          </Button>
+                          {onRecommendJobDescription && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="border-dashed flex-1 text-primary hover:text-primary hover:bg-primary/5 hover:border-primary/30"
+                              onClick={() => handleRecommendJobDescriptionLocal(index, exp.job_title)}
+                              disabled={recommendingIdx === index || !exp.job_title}
+                            >
+                              {recommendingIdx === index ? (
+                                <Loader2 className="w-3 h-3 mr-2 animate-spin" />
+                              ) : (
+                                <Wand2 className="w-3 h-3 mr-2" />
+                              )}
+                              {recommendingIdx === index ? "Suggesting..." : "AI Suggestions"}
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </CardContent>
