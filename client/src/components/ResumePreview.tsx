@@ -49,19 +49,7 @@ export default function ResumePreview({ data }: ResumePreviewProps) {
           </section>
         )}
 
-        {/* Skills */}
-        {data.skills && data.skills.length > 0 && (
-          <section className="space-y-3">
-            <h2 className="text-sm font-bold uppercase tracking-wider border-b pb-1.5">
-              Skills
-            </h2>
-            <ul className="grid grid-cols-2 gap-x-8 gap-y-1.5 list-disc list-outside ml-4 text-xs text-slate-800 pt-1">
-              {data.skills.map((skill, index) => (
-                <li key={index}>{skill}</li>
-              ))}
-            </ul>
-          </section>
-        )}
+
 
         {/* Experience */}
         {data.experiences && data.experiences.length > 0 && data.experiences[0].company_name && (
@@ -109,6 +97,19 @@ export default function ResumePreview({ data }: ResumePreviewProps) {
                 </div>
               </div>
             ))}
+          </section>
+        )}
+        {/* Skills */}
+        {data.skills && data.skills.length > 0 && (
+          <section className="space-y-3">
+            <h2 className="text-sm font-bold uppercase tracking-wider border-b pb-1.5">
+              Skills
+            </h2>
+            <ul className="grid grid-cols-2 gap-x-8 gap-y-1.5 list-disc list-outside ml-4 text-xs text-slate-800 pt-1">
+              {data.skills.map((skill, index) => (
+                <li key={index}>{skill}</li>
+              ))}
+            </ul>
           </section>
         )}
       </div>

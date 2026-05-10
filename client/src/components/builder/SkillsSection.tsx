@@ -63,20 +63,22 @@ export default function SkillsSection({
           <Label className="text-lg font-bold tracking-tight">
             Skills & Expertise
           </Label>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleGetSuggestions}
-            disabled={isLoading}
-            className="rounded-xl gap-2 border-primary/20 hover:bg-primary/5 text-primary font-bold shadow-sm"
-          >
-            {isLoading ? (
-              <Loader2 className="size-3.5 animate-spin" />
-            ) : (
-              <Sparkles className="size-3.5" />
-            )}
-            {recommendations.length > 0 ? "Refresh AI Skills" : "Suggest 100+ Skills"}
-          </Button>
+          {recommendations.length > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleGetSuggestions}
+              disabled={isLoading}
+              className="rounded-xl gap-2 border-primary/20 hover:bg-primary/5 text-primary font-bold shadow-sm"
+            >
+              {isLoading ? (
+                <Loader2 className="size-3.5 animate-spin" />
+              ) : (
+                <Sparkles className="size-3.5" />
+              )}
+              Refresh AI Skills
+            </Button>
+          )}
         </div>
         <p className="text-sm text-muted-foreground leading-relaxed">
           Add specific technical skills, tools, and professional strengths. Use AI to discover what hiring managers are looking for.
@@ -156,11 +158,27 @@ export default function SkillsSection({
                 <div className="size-12 rounded-full bg-primary/10 flex items-center justify-center">
                   <Sparkles className="size-6 text-primary/60" />
                 </div>
-                <div className="space-y-1">
-                  <p className="text-xs font-bold">Discover Your Potential</p>
-                  <p className="text-[10px] text-muted-foreground max-w-45 mx-auto">
-                    Click the suggest button above to get 100+ tailored skills for your role.
-                  </p>
+                <div className="space-y-4 flex flex-col items-center">
+                  <div className="space-y-1">
+                    <p className="text-xs font-bold">Discover Your Potential</p>
+                    <p className="text-[10px] text-muted-foreground max-w-45 mx-auto">
+                      Get 100+ tailored skills for your role powered by AI.
+                    </p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleGetSuggestions}
+                    disabled={isLoading}
+                    className="rounded-xl gap-2 border-primary/20 hover:bg-primary/5 text-primary font-bold shadow-sm"
+                  >
+                    {isLoading ? (
+                      <Loader2 className="size-3.5 animate-spin" />
+                    ) : (
+                      <Sparkles className="size-3.5" />
+                    )}
+                    Suggest 100+ Skills
+                  </Button>
                 </div>
               </div>
             ) : (
