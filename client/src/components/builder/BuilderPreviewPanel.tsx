@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { Eye } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ResumePreview from "@/components/ResumePreview";
@@ -5,6 +6,23 @@ import { useResumeStore } from "@/store/useResumeStore";
 
 export default function BuilderPreviewPanel() {
   const formData = useResumeStore((state) => state.formData);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        // Standard A4 width at 96 DPI is 794px
+        setScale(entry.contentRect.width / 794);
+      }
+    });
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <aside className="h-full border-l bg-muted/30 flex flex-col overflow-hidden">
@@ -27,10 +45,23 @@ export default function BuilderPreviewPanel() {
           </span>
         </div>
       </header>
-      <ScrollArea className="flex-1 bg-slate-200/50">
-        <div className="p-8 flex justify-center">
-          <div className="shadow-2xl rounded-sm bg-white min-h-[297mm] w-full max-w-[210mm]">
-            <ResumePreview data={formData} />
+      <ScrollArea className="flex-1 min-h-0 h-full bg-slate-200/50">
+        <div className="p-4 sm:p-8 flex justify-center">
+          <div 
+            ref={containerRef}
+            className="shadow-2xl rounded-sm bg-white w-full max-w-[794px] aspect-[210/297] overflow-hidden relative"
+          >
+            <div 
+              className="absolute top-0 left-0"
+              style={{ 
+                width: '794px', 
+                height: '1123px', 
+                transform: `scale(${scale})`, 
+                transformOrigin: 'top left' 
+              }}
+            >
+              <ResumePreview data={formData} />
+            </div>
           </div>
         </div>
       </ScrollArea>
