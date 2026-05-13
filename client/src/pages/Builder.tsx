@@ -8,7 +8,6 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useResumeStore } from "@/store/useResumeStore";
 import BuilderFormPanel from "@/components/builder/BuilderFormPanel";
 import BuilderPreviewPanel from "@/components/builder/BuilderPreviewPanel";
-import BuilderStatus from "@/components/builder/BuilderStatus";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Eye } from "lucide-react";
@@ -19,12 +18,7 @@ export default function Builder() {
   const [showPreviewMobile, setShowPreviewMobile] = useState(false);
   
   const {
-    isGenerating,
-    taskId,
-    fileUrl,
-    status,
     error,
-    handleReset,
   } = useResumeStore();
 
   useEffect(() => {
