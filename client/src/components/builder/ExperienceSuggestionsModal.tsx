@@ -3,6 +3,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { Check, RefreshCw, Wand2 } from "lucide-react";
 import { useState } from "react";
+import { Skeleton } from "../ui/skeleton";
 
 interface ExperienceSuggestionsModalProps {
   open: boolean;
@@ -69,7 +70,14 @@ export default function ExperienceSuggestionsModal({
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto min-h-0 px-6">
           <div className="space-y-3 py-6">
-            {filteredSuggestions.length > 0 ? (
+            {loading ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="w-full p-4 rounded-xl border border-border/30 space-y-2">
+                  <Skeleton className="h-3 w-full" />
+                  <Skeleton className="h-3 w-4/5" />
+                </div>
+              ))
+            ) : filteredSuggestions.length > 0 ? (
               filteredSuggestions.map((suggestion, i) => {
                 const isSelected = selectedItems.includes(suggestion);
                 return (

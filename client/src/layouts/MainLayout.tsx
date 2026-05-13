@@ -31,21 +31,6 @@ export default function MainLayout() {
             </span>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
-            <Link to="/" className="hover:text-primary transition-colors">
-              Home
-            </Link>
-            <Link
-              to="/create"
-              className="hover:text-primary transition-colors"
-            >
-              Builder
-            </Link>
-            <Link to="#" className="hover:text-primary transition-colors">
-              Templates
-            </Link>
-          </nav>
-
           <div className="flex items-center gap-4">
             <Link
               to="/create"

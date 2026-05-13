@@ -33,21 +33,13 @@ export default function Hero() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-16 duration-1000">
-            <Button
-              asChild
-              size="lg"
-              className="h-16 px-10 text-xl rounded-2xl gap-3 shadow-2xl shadow-primary/30 transition-transform hover:scale-105 active:scale-95"
-            >
+            <Button asChild size="lg" className="h-16 px-10 text-xl">
               <Link to="/create">
                 <Wand2 className="w-6 h-6" />
                 Build My Resume
               </Link>
             </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className="h-16 px-10 text-xl rounded-2xl gap-3 border-primary/20 hover:bg-primary/5 transition-all"
-            >
+            <Button variant="outline" size="lg" className="h-16 px-10 text-xl">
               <FileText className="w-6 h-6" />
               Live Preview
             </Button>

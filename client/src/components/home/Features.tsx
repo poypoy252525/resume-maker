@@ -1,4 +1,5 @@
 import { CheckCircle } from "lucide-react";
+import { Skeleton } from "../ui/skeleton";
 
 export default function Features() {
   return (
@@ -35,15 +36,15 @@ export default function Features() {
             <div className="relative h-full border border-white/10 rounded-[3rem] bg-card overflow-hidden shadow-2xl">
               {/* Mock UI for Resume Preview */}
               <div className="p-8 space-y-6 opacity-50 grayscale hover:grayscale-0 transition-all duration-700">
-                <div className="w-1/3 h-8 bg-primary/20 rounded-lg" />
-                <div className="w-full h-4 bg-muted rounded" />
-                <div className="w-full h-4 bg-muted rounded" />
-                <div className="w-2/3 h-4 bg-muted rounded" />
+                <Skeleton className="w-1/3 h-8 bg-primary/20" />
+                <Skeleton className="w-full h-4" />
+                <Skeleton className="w-full h-4" />
+                <Skeleton className="w-2/3 h-4" />
                 <div className="grid grid-cols-2 gap-4 pt-4">
-                  <div className="h-24 bg-muted rounded-xl" />
-                  <div className="h-24 bg-muted rounded-xl" />
+                  <Skeleton className="h-24 rounded-xl" />
+                  <Skeleton className="h-24 rounded-xl" />
                 </div>
-                <div className="h-48 bg-muted rounded-xl" />
+                <Skeleton className="h-48 rounded-xl" />
               </div>
             </div>
           </div>
