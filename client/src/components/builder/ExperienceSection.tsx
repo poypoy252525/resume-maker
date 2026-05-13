@@ -88,11 +88,11 @@ export default function ExperienceSection({
   const [suggestionsCache, setSuggestionsCache] = useState<Record<number, string[]>>({});
   const [viewingSuggestionsIdx, setViewingSuggestionsIdx] = useState<number | null>(null);
 
-  const handleRecommendJobDescriptionLocal = async (index: number, jobTitle: string) => {
+  const handleRecommendJobDescriptionLocal = async (index: number, jobTitle: string, force = false) => {
     if (!onRecommendJobDescription) return;
     
     // Check cache first
-    if (suggestionsCache[index]) {
+    if (!force && suggestionsCache[index]) {
       setViewingSuggestionsIdx(index);
       setIsSuggestionsModalOpen(true);
       return;
@@ -111,12 +111,12 @@ export default function ExperienceSection({
     }
   };
 
-  const handleAddSuggestion = (suggestion: string) => {
+  const handleAddSuggestions = (newSuggestions: string[]) => {
     if (viewingSuggestionsIdx === null) return;
     const exp = experiences[viewingSuggestionsIdx];
     // Remove empty bullets if any
     const currentBullets = exp.bullet_points.filter((bp) => bp.trim() !== "");
-    onChange(viewingSuggestionsIdx, "bullet_points", [...currentBullets, suggestion]);
+    onChange(viewingSuggestionsIdx, "bullet_points", [...currentBullets, ...newSuggestions]);
   };
 
   const handleOptimizeBullet = async (bullet: string, bulletIdx: number) => {
@@ -433,8 +433,10 @@ export default function ExperienceSection({
         onOpenChange={setIsSuggestionsModalOpen}
         suggestions={viewingSuggestionsIdx !== null ? (suggestionsCache[viewingSuggestionsIdx] || []) : []}
         jobTitle={viewingSuggestionsIdx !== null ? experiences[viewingSuggestionsIdx].job_title : ""}
-        onAddSuggestion={handleAddSuggestion}
+        onAddSuggestions={handleAddSuggestions}
         addedBullets={viewingSuggestionsIdx !== null ? experiences[viewingSuggestionsIdx].bullet_points : []}
+        onRefresh={() => viewingSuggestionsIdx !== null && handleRecommendJobDescriptionLocal(viewingSuggestionsIdx, experiences[viewingSuggestionsIdx].job_title, true)}
+        loading={recommendingIdx !== null}
       />
 
       {/* AI Optimization Modal */}
