@@ -1,12 +1,8 @@
-import { useState, useEffect } from "react";
-import { 
-  Dialog, 
-  DialogContent, 
-} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Wand2, RefreshCw, Check } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { Check, RefreshCw, Wand2 } from "lucide-react";
+import { useState } from "react";
 
 interface ExperienceSuggestionsModalProps {
   open: boolean;
@@ -31,22 +27,22 @@ export default function ExperienceSuggestionsModal({
 }: ExperienceSuggestionsModalProps) {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
-  // Reset selection when modal opens/closes or suggestions change
-  useEffect(() => {
-    if (!open) {
-      setSelectedItems([]);
-    }
-  }, [open, suggestions]);
+  // Reset selection when modal is closed (Adjusting state during render is the recommended pattern)
+  if (!open && selectedItems.length > 0) {
+    setSelectedItems([]);
+  }
 
   const toggleSelection = (suggestion: string) => {
-    setSelectedItems(prev => 
-      prev.includes(suggestion) 
-        ? prev.filter(s => s !== suggestion) 
-        : [...prev, suggestion]
+    setSelectedItems((prev) =>
+      prev.includes(suggestion)
+        ? prev.filter((s) => s !== suggestion)
+        : [...prev, suggestion],
     );
   };
 
-  const filteredSuggestions = suggestions.filter(s => !addedBullets.includes(s));
+  const filteredSuggestions = suggestions.filter(
+    (s) => !addedBullets.includes(s),
+  );
 
   const handleAddSelected = () => {
     if (selectedItems.length > 0) {
@@ -57,7 +53,7 @@ export default function ExperienceSuggestionsModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg rounded-3xl flex flex-col max-h-[80vh] p-0 overflow-hidden border-none shadow-2xl bg-background !gap-0">
+      <DialogContent className="sm:max-w-lg rounded-3xl flex flex-col max-h-[80vh] p-0 overflow-hidden border-none shadow-2xl bg-background gap-0!">
         {/* Header Section */}
         <div className="p-6 border-b shrink-0">
           <div className="flex items-center gap-2 mb-1">
@@ -65,7 +61,8 @@ export default function ExperienceSuggestionsModal({
             <h2 className="text-xl font-bold">AI Role Suggestions</h2>
           </div>
           <p className="text-xs text-muted-foreground">
-            Select responsibilities for <span className="font-bold text-foreground">{jobTitle}</span>
+            Select responsibilities for{" "}
+            <span className="font-bold text-foreground">{jobTitle}</span>
           </p>
         </div>
 
@@ -81,24 +78,26 @@ export default function ExperienceSuggestionsModal({
                     onClick={() => toggleSelection(suggestion)}
                     className={cn(
                       "w-full text-left relative p-4 rounded-xl border transition-all duration-200 group",
-                      isSelected 
-                        ? "border-primary bg-primary/5 shadow-sm ring-1 ring-primary/20" 
-                        : "border-border/50 bg-background hover:border-primary/30 hover:bg-muted/30"
+                      isSelected
+                        ? "border-primary bg-primary/5 shadow-sm ring-1 ring-primary/20"
+                        : "border-border/50 bg-background hover:border-primary/30 hover:bg-muted/30",
                     )}
                   >
                     <p className="text-xs leading-relaxed pr-10">
                       {suggestion}
                     </p>
-                    <div className={cn(
-                      "absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center size-5 rounded-full border transition-all",
-                      isSelected 
-                        ? "bg-primary border-primary text-white shadow-sm" 
-                        : "border-muted-foreground/30 group-hover:border-primary/50"
-                    )}>
+                    <div
+                      className={cn(
+                        "absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center size-5 rounded-full border transition-all",
+                        isSelected
+                          ? "bg-primary border-primary text-white shadow-sm"
+                          : "border-muted-foreground/30 group-hover:border-primary/50",
+                      )}
+                    >
                       {isSelected && <Check className="w-3 h-3" />}
                     </div>
                   </button>
-                )
+                );
               })
             ) : (
               <div className="py-12 text-center">
@@ -106,8 +105,16 @@ export default function ExperienceSuggestionsModal({
                   <Wand2 className="w-8 h-8 opacity-20" />
                 </div>
                 <p className="text-sm font-semibold">No more suggestions</p>
-                <Button variant="outline" size="sm" onClick={onRefresh} disabled={loading} className="mt-4 rounded-xl">
-                  <RefreshCw className={cn("w-3 h-3 mr-2", loading && "animate-spin")} />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onRefresh}
+                  disabled={loading}
+                  className="mt-4 rounded-xl"
+                >
+                  <RefreshCw
+                    className={cn("w-3 h-3 mr-2", loading && "animate-spin")}
+                  />
                   Refresh
                 </Button>
               </div>
@@ -120,35 +127,41 @@ export default function ExperienceSuggestionsModal({
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <div className="flex flex-col">
-                <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Selected</span>
-                <span className="text-xs font-bold">{selectedItems.length} items</span>
+                <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">
+                  Selected
+                </span>
+                <span className="text-xs font-bold">
+                  {selectedItems.length} items
+                </span>
               </div>
-              <Button 
-                variant="secondary" 
-                size="sm" 
-                onClick={onRefresh} 
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={onRefresh}
                 disabled={loading}
                 className="h-8 rounded-lg text-[10px] font-bold uppercase tracking-widest"
               >
-                <RefreshCw className={cn("w-3 h-3 mr-2", loading && "animate-spin")} />
+                <RefreshCw
+                  className={cn("w-3 h-3 mr-2", loading && "animate-spin")}
+                />
                 {loading ? "Generating..." : "Refresh"}
               </Button>
             </div>
-            
+
             <div className="flex gap-2">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => onOpenChange(false)} 
-                className="flex-1 rounded-xl text-xs"
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onOpenChange(false)}
+                className="flex-1"
               >
                 Cancel
               </Button>
-              <Button 
-                size="sm" 
-                onClick={handleAddSelected} 
+              <Button
+                size="sm"
+                onClick={handleAddSelected}
                 disabled={selectedItems.length === 0}
-                className="flex-[2] rounded-xl shadow-lg shadow-primary/20 text-xs font-bold"
+                className="flex-2"
               >
                 Add to Experience
               </Button>
