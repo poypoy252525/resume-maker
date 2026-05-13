@@ -333,11 +333,11 @@ export default function ExperienceSection({
                             </div>
                           </div>
                         ))}
-                        <div className="flex gap-2 w-full mt-1">
+                        <div className="flex flex-col sm:flex-row gap-2 w-full mt-1">
                           <Button
                             variant="outline"
                             size="sm"
-                            className="border-dashed flex-1"
+                            className="border-dashed flex-1 h-9 sm:h-8"
                             onClick={() =>
                               onChange(index, "bullet_points", [
                                 ...exp.bullet_points,
@@ -351,7 +351,7 @@ export default function ExperienceSection({
                             <Button
                               variant="outline"
                               size="sm"
-                              className="border-dashed flex-1 text-primary hover:text-primary hover:bg-primary/5 hover:border-primary/30"
+                              className="border-dashed flex-1 text-primary hover:text-primary hover:bg-primary/5 hover:border-primary/30 h-9 sm:h-8"
                               onClick={() => handleRecommendJobDescriptionLocal(index, exp.job_title)}
                               disabled={recommendingIdx === index || !exp.job_title}
                             >
