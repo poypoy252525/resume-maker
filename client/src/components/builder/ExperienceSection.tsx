@@ -14,6 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import ExperienceSuggestionsModal from "./ExperienceSuggestionsModal";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -83,20 +84,39 @@ export default function ExperienceSection({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [recommendingIdx, setRecommendingIdx] = useState<number | null>(null);
+  const [isSuggestionsModalOpen, setIsSuggestionsModalOpen] = useState(false);
+  const [suggestionsCache, setSuggestionsCache] = useState<Record<number, string[]>>({});
+  const [viewingSuggestionsIdx, setViewingSuggestionsIdx] = useState<number | null>(null);
 
   const handleRecommendJobDescriptionLocal = async (index: number, jobTitle: string) => {
     if (!onRecommendJobDescription) return;
+    
+    // Check cache first
+    if (suggestionsCache[index]) {
+      setViewingSuggestionsIdx(index);
+      setIsSuggestionsModalOpen(true);
+      return;
+    }
+
     setRecommendingIdx(index);
     try {
       const suggestions = await onRecommendJobDescription(jobTitle);
       if (suggestions && suggestions.length > 0) {
-        const exp = experiences[index];
-        const currentBullets = exp.bullet_points.filter((bp) => bp.trim() !== "");
-        onChange(index, "bullet_points", [...currentBullets, ...suggestions]);
+        setSuggestionsCache(prev => ({ ...prev, [index]: suggestions }));
+        setViewingSuggestionsIdx(index);
+        setIsSuggestionsModalOpen(true);
       }
     } finally {
       setRecommendingIdx(null);
     }
+  };
+
+  const handleAddSuggestion = (suggestion: string) => {
+    if (viewingSuggestionsIdx === null) return;
+    const exp = experiences[viewingSuggestionsIdx];
+    // Remove empty bullets if any
+    const currentBullets = exp.bullet_points.filter((bp) => bp.trim() !== "");
+    onChange(viewingSuggestionsIdx, "bullet_points", [...currentBullets, suggestion]);
   };
 
   const handleOptimizeBullet = async (bullet: string, bulletIdx: number) => {
@@ -407,6 +427,15 @@ export default function ExperienceSection({
         <Plus className="w-4 h-4" />
         Add Work Experience
       </Button>
+
+      <ExperienceSuggestionsModal
+        open={isSuggestionsModalOpen}
+        onOpenChange={setIsSuggestionsModalOpen}
+        suggestions={viewingSuggestionsIdx !== null ? (suggestionsCache[viewingSuggestionsIdx] || []) : []}
+        jobTitle={viewingSuggestionsIdx !== null ? experiences[viewingSuggestionsIdx].job_title : ""}
+        onAddSuggestion={handleAddSuggestion}
+        addedBullets={viewingSuggestionsIdx !== null ? experiences[viewingSuggestionsIdx].bullet_points : []}
+      />
 
       {/* AI Optimization Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
