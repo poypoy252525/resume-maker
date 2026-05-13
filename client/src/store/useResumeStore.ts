@@ -207,7 +207,7 @@ export const useResumeStore = create<ResumeState>()(
 
       handleSubmit: async () => {
         const { formData } = get();
-        set({ loading: true, error: null });
+        set({ loading: true, error: null, fileUrl: null });
         try {
           const cleanedData = {
             ...formData,
@@ -226,7 +226,37 @@ export const useResumeStore = create<ResumeState>()(
           });
 
           const result = await generateResume(cleanedData);
-          set({ taskId: result.task_id, isGenerating: true });
+          const taskId = result.task_id;
+          set({ taskId, status: "PENDING" });
+          
+          // Poll until success
+          let pollRetries = 0;
+          const maxRetries = 30; // 60 seconds total (2s interval)
+          
+          const poll = async (): Promise<string> => {
+            const res = await checkTaskStatus(taskId);
+            if (res.status === "SUCCESS") return res.file_url;
+            if (res.status === "FAILURE") throw new Error(res.error || "Generation failed");
+            
+            if (pollRetries >= maxRetries) throw new Error("Generation timed out. Please try again.");
+            
+            pollRetries++;
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            return poll();
+          };
+
+          const fileUrl = await poll();
+          set({ fileUrl, status: "SUCCESS", isGenerating: false });
+          
+          // Trigger direct download
+          const link = document.createElement("a");
+          link.href = fileUrl;
+          link.setAttribute("download", `${formData.full_name.replace(/\s+/g, "_")}_Resume.pdf`);
+          link.setAttribute("target", "_blank");
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+
         } catch (err: unknown) {
           set({ error: (err as Error).message || "Something went wrong" });
         } finally {

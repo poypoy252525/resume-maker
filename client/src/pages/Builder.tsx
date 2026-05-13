@@ -33,16 +33,7 @@ export default function Builder() {
     }
   }, [error]);
 
-  if (isGenerating) {
-    return (
-      <BuilderStatus
-        status={status}
-        taskId={taskId}
-        fileUrl={fileUrl}
-        onReset={handleReset}
-      />
-    );
-  }
+
 
   return (
     <div className="h-full w-full overflow-hidden flex flex-col bg-background">

@@ -1,15 +1,18 @@
 import { Toaster } from "../components/ui/sonner";
 import { Outlet, Link } from "react-router-dom";
-import { Sparkles, ArrowLeft, Save, Share2 } from "lucide-react";
+import { Sparkles, ArrowLeft, Save, Share2, Loader2 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Separator } from "../components/ui/separator";
 import { Badge } from "../components/ui/badge";
+import { useResumeStore } from "../store/useResumeStore";
 
 /**
  * BuilderLayout - Used for the actual Resume Builder Workspace
  * Minimalist, full-screen, focused on productivity
  */
 export default function BuilderLayout() {
+  const { handleSubmit, loading } = useResumeStore();
+
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden">
       {/* Workspace Header - Minimal and Functional */}
@@ -52,9 +55,15 @@ export default function BuilderLayout() {
           <Button
             size="sm"
             className="h-8 md:h-9 px-3 md:px-4 gap-1 md:gap-2 shadow-sm"
+            onClick={handleSubmit}
+            disabled={loading}
           >
-            <Share2 className="w-4 h-4" />
-            <span className="text-xs md:text-sm">Export</span>
+            {loading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Share2 className="w-4 h-4" />
+            )}
+            <span className="text-xs md:text-sm">{loading ? "Exporting..." : "Export"}</span>
           </Button>
         </div>
       </header>

@@ -18,6 +18,20 @@ class ResumeViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+    @action(detail=False, methods=['post'], url_path='generate')
+    def generate_no_id(self, request):
+        # Use ResumeDataSerializer to validate the JSON data directly from request
+        data_serializer = ResumeDataSerializer(data=request.data)
+        if data_serializer.is_valid():
+            task = generate_document_task.delay(data_serializer.validated_data)
+            
+            return Response({
+                "message": "Resume generation started.",
+                "task_id": task.id
+            }, status=status.HTTP_202_ACCEPTED)
+        
+        return Response(data_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     @action(detail=True, methods=['post'])
     def generate(self, request, pk=None):
         resume = self.get_object()

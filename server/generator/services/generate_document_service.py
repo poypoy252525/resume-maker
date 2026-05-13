@@ -1,112 +1,297 @@
-from docxtpl import DocxTemplate
-from django.conf import settings
 import os
 import subprocess
 import logging
+from docx import Document
+from docx.shared import Pt, RGBColor, Inches
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.oxml.ns import qn
+from docx.oxml import OxmlElement
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
 class GenerateDocumentService:
-    
-    
+    def __init__(self):
+        self.doc = None
+        self.slate_900 = RGBColor(15, 23, 42)
+        self.slate_700 = RGBColor(51, 65, 85)
+        self.slate_600 = RGBColor(71, 85, 105)
+        self.slate_500 = RGBColor(100, 116, 139)
+        self.slate_400 = RGBColor(148, 163, 184)
+        self.slate_200 = RGBColor(226, 232, 240)
+
+    def _set_paragraph_border(self, paragraph):
+        p = paragraph._p
+        pPr = p.get_or_add_pPr()
+        pBdr = OxmlElement('w:pBdr')
+        bottom = OxmlElement('w:bottom')
+        bottom.set(qn('w:val'), 'single')
+        bottom.set(qn('w:sz'), '4')  # 1/2 pt
+        bottom.set(qn('w:space'), '1')
+        bottom.set(qn('w:color'), 'E2E2E2')
+        pBdr.append(bottom)
+        pPr.append(pBdr)
+
+    def _add_section_header(self, text):
+        h = self.doc.add_paragraph()
+        h.paragraph_format.space_before = Pt(18)
+        h.paragraph_format.space_after = Pt(6)
+        self._set_paragraph_border(h)
+        
+        run = h.add_run(text.upper())
+        run.bold = True
+        run.font.size = Pt(9)
+        run.font.color.rgb = self.slate_500
+        run.font.name = 'Arial'
+        
+        # Tracking/Kerning
+        rPr = run._element.get_or_add_rPr()
+        spacing = OxmlElement('w:spacing')
+        spacing.set(qn('w:val'), '35')
+        rPr.append(spacing)
+
     def generate(self, context=None):
         if context is None:
             context = DUMMY_RESUME_CONTEXT
             
-        template_path = os.path.join(settings.BASE_DIR, 'generator/templates/generator/Resume.docx')
-        doc = DocxTemplate(template_path)
-        doc.render(context)
+        self.doc = Document()
         
+        # Set Default Style
+        style = self.doc.styles['Normal']
+        font = style.font
+        font.name = 'Arial'
+        font.size = Pt(10)
+        font.color.rgb = self.slate_700
+
+        # Set Margins (A4)
+        sections = self.doc.sections
+        for section in sections:
+            section.top_margin = Inches(1)
+            section.bottom_margin = Inches(1)
+            section.left_margin = Inches(1)
+            section.right_margin = Inches(1)
+
+        # Name
+        name_p = self.doc.add_paragraph()
+        name_run = name_p.add_run(context.get('full_name', '').upper())
+        name_run.bold = True
+        name_run.font.size = Pt(28)
+        name_run.font.name = 'Arial'
+        name_run.font.color.rgb = self.slate_900
+        name_p.paragraph_format.space_after = Pt(4)
+
+        # Contact Info
+        contact_items = []
+        if context.get('email'): contact_items.append(context['email'])
+        if context.get('phone_number'): contact_items.append(context['phone_number'])
+        if context.get('location'): contact_items.append(context['location'])
+
+        for i, item in enumerate(contact_items):
+            p = self.doc.add_paragraph()
+            run = p.add_run(item)
+            run.font.size = Pt(9.5)
+            run.font.name = 'Arial'
+            run.font.color.rgb = self.slate_600
+            
+            # Use small spacing between items, but larger after the last one
+            if i == len(contact_items) - 1:
+                p.paragraph_format.space_after = Pt(16)
+            else:
+                p.paragraph_format.space_after = Pt(2)
+
+        # Professional Summary
+        if context.get('skill_description'):
+            self._add_section_header("Professional Summary")
+            summary_p = self.doc.add_paragraph()
+            summary_p.paragraph_format.line_spacing = 1.2
+            summary_run = summary_p.add_run(context['skill_description'])
+            summary_run.font.size = Pt(10)
+            summary_run.font.name = 'Arial'
+
+        # Experience
+        if context.get('experiences'):
+            self._add_section_header("Professional Experience")
+            for exp in context['experiences']:
+                # Combine Title and Company into ONE table with TWO rows
+                table = self.doc.add_table(rows=2, cols=2)
+                table.width = Inches(6.5)
+                
+                # Row 0: Job Title & Dates
+                cells = table.rows[0].cells
+                title_p = cells[0].paragraphs[0]
+                title_p.paragraph_format.space_before = Pt(0)
+                title_p.paragraph_format.space_after = Pt(0)
+                title_run = title_p.add_run(exp.get('job_title', ''))
+                title_run.bold = True
+                title_run.font.size = Pt(11.5)
+                title_run.font.name = 'Arial'
+                title_run.font.color.rgb = self.slate_900
+                
+                date_p = cells[1].paragraphs[0]
+                date_p.paragraph_format.space_before = Pt(0)
+                date_p.paragraph_format.space_after = Pt(0)
+                date_p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+                date_run = date_p.add_run(f"{exp.get('date_from', '')} — {exp.get('date_to') or 'Present'}")
+                date_run.font.size = Pt(8.5)
+                date_run.font.name = 'Arial'
+                date_run.font.color.rgb = self.slate_500
+                
+                # Row 1: Company & Location
+                cells2 = table.rows[1].cells
+                comp_p = cells2[0].paragraphs[0]
+                comp_p.paragraph_format.space_before = Pt(0)
+                comp_p.paragraph_format.space_after = Pt(0)
+                comp_run = comp_p.add_run(exp.get('company_name', ''))
+                comp_run.bold = True
+                comp_run.font.size = Pt(10)
+                comp_run.font.name = 'Arial'
+                comp_run.font.color.rgb = self.slate_700
+                
+                loc_p = cells2[1].paragraphs[0]
+                loc_p.paragraph_format.space_before = Pt(0)
+                loc_p.paragraph_format.space_after = Pt(0)
+                loc_p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+                loc_run = loc_p.add_run(exp.get('location', ''))
+                loc_run.italic = True
+                loc_run.font.size = Pt(8.5)
+                loc_run.font.name = 'Arial'
+                loc_run.font.color.rgb = self.slate_400
+
+                # Bullet Points
+                for bp in exp.get('bullet_points', []):
+                    if bp.strip():
+                        b_p = self.doc.add_paragraph(style='List Bullet')
+                        b_p.paragraph_format.left_indent = Inches(0.25)
+                        b_p.paragraph_format.first_line_indent = Inches(-0.15)
+                        b_p.paragraph_format.space_before = Pt(2)
+                        b_p.paragraph_format.space_after = Pt(2)
+                        
+                        b_run = b_p.add_run(bp.strip())
+                        b_run.font.size = Pt(10)
+                        b_run.font.name = 'Arial'
+                        b_run.font.color.rgb = self.slate_700
+                
+                self.doc.add_paragraph().paragraph_format.space_after = Pt(6)
+
+        # Education
+        if context.get('educations'):
+            self._add_section_header("Education")
+            for edu in context['educations']:
+                table = self.doc.add_table(rows=2, cols=2)
+                table.width = Inches(6.5)
+                
+                # Row 0: School & Dates
+                cells = table.rows[0].cells
+                sch_p = cells[0].paragraphs[0]
+                sch_p.paragraph_format.space_before = Pt(0)
+                sch_p.paragraph_format.space_after = Pt(0)
+                sch_run = sch_p.add_run(edu.get('school', ''))
+                sch_run.bold = True
+                sch_run.font.size = Pt(10.5)
+                sch_run.font.name = 'Arial'
+                sch_run.font.color.rgb = self.slate_900
+                
+                date_p = cells[1].paragraphs[0]
+                date_p.paragraph_format.space_before = Pt(0)
+                date_p.paragraph_format.space_after = Pt(0)
+                date_p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+                date_run = date_p.add_run(f"{edu.get('date_from', '')} — {edu.get('date_to', '')}")
+                date_run.font.size = Pt(8.5)
+                date_run.font.name = 'Arial'
+                date_run.font.color.rgb = self.slate_500
+                
+                # Row 1: School Type & Location
+                cells2 = table.rows[1].cells
+                type_p = cells2[0].paragraphs[0]
+                type_p.paragraph_format.space_before = Pt(0)
+                type_p.paragraph_format.space_after = Pt(0)
+                type_run = type_p.add_run(edu.get('school_type', ''))
+                type_run.font.size = Pt(10)
+                type_run.font.name = 'Arial'
+                
+                loc_p = cells2[1].paragraphs[0]
+                loc_p.paragraph_format.space_before = Pt(0)
+                loc_p.paragraph_format.space_after = Pt(0)
+                loc_p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+                loc_run = loc_p.add_run(edu.get('location', ''))
+                loc_run.italic = True
+                loc_run.font.size = Pt(8.5)
+                loc_run.font.name = 'Arial'
+                loc_run.font.color.rgb = self.slate_400
+                
+                self.doc.add_paragraph().paragraph_format.space_after = Pt(4)
+
+        # Skills
+        if context.get('skills'):
+            self._add_section_header("Skills")
+            skills_p = self.doc.add_paragraph()
+            skills_p.paragraph_format.line_spacing = 1.2
+            
+            label_run = skills_p.add_run("Technical Skills: ")
+            label_run.bold = True
+            label_run.font.size = Pt(10)
+            label_run.font.name = 'Arial'
+            label_run.font.color.rgb = self.slate_900
+            
+            skills_run = skills_p.add_run(", ".join(context['skills']))
+            skills_run.font.size = Pt(10)
+            skills_run.font.name = 'Arial'
+            skills_run.font.color.rgb = self.slate_700
+
+        # Save & Output
         output_dir = os.path.join(settings.MEDIA_ROOT, 'resumes')
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
             
-        # Create a safe filename from full_name or use a default
         full_name_slug = context.get('full_name', 'resume').lower().replace(' ', '_')
         output_path = os.path.join(output_dir, f'{full_name_slug}.docx')
-        doc.save(output_path)
-        logger.info(f"Generated DOCX: {output_path}")
+        self.doc.save(output_path)
         
-        # Convert to PDF
-        logger.info(f"Converting {output_path} to PDF")
+        logger.info(f"Generated DOCX: {output_path}")
         self.convert_to_pdf(output_path, output_dir)
         return full_name_slug
         
     def convert_to_pdf(self, docx_path, output_dir):
-        logger.info(f"Converting {docx_path} to PDF...")
         try:
-            # On Windows, you might need to provide the full path to soffice.exe
-            # but on Docker/Linux, 'libreoffice' or 'soffice' is usually enough.
             cmd = ['libreoffice', '--headless', '--convert-to', 'pdf', docx_path, '--outdir', output_dir]
-            
-            # Check if we are on Windows and try 'soffice' if 'libreoffice' fails
             if os.name == 'nt':
                 try:
                     subprocess.run(cmd, check=True, capture_output=True)
                 except FileNotFoundError:
-                    cmd[0] = 'soffice' # Often the command on Windows
+                    cmd[0] = 'soffice'
                     subprocess.run(cmd, check=True, capture_output=True)
             else:
                 subprocess.run(cmd, check=True, capture_output=True)
-                
-            logger.info(f"Generated PDF in: {output_dir}")
         except Exception as e:
             logger.error(f"PDF conversion failed: {e}")
-        
-    
+
 DUMMY_RESUME_CONTEXT = {
-    "full_name": "Alexander Thorne",
-    "email": "alex.thorne@example.com",
-    "phone_number": "+1 (555) 010-8899",
-    "location": "Springfield, OR",
-    "has_skill": True,
-    "skill_description": "Python, Django, AWS, Kubernetes, React, PostgreSQL, System Design, Team Leadership.",
-    "has_experience": True,
+    "full_name": "CARL JEFFERSON DELFIN",
+    "email": "carljefferson.delfin@gmail.com",
+    "phone_number": "09103594750",
+    "location": "Rodriguez, Rizal, Philippines",
+    "skill_description": "I am a passionate Web Developer...",
     "experiences": [
         {
-            "company_name": "CloudNexus Solutions",
-            "location": "Remote",
-            "job_title": "Senior Software Architect",
-            "date_from": "Jan 2020",
+            "company_name": "Acme Inc.",
+            "location": "Urban Rodriguez, Rizal",
+            "job_title": "Full Stack Web Developer",
+            "date_from": "October 2025",
             "date_to": "Present",
             "bullet_points": [
-                "Led the migration of legacy monolithic systems to a serverless microservices architecture.",
-                "Designed high-throughput data processing pipelines handling 10M+ events/day.",
-                "Mentored a team of 15+ engineers and implemented TDD best practices."
-            ]
-        },
-        {
-            "company_name": "InnovateSoft Corp",
-            "location": "San Francisco, CA",
-            "job_title": "Full Stack Developer",
-            "date_from": "June 2015",
-            "date_to": "Dec 2019",
-            "bullet_points": [
-                "Developed real-time analytics dashboards using Django and React.",
-                "Optimized database performance reducing query times by 40%.",
-                "Integrated multiple third-party APIs for payment and CRM."
+                "Experienced with Java and Spring Boot...",
+                "Utilized Docker and Kubernetes..."
             ]
         }
     ],
-    "has_education": True,
     "educations": [
         {
-            "school": "Stanford University",
-            "location": "Stanford, CA",
-            "school_type": "Master of Science in Computer Science",
-            "date_from": "Sept 2013",
-            "date_to": "June 2015",
-            "has_content": True,
-            "content": "Specialized in Distributed Systems and Artificial Intelligence. Graduated with 4.0 GPA."
-        },
-        {
-            "school": "MIT",
-            "location": "Cambridge, MA",
-            "school_type": "Bachelor of Science in Software Engineering",
-            "date_from": "Sept 2009",
-            "date_to": "May 2013",
-            "has_content": False,
-            "content": ""
+            "school": "Colegio De Montalban",
+            "location": "Rodriguez, Rizal, Philippines",
+            "school_type": "B.S in Information Technology",
+            "date_from": "2021",
+            "date_to": "2025"
         }
-    ]
+    ],
+    "skills": ["ROI Modeling", "Cost-Benefit Analysis", "Inventory Management"]
 }
