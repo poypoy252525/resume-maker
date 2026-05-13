@@ -11,13 +11,13 @@ import { useResumeStore } from "../store/useResumeStore";
  * Minimalist, full-screen, focused on productivity
  */
 export default function BuilderLayout() {
-  const { handleSubmit, loading } = useResumeStore();
+  const { formData, handleSubmit, loading } = useResumeStore();
 
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden">
       {/* Workspace Header - Minimal and Functional */}
       <header className="h-14 border-b bg-card/50 backdrop-blur-md flex items-center justify-between px-4 z-50">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 md:gap-4 min-w-0">
           <Button
             variant="ghost"
             size="sm"
@@ -32,14 +32,16 @@ export default function BuilderLayout() {
           <Separator orientation="vertical" className="h-6" />
           <div className="flex items-center gap-2 font-semibold min-w-0">
             <Sparkles className="w-4 h-4 text-primary shrink-0" />
-            <span className="text-xs md:text-sm truncate">Untitled Resume</span>
+            <span className="text-xs md:text-sm truncate">
+              {formData.full_name || "Untitled Resume"}
+            </span>
             <Badge variant="secondary" className="ml-1 md:ml-2 h-4 md:h-5 text-[8px] md:text-[10px] font-bold shrink-0">
               AI
             </Badge>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 md:gap-4">
+        <div className="flex items-center gap-1 md:gap-4 shrink-0 ml-auto">
           <div className="hidden lg:flex items-center gap-2 mr-2 text-[11px] text-muted-foreground">
             <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
             Auto-saved 2m ago
@@ -63,7 +65,7 @@ export default function BuilderLayout() {
             ) : (
               <Share2 className="w-4 h-4" />
             )}
-            <span className="text-xs md:text-sm">{loading ? "Exporting..." : "Export"}</span>
+            <span className="hidden sm:inline text-xs md:text-sm">{loading ? "Exporting..." : "Export"}</span>
           </Button>
         </div>
       </header>

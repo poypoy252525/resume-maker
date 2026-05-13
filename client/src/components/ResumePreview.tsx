@@ -12,7 +12,7 @@ export default function ResumePreview({ data }: ResumePreviewProps) {
       <div className="mx-auto space-y-7">
         {/* Header */}
         <header className="text-left space-y-3">
-          <h1 className="text-4xl font-extrabold tracking-tight uppercase text-slate-900">
+          <h1 className="text-4xl font-extrabold tracking-tight uppercase text-slate-900 truncate">
             {data.full_name}
           </h1>
           <div className="flex flex-col justify-start gap-y-1 text-sm text-slate-600 font-medium">

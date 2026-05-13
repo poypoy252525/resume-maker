@@ -48,24 +48,24 @@ export default function BuilderFormPanel() {
   return (
     <div className="h-full bg-background flex flex-col overflow-hidden">
       <header className="h-14 border-b bg-background px-4 md:px-6 flex items-center justify-between shrink-0 shadow-sm z-10">
-        <div className="flex items-center gap-3 md:gap-4">
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary shadow-sm">
+        <div className="flex items-center gap-3 md:gap-4 min-w-0">
+          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary shadow-sm shrink-0">
             {currentStepItem ? (
               <currentStepItem.icon className="w-4 h-4" />
             ) : (
               <div className="w-4 h-4 border-2 border-primary/30 rounded-sm" />
             )}
           </div>
-          <div className="flex flex-col">
-            <h2 className="text-sm font-bold leading-none mb-1 flex items-center gap-2">
-              {currentStepItem?.label || "Resume Builder"}
+          <div className="flex flex-col min-w-0">
+            <h2 className="text-sm font-bold leading-none mb-1 flex items-center gap-2 min-w-0">
+              <span className="truncate">{currentStepItem?.label || "Resume Builder"}</span>
               {isEditingExperience && (
-                <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
-                  Editing Item {focusedExperienceIndex! + 1}
+                <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium shrink-0">
+                  Item {focusedExperienceIndex! + 1}
                 </span>
               )}
             </h2>
-            <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-tight line-clamp-1">
+            <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-tight truncate">
               {isEditingExperience ? "Fill in details, then click Done" : (currentStepItem?.description || "Select a section to begin")}
             </p>
           </div>
