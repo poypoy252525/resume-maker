@@ -112,9 +112,15 @@ class ResumeStatusView(APIView):
         res = AsyncResult(task_id)
         if res.ready():
             if res.successful():
+                media_path = f"{settings.MEDIA_URL}resumes/{res.result}.pdf"
+                if settings.SITE_URL:
+                    file_url = f"{settings.SITE_URL.rstrip('/')}{media_path}"
+                else:
+                    file_url = request.build_absolute_uri(media_path)
+                
                 return Response({
                     "status": "SUCCESS",
-                    "file_url": f"{settings.SITE_URL}{settings.MEDIA_URL}resumes/{res.result}.pdf"
+                    "file_url": file_url
                 })
             else:
                 return Response({
