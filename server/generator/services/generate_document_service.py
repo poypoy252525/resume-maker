@@ -157,6 +157,11 @@ class GenerateDocumentService:
                 loc_run.font.name = 'Arial'
                 loc_run.font.color.rgb = self.slate_400
 
+                # Add a small margin at the bottom of the table
+                spacer = self.doc.add_paragraph()
+                spacer.paragraph_format.space_after = Pt(8)
+                spacer.paragraph_format.line_spacing = Pt(1)
+
                 # Bullet Points
                 for bp in exp.get('bullet_points', []):
                     if bp.strip():
