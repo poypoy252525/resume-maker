@@ -131,12 +131,26 @@ export default function ResumePreview({ data }: ResumePreviewProps) {
             <h2 className="text-[11px] font-bold uppercase tracking-[0.25em] text-slate-500 border-b border-slate-200 pb-1.5">
               Skills
             </h2>
-            <p className="text-[13px] text-slate-700 leading-relaxed">
-              <span className="font-bold text-slate-900">
-                Technical Skills:
-              </span>{" "}
-              {data.skills.join(", ")}
-            </p>
+            <div className="grid grid-cols-2 gap-x-12">
+              <ul className="list-disc list-outside ml-4 text-[13px] space-y-1 text-slate-700">
+                {data.skills
+                  .slice(0, Math.ceil(data.skills.length / 2))
+                  .map((skill, i) => (
+                    <li key={i} className="pl-1 text-slate-700">
+                      {skill}
+                    </li>
+                  ))}
+              </ul>
+              <ul className="list-disc list-outside ml-4 text-[13px] space-y-1 text-slate-700">
+                {data.skills
+                  .slice(Math.ceil(data.skills.length / 2))
+                  .map((skill, i) => (
+                    <li key={i} className="pl-1 text-slate-700">
+                      {skill}
+                    </li>
+                  ))}
+              </ul>
+            </div>
           </section>
         )}
       </div>

@@ -229,19 +229,41 @@ class GenerateDocumentService:
         # Skills
         if context.get('skills'):
             self._add_section_header("Skills")
-            skills_p = self.doc.add_paragraph()
-            skills_p.paragraph_format.line_spacing = 1.2
             
-            label_run = skills_p.add_run("Technical Skills: ")
-            label_run.bold = True
-            label_run.font.size = Pt(10)
-            label_run.font.name = 'Arial'
-            label_run.font.color.rgb = self.slate_900
+            # Split skills into two columns
+            skills = context.get('skills', [])
+            mid = (len(skills) + 1) // 2
+            left_col = skills[:mid]
+            right_col = skills[mid:]
             
-            skills_run = skills_p.add_run(", ".join(context['skills']))
-            skills_run.font.size = Pt(10)
-            skills_run.font.name = 'Arial'
-            skills_run.font.color.rgb = self.slate_700
+            # Create a two-column table for skills
+            table = self.doc.add_table(rows=1, cols=2)
+            table.autofit = False
+            
+            # Set column widths
+            for column in table.columns:
+                column.width = Inches(3.25)
+            
+            def add_skills_to_cell(cell, skill_list):
+                for i, skill in enumerate(skill_list):
+                    if i == 0:
+                        p = cell.paragraphs[0]
+                    else:
+                        p = cell.add_paragraph()
+                    
+                    p.style = 'List Bullet'
+                    p.paragraph_format.left_indent = Inches(0.2)
+                    p.paragraph_format.first_line_indent = Inches(-0.15)
+                    p.paragraph_format.space_before = Pt(1)
+                    p.paragraph_format.space_after = Pt(1)
+                    
+                    run = p.add_run(skill)
+                    run.font.size = Pt(10)
+                    run.font.name = 'Arial'
+                    run.font.color.rgb = self.slate_700
+
+            add_skills_to_cell(table.cell(0, 0), left_col)
+            add_skills_to_cell(table.cell(0, 1), right_col)
 
         # Save & Output
         output_dir = os.path.join(settings.MEDIA_ROOT, 'resumes')
