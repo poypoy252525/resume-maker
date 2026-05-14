@@ -232,22 +232,13 @@ export default function BuilderFormPanel() {
                 <ChevronLeft className="w-4 h-4 mr-2" /> Previous
               </Button>
 
-              {step !== 4 ? (
+              {step !== 4 && (
                 <Button
                   size="lg"
                   onClick={handleNext}
                   className="rounded-xl px-8 shadow-md"
                 >
                   Next <ChevronRight className="w-4 h-4 ml-2" />
-                </Button>
-              ) : (
-                <Button
-                  size="lg"
-                  onClick={handleSubmit}
-                  disabled={loading}
-                  className="rounded-xl px-8 shadow-lg shadow-primary/20 bg-primary hover:bg-primary/90"
-                >
-                  {loading ? "Generating..." : "Generate Resume"}
                 </Button>
               )}
             </div>
