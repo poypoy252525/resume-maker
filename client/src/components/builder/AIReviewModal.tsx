@@ -39,7 +39,7 @@ export default function AIReviewModal() {
 
   return (
     <Dialog open={isReviewModalOpen} onOpenChange={setReviewModalOpen}>
-      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col p-0 overflow-hidden border-none shadow-2xl bg-background/95 backdrop-blur-xl">
+      <DialogContent className="sm:max-w-4xl w-[95vw] max-h-[90vh] h-[90vh] flex flex-col p-0 overflow-hidden border-none shadow-2xl bg-background/95 backdrop-blur-xl">
         <DialogHeader className="p-6 pb-2 border-b bg-muted/30">
           <div className="flex items-center gap-3">
             <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
@@ -54,7 +54,7 @@ export default function AIReviewModal() {
           </div>
         </DialogHeader>
 
-        <ScrollArea className="flex-1">
+        <div className="flex-1 overflow-y-auto">
           <div className="p-6 space-y-8 pb-12">
             {loading ? (
               <div className="flex flex-col items-center justify-center py-20 space-y-4">
@@ -203,7 +203,7 @@ export default function AIReviewModal() {
               </>
             )}
           </div>
-        </ScrollArea>
+        </div>
       </DialogContent>
     </Dialog>
   );

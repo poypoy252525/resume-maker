@@ -72,8 +72,6 @@ class AIAgent:
                 response_mime_type="application/json",
                 response_schema=self.response_schema,
                 temperature=self.temperature,
-                tools=[types.Tool(google_search=types.GoogleSearch())],
-                thinking_config=types.ThinkingConfig(include_thoughts=True) if "gemma-4" in self.model_name else None
             )
 
             response = self.client.models.generate_content(
