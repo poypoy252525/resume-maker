@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 from .views import ResumeViewSet, ResumeStatusView, TaskStatusView
 
 router = DefaultRouter()
-router.register(r'', ResumeViewSet, basename='resume')
+router.register(r'resumes', ResumeViewSet, basename='resume')
 
 urlpatterns = [
     path('', include(router.urls)),
