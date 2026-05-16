@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Eye } from "lucide-react";
 import { toast } from "sonner";
+import AIReviewModal from "@/components/builder/AIReviewModal";
 
 export default function Builder() {
   const isDesktop = useMediaQuery("(min-width: 1024px)");
@@ -27,10 +28,9 @@ export default function Builder() {
     }
   }, [error]);
 
-
-
   return (
     <div className="h-full w-full overflow-hidden flex flex-col bg-background">
+      <AIReviewModal />
       {isDesktop ? (
         <ResizablePanelGroup orientation="horizontal" className="flex-1">
           <ResizablePanel defaultSize={50} minSize={30}>

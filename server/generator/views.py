@@ -57,9 +57,6 @@ class ResumeViewSet(viewsets.ModelViewSet):
         job_description = request.data.get('job_description', '')
         target_role = request.data.get('target_role', '')
         
-        if not job_description:
-            return Response({"error": "Job description is required."}, status=status.HTTP_400_BAD_REQUEST)
-            
         try:
             task = analyze_resume_task.delay(resume_data, job_description, target_role)
             return Response({"task_id": task.id}, status=status.HTTP_202_ACCEPTED)

@@ -26,6 +26,7 @@ interface ResumeState {
   fileUrl: string | null;
   status: string;
   error: string | null;
+  isReviewModalOpen: boolean;
 
   // Actions
   setStep: (step: number) => void;
@@ -33,6 +34,7 @@ interface ResumeState {
   setActiveExperienceIndex: (index: number | null) => void;
   setActiveBulletIndex: (index: number | null) => void;
   setFocusedExperienceIndex: (index: number | null) => void;
+  setReviewModalOpen: (open: boolean) => void;
   
   // Async Actions
   triggerAIAnalysis: () => Promise<void>;
@@ -79,6 +81,7 @@ export const useResumeStore = create<ResumeState>()(
       fileUrl: null,
       status: "PENDING",
       error: null,
+      isReviewModalOpen: false,
 
       // Actions
       setStep: (step) => set({ step }),
@@ -94,6 +97,7 @@ export const useResumeStore = create<ResumeState>()(
       setActiveExperienceIndex: (index) => set({ activeExperienceIndex: index }),
       setActiveBulletIndex: (index) => set({ activeBulletIndex: index }),
       setFocusedExperienceIndex: (index) => set({ focusedExperienceIndex: index }),
+      setReviewModalOpen: (open) => set({ isReviewModalOpen: open }),
 
       handleReset: () => set({
         step: 1,
@@ -128,12 +132,9 @@ export const useResumeStore = create<ResumeState>()(
       },
 
       triggerAIAnalysis: async () => {
-        const { formData, pollTask } = get();
-        if (!formData.job_description) {
-          set({ error: "Job description is required for AI analysis." });
-          return;
-        }
+        const { formData, pollTask, setReviewModalOpen } = get();
         set({ loading: true, error: null });
+        setReviewModalOpen(true);
         try {
           const { task_id } = await analyzeResume(
             formData,

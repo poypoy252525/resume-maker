@@ -26,6 +26,15 @@ export interface AIFeedback {
   suggestions: string[];
   recommended_skills: string[];
   skills_reasoning?: string;
+  review?: {
+    overview: string;
+    what_to_improve?: string;
+    section_analysis: {
+      section_name: string;
+      score: number;
+      what_to_improve: string;
+    }[];
+  };
 }
 
 export interface ResumeData {

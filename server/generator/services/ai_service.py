@@ -24,6 +24,16 @@ class ParaphraseResult(BaseModel):
 class JobDescriptionRecommendation(BaseModel):
     job_description: List[str] = Field(..., description="A list of 5 recommended job description bullet points.")
 
+class SectionAnalysis(BaseModel):
+    section_name: str = Field(..., description="Name of the section (e.g., Work Experience, Education, Skills, etc.)")
+    score: int = Field(..., description="Score for this section from 0 to 100.")
+    what_to_improve: str = Field(..., description="Specific advice on how to improve this section.")
+
+class ResumeReview(BaseModel):
+    overview: str = Field(..., description="A high-level summary of the resume's quality and alignment.")
+    what_to_improve: Optional[str] = Field(None, description="General improvements for the entire resume.")
+    section_analysis: List[SectionAnalysis] = Field(..., description="Detailed analysis for each key section of the resume.")
+
 # --- Core Agent ---
 
 class AIAgent:
@@ -93,6 +103,7 @@ class AIService:
         self.skill_recommender = AIAgent('skill_recommender.txt', SkillRecommendation)
         self.paraphraser = AIAgent('paraphraser.txt', ParaphraseResult, temperature=0.4)
         self.job_description_recommender = AIAgent('job_description_recommender.txt', JobDescriptionRecommendation, temperature=0.5)
+        self.reviewer = AIAgent('resume_reviewer.txt', ResumeReview, temperature=0.3)
 
     def evaluate_ats(self, resume_data: dict, job_description: str) -> dict:
         return self.ats_evaluator.generate(
@@ -119,4 +130,11 @@ class AIService:
             job_title=job_title,
             target_role=target_role,
             job_description=job_description
+        )
+
+    def review_resume(self, resume_data: dict, job_description: Optional[str], target_role: str) -> dict:
+        return self.reviewer.generate(
+            resume_data=json.dumps(resume_data, indent=2),
+            job_description=job_description,
+            target_role=target_role
         )

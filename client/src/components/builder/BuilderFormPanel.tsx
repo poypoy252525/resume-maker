@@ -92,7 +92,7 @@ export default function BuilderFormPanel() {
             size="sm"
             className="h-8 text-[10px] font-bold uppercase tracking-wider rounded-lg border-primary/20 hover:bg-primary/5 hover:text-primary transition-all"
             onClick={triggerAIAnalysis}
-            disabled={loading || !formData.job_description}
+            disabled={loading}
           >
             <Wand2 className="w-3 h-3 mr-1.5" />
             AI Analyze

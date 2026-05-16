@@ -25,6 +25,7 @@ def analyze_resume_task(resume_data, job_description, target_role):
         ai_service = AIService()
         ats_result = ai_service.evaluate_ats(resume_data, job_description)
         skills_result = ai_service.recommend_skills(target_role, job_description)
+        review_result = ai_service.review_resume(resume_data, job_description, target_role)
         
         return {
             'ats_score': ats_result.get('ats_score', 0),
@@ -32,7 +33,8 @@ def analyze_resume_task(resume_data, job_description, target_role):
             'missing_keywords': ats_result.get('missing_keywords', []),
             'suggestions': ats_result.get('suggestions', []),
             'recommended_skills': skills_result.get('recommended_skills', []),
-            'skills_reasoning': skills_result.get('reasoning', '')
+            'skills_reasoning': skills_result.get('reasoning', ''),
+            'review': review_result
         }
     except Exception as e:
         logger.error(f"AI analysis failed: {str(e)}", exc_info=True)
