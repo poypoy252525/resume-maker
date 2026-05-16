@@ -1,6 +1,6 @@
 import { Toaster } from "../components/ui/sonner";
 import { Outlet, Link } from "react-router-dom";
-import { Sparkles, ArrowLeft, Save, Share2, Loader2 } from "lucide-react";
+import { Sparkles, ArrowLeft, Share2, Loader2 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Separator } from "../components/ui/separator";
 import { Badge } from "../components/ui/badge";
@@ -42,18 +42,7 @@ export default function BuilderLayout() {
         </div>
 
         <div className="flex items-center gap-1 md:gap-4 shrink-0 ml-auto">
-          <div className="hidden lg:flex items-center gap-2 mr-2 text-[11px] text-muted-foreground">
-            <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-            Auto-saved 2m ago
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 md:h-9 px-2 md:px-3 gap-1 md:gap-2"
-          >
-            <Save className="w-4 h-4" />
-            <span className="hidden md:inline">Save</span>
-          </Button>
+
           <Button
             size="sm"
             className="h-8 md:h-9 px-3 md:px-4 gap-1 md:gap-2 shadow-sm"

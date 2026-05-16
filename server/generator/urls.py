@@ -7,6 +7,6 @@ router.register(r'resumes', ResumeViewSet, basename='resume')
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('status/<str:task_id>/', ResumeStatusView.as_view(), name='resume-status'),
-    path('task-status/<str:task_id>/', TaskStatusView.as_view(), name='task-status'),
+    path('resumes/status/<str:task_id>/', ResumeStatusView.as_view(), name='resume-status'),
+    path('resumes/task-status/<str:task_id>/', TaskStatusView.as_view(), name='task-status'),
 ]
