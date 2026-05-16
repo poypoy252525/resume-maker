@@ -19,7 +19,7 @@ import {
  * Minimalist, full-screen, focused on productivity
  */
 export default function BuilderLayout() {
-  const { formData, handleSubmit, loading } = useResumeStore();
+  const { formData, handleSubmit, isDownloading } = useResumeStore();
 
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden">
@@ -55,15 +55,15 @@ export default function BuilderLayout() {
               <Button
                 size="sm"
                 className="h-8 md:h-9 px-3 md:px-4 gap-1 md:gap-2 shadow-sm"
-                disabled={loading}
+                disabled={isDownloading}
               >
-                {loading ? (
+                {isDownloading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
                   <Download className="w-4 h-4" />
                 )}
                 <span className="hidden sm:inline text-xs md:text-sm">
-                  {loading ? "Downloading..." : "Download"}
+                  {isDownloading ? "Downloading..." : "Download"}
                 </span>
                 <ChevronDown className="w-3 h-3 opacity-50" />
               </Button>

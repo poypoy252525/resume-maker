@@ -22,6 +22,7 @@ interface ResumeState {
   // Status
   isGenerating: boolean;
   loading: boolean;
+  isDownloading: boolean;
   taskId: string | null;
   fileUrl: string | null;
   status: string;
@@ -77,6 +78,7 @@ export const useResumeStore = create<ResumeState>()(
       focusedExperienceIndex: null,
       isGenerating: false,
       loading: false,
+      isDownloading: false,
       taskId: null,
       fileUrl: null,
       status: "PENDING",
@@ -208,7 +210,7 @@ export const useResumeStore = create<ResumeState>()(
 
       handleSubmit: async (format: "pdf" | "docx" = "pdf") => {
         const { formData } = get();
-        set({ loading: true, error: null, fileUrl: null });
+        set({ isDownloading: true, error: null, fileUrl: null });
         try {
           const cleanedData = {
             ...formData,
@@ -261,7 +263,7 @@ export const useResumeStore = create<ResumeState>()(
         } catch (err: unknown) {
           set({ error: (err as Error).message || "Something went wrong" });
         } finally {
-          set({ loading: false });
+          set({ isDownloading: false });
         }
       },
     }),
