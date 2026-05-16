@@ -2,6 +2,7 @@ import Footer from "../components/Footer";
 import { Toaster } from "../components/ui/sonner";
 import { Outlet, Link } from "react-router-dom";
 import { Sparkles } from "lucide-react";
+import GoogleLoginButton from "../components/auth/GoogleLoginButton";
 
 /**
  * MainLayout - Used for Marketing/Landing pages
@@ -32,6 +33,7 @@ export default function MainLayout() {
           </Link>
 
           <div className="flex items-center gap-4">
+            <GoogleLoginButton />
             <Link
               to="/create"
               className="text-sm font-medium bg-primary text-primary-foreground px-4 py-2 rounded-xl hover:opacity-90 transition-opacity"
