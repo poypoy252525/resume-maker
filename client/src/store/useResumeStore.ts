@@ -39,7 +39,7 @@ interface ResumeState {
   handleParaphrase: (bulletPoint: string) => Promise<string[] | null>;
   handleRecommendJobDescription: (jobTitle: string) => Promise<string[] | null>;
   handleRecommendSkills: () => Promise<string[] | null>;
-  handleSubmit: () => Promise<void>;
+  handleSubmit: (format?: "pdf" | "docx") => Promise<void>;
   handleReset: () => void;
   
   // Helpers
@@ -205,7 +205,7 @@ export const useResumeStore = create<ResumeState>()(
         }
       },
 
-      handleSubmit: async () => {
+      handleSubmit: async (format: "pdf" | "docx" = "pdf") => {
         const { formData } = get();
         set({ loading: true, error: null, fileUrl: null });
         try {
@@ -234,7 +234,7 @@ export const useResumeStore = create<ResumeState>()(
           const maxRetries = 30; // 60 seconds total (2s interval)
           
           const poll = async (): Promise<string> => {
-            const res = await checkTaskStatus(taskId);
+            const res = await checkTaskStatus(taskId, format);
             if (res.status === "SUCCESS") return res.file_url;
             if (res.status === "FAILURE") throw new Error(res.error || "Generation failed");
             
@@ -251,7 +251,7 @@ export const useResumeStore = create<ResumeState>()(
           // Trigger direct download
           const link = document.createElement("a");
           link.href = fileUrl;
-          link.setAttribute("download", `${formData.full_name.replace(/\s+/g, "_")}_Resume.pdf`);
+          link.setAttribute("download", `${formData.full_name.replace(/\s+/g, "_")}_Resume.${format}`);
           link.setAttribute("target", "_blank");
           document.body.appendChild(link);
           link.click();

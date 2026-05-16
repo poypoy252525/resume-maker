@@ -108,11 +108,12 @@ class ResumeViewSet(viewsets.ModelViewSet):
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class ResumeStatusView(APIView):
-    def get(self, request, task_id, *args, **kwargs):
-        res = AsyncResult(task_id)
+    def get(self, request, task_id, file_format='pdf', *args, **kwargs):
+        res = AsyncResult(str(task_id))
+        
         if res.ready():
             if res.successful():
-                media_path = f"{settings.MEDIA_URL}resumes/{res.result}.pdf"
+                media_path = f"{settings.MEDIA_URL}resumes/{res.result}.{file_format}"
                 if settings.SITE_URL:
                     file_url = f"{settings.SITE_URL.rstrip('/')}{media_path}"
                 else:
@@ -134,7 +135,7 @@ class TaskStatusView(APIView):
     Generic task status view for AI operations.
     """
     def get(self, request, task_id, *args, **kwargs):
-        res = AsyncResult(task_id)
+        res = AsyncResult(str(task_id))
         if res.ready():
             if res.successful():
                 return Response({

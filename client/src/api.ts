@@ -63,8 +63,8 @@ export const generateResume = async (data: ResumeData) => {
   return response.json();
 };
 
-export const checkTaskStatus = async (taskId: string) => {
-  const response = await fetch(`${API_BASE_URL}/resumes/status/${taskId}/`);
+export const checkTaskStatus = async (taskId: string, format: string = "pdf") => {
+  const response = await fetch(`${API_BASE_URL}/resumes/status/${taskId}/${format}/`);
   if (!response.ok) {
     throw new Error("Failed to check task status");
   }
