@@ -14,7 +14,7 @@ export default function CTA() {
             </h2>
             <p className="text-xl md:text-2xl text-white/80">
               Join 50,000+ professionals who have accelerated their career
-              with Resume Architect.
+              with Resumaker.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-4">
               <Button

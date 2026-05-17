@@ -2,7 +2,7 @@ import Footer from "../components/Footer";
 import { Toaster } from "../components/ui/sonner";
 import { Outlet, Link } from "react-router-dom";
 import { Sparkles } from "lucide-react";
-import GoogleLoginButton from "../components/auth/GoogleLoginButton";
+import { Button } from "../components/ui/button";
 
 /**
  * MainLayout - Used for Marketing/Landing pages
@@ -28,23 +28,30 @@ export default function MainLayout() {
               <Sparkles className="w-5 h-5 text-primary-foreground" />
             </div>
             <span>
-              Resume <span className="text-primary">Architect</span>
+              Resu<span className="text-primary">maker</span>
             </span>
           </Link>
 
           <div className="flex items-center gap-4">
-            <GoogleLoginButton />
-            <Link
+            <Button variant="outline" asChild>
+              <Link to="/signup">Sign up</Link>
+            </Button>
+            <Button asChild>
+              <Link to="/create">Get Started</Link>
+            </Button>
+            {/* <Link
               to="/create"
-              className="text-sm font-medium bg-primary text-primary-foreground px-4 py-2 rounded-xl hover:opacity-90 transition-opacity"
+              // className="text-sm font-medium bg-primary text-primary-foreground px-4 py-2 rounded-xl hover:opacity-90 transition-opacity"
             >
               Get Started
-            </Link>
+            </Link> */}
           </div>
         </div>
       </header>
 
-      <main className="relative z-10"><Outlet /></main>
+      <main className="relative z-10">
+        <Outlet />
+      </main>
       <Footer />
       <Toaster />
     </div>

@@ -4,6 +4,7 @@ import BuilderLayout from "./layouts/BuilderLayout";
 import Home from "./pages/Home";
 import Builder from "./pages/Builder";
 import Scratch from "./pages/Scratch";
+import SignUp from "./pages/SignUp";
 
 export const router = createBrowserRouter([
   {
@@ -13,6 +14,10 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: <Home />,
+      },
+      {
+        path: "signup",
+        element: <SignUp />,
       },
     ],
   },

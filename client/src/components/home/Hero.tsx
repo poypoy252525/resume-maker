@@ -16,7 +16,7 @@ export default function Hero() {
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 text-sm font-medium mb-8 animate-in fade-in slide-in-from-top-4 duration-1000">
             <Sparkles className="w-4 h-4" />
-            <span>AI-Powered Resume Architect v2.0</span>
+            <span>AI-Powered Resumaker v2.0</span>
           </div>
 
           <h1 className="text-4xl md:text-7xl font-bold tracking-tight mb-4 md:mb-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">

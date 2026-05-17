@@ -12,7 +12,7 @@ export default function Footer() {
                 <Sparkles className="w-6 h-6 text-primary-foreground" />
               </div>
               <span>
-                Resume <span className="text-primary">Architect</span>
+                Resu<span className="text-primary">maker</span>
               </span>
             </div>
             <p className="text-muted-foreground max-w-sm leading-relaxed text-lg">
@@ -80,7 +80,7 @@ export default function Footer() {
         </div>
 
         <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
-          <p>© 2026 Resume Architect Inc. All rights reserved.</p>
+          <p>© 2026 Resumaker Inc. All rights reserved.</p>
           <div className="flex gap-8">
             <Link to="#" className="hover:text-primary transition-colors">
               Privacy Policy
