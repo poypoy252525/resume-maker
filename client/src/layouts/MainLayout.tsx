@@ -1,14 +1,17 @@
 import Footer from "../components/Footer";
 import { Toaster } from "../components/ui/sonner";
 import { Outlet, Link } from "react-router-dom";
-import { Sparkles } from "lucide-react";
+import { Sparkles, LayoutDashboard } from "lucide-react";
 import { Button } from "../components/ui/button";
+import { useAuthStore } from "../store/useAuthStore";
 
 /**
  * MainLayout - Used for Marketing/Landing pages
  * Includes full navigation and footer
  */
 export default function MainLayout() {
+  const { isAuthenticated } = useAuthStore();
+
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
       {/* Ambient background glows */}
@@ -28,23 +31,30 @@ export default function MainLayout() {
               <Sparkles className="w-5 h-5 text-primary-foreground" />
             </div>
             <span>
-              Resu<span className="text-primary">maker</span>
+              <span className="text-transparent bg-clip-text bg-linear-to-r from-primary to-violet-500">
+                Resumaker
+              </span>
             </span>
           </Link>
 
           <div className="flex items-center gap-4">
-            <Button variant="outline" asChild>
-              <Link to="/signup">Sign up</Link>
-            </Button>
-            <Button asChild>
-              <Link to="/create">Get Started</Link>
-            </Button>
-            {/* <Link
-              to="/create"
-              // className="text-sm font-medium bg-primary text-primary-foreground px-4 py-2 rounded-xl hover:opacity-90 transition-opacity"
-            >
-              Get Started
-            </Link> */}
+            {isAuthenticated ? (
+              <Button asChild className="gap-2">
+                <Link to="/dashboard">
+                  <LayoutDashboard className="w-4 h-4" />
+                  Dashboard
+                </Link>
+              </Button>
+            ) : (
+              <>
+                <Button variant="outline" asChild>
+                  <Link to="/signup">Sign up</Link>
+                </Button>
+                <Button asChild>
+                  <Link to="/create">Get Started</Link>
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </header>

@@ -1,11 +1,14 @@
 import { useGoogleLogin } from "@react-oauth/google";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export default function GoogleLoginButton() {
+  const navigate = useNavigate();
+  const { setToken, fetchUser } = useAuthStore();
+
   const login = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
-      console.log(tokenResponse);
-      // Send tokenResponse.access_token to backend
       try {
         const response = await fetch(
           `${import.meta.env.VITE_API_BASE_URL}/api/auth/google/`,
@@ -17,17 +20,16 @@ export default function GoogleLoginButton() {
             body: JSON.stringify({
               access_token: tokenResponse.access_token,
             }),
-          },
+          }
         );
 
         const data = await response.json();
         console.log("Login success:", data);
 
-        // Save token to localStorage or state
         if (data.key) {
-          localStorage.setItem("auth_token", data.key);
-          // Reload or redirect
-          window.location.reload();
+          setToken(data.key);
+          await fetchUser();
+          navigate("/dashboard");
         }
       } catch (error) {
         console.error("Login failed:", error);
@@ -46,3 +48,4 @@ export default function GoogleLoginButton() {
     </Button>
   );
 }
+
