@@ -106,7 +106,7 @@ export default function Dashboard() {
   return (
     <div className="space-y-8">
       {/* ── Welcome Hero ── */}
-      <section className="relative rounded-2xl overflow-hidden border bg-gradient-to-br from-primary/5 via-background to-violet-500/5 p-6 md:p-8">
+      <section className="relative rounded-2xl overflow-hidden border bg-linear-to-br from-primary/5 via-background to-violet-500/5 p-6 md:p-8">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute -top-1/2 -right-1/4 w-96 h-96 rounded-full bg-primary/8 blur-[100px]" />
           <div className="absolute -bottom-1/2 -left-1/4 w-96 h-96 rounded-full bg-violet-500/6 blur-[100px]" />
@@ -224,7 +224,7 @@ export default function Dashboard() {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-4">
                     {/* Icon */}
-                    <div className="flex-shrink-0 size-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <div className="shrink-0 size-10 rounded-lg bg-primary/10 flex items-center justify-center">
                       <FileText className="size-5 text-primary" />
                     </div>
 
@@ -259,7 +259,7 @@ export default function Dashboard() {
                     </div>
 
                     {/* Meta */}
-                    <div className="flex-shrink-0 text-right">
+                    <div className="shrink-0 text-right">
                       <p className="text-xs text-muted-foreground flex items-center gap-1">
                         <Clock className="size-3" /> {resume.updatedAt}
                       </p>
@@ -334,14 +334,14 @@ export default function Dashboard() {
             <CardContent className="space-y-3">
               {mockActivity.map((act) => (
                 <div key={act.label} className="flex items-start gap-3">
-                  <div className={`p-2 rounded-lg flex-shrink-0 ${act.bg}`}>
+                  <div className={`p-2 rounded-lg shrink-0 ${act.bg}`}>
                     <act.icon className={`size-3.5 ${act.color}`} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium truncate">{act.label}</p>
                     <p className="text-[11px] text-muted-foreground truncate">{act.sub}</p>
                   </div>
-                  <span className="text-[11px] text-muted-foreground flex-shrink-0">
+                  <span className="text-[11px] text-muted-foreground shrink-0">
                     {act.time}
                   </span>
                 </div>
@@ -350,7 +350,7 @@ export default function Dashboard() {
           </Card>
 
           {/* Pro Tip */}
-          <Card className="border bg-gradient-to-br from-primary/5 to-violet-500/5 border-primary/10">
+          <Card className="border bg-linear-to-br from-primary/5 to-violet-500/5 border-primary/10">
             <CardContent className="p-4">
               <div className="flex items-start gap-3">
                 <div className="p-2 rounded-lg bg-primary/10">
