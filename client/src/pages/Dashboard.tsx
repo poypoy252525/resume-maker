@@ -181,7 +181,10 @@ export default function Dashboard() {
             bg: "bg-amber-500/10",
           },
         ].map((stat) => (
-          <Card key={stat.label} className="border bg-card/60 backdrop-blur-sm hover:shadow-md transition-shadow">
+          <Card
+            key={stat.label}
+            className="border bg-card/60 backdrop-blur-sm hover:shadow-md transition-shadow"
+          >
             <CardContent className="p-5">
               <div className="flex items-start justify-between">
                 <div>
@@ -208,7 +211,12 @@ export default function Dashboard() {
         <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold">Recent Resumes</h2>
-            <Button variant="ghost" size="sm" asChild className="gap-1 text-muted-foreground">
+            <Button
+              variant="ghost"
+              size="sm"
+              asChild
+              className="gap-1 text-muted-foreground"
+            >
               <Link to="/dashboard/resumes">
                 View all <ArrowRight className="size-3.5" />
               </Link>
@@ -231,9 +239,15 @@ export default function Dashboard() {
                     {/* Info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <p className="font-semibold truncate text-sm">{resume.title}</p>
+                        <p className="font-semibold truncate text-sm">
+                          {resume.title}
+                        </p>
                         <Badge
-                          variant={resume.status === "complete" ? "default" : "secondary"}
+                          variant={
+                            resume.status === "complete"
+                              ? "default"
+                              : "secondary"
+                          }
                           className="text-[10px] px-1.5 py-0"
                         >
                           {resume.status === "complete" ? (
@@ -252,7 +266,9 @@ export default function Dashboard() {
                             className={`h-1.5 ${scoreBar(resume.score)}`}
                           />
                         </div>
-                        <span className={`text-xs font-bold ${scoreColor(resume.score)}`}>
+                        <span
+                          className={`text-xs font-bold ${scoreColor(resume.score)}`}
+                        >
                           {resume.score}/100
                         </span>
                       </div>
@@ -329,7 +345,9 @@ export default function Dashboard() {
           <Card className="border bg-card/60">
             <CardHeader className="pb-3">
               <CardTitle className="text-base">Recent Activity</CardTitle>
-              <CardDescription className="text-xs">Your last actions</CardDescription>
+              <CardDescription className="text-xs">
+                Your last actions
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               {mockActivity.map((act) => (
@@ -339,7 +357,9 @@ export default function Dashboard() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium truncate">{act.label}</p>
-                    <p className="text-[11px] text-muted-foreground truncate">{act.sub}</p>
+                    <p className="text-[11px] text-muted-foreground truncate">
+                      {act.sub}
+                    </p>
                   </div>
                   <span className="text-[11px] text-muted-foreground shrink-0">
                     {act.time}
@@ -358,7 +378,9 @@ export default function Dashboard() {
                 </div>
                 <div>
                   <p className="text-xs font-semibold mb-1">💡 Pro Tip</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">{tip}</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    {tip}
+                  </p>
                 </div>
               </div>
             </CardContent>
