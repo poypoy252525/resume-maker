@@ -29,7 +29,7 @@ export default function GoogleLoginButton() {
         if (data.key) {
           setToken(data.key);
           await fetchUser();
-          navigate("/dashboard");
+          navigate("/app");
         }
       } catch (error) {
         console.error("Login failed:", error);

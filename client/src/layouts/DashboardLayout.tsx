@@ -17,12 +17,12 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 
 function getBreadcrumb(pathname: string): string {
   const map: Record<string, string> = {
-    "/dashboard": "Dashboard",
-    "/dashboard/resumes": "My Resumes",
-    "/dashboard/activity": "Recent Activity",
-    "/dashboard/favorites": "Favorites",
-    "/dashboard/profile": "Profile",
-    "/dashboard/settings": "Settings",
+    "/app": "Dashboard",
+    "/app/resumes": "My Resumes",
+    "/app/activity": "Recent Activity",
+    "/app/favorites": "Favorites",
+    "/app/profile": "Profile",
+    "/app/settings": "Settings",
   };
   return map[pathname] ?? "Dashboard";
 }

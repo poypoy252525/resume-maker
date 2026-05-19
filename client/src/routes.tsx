@@ -24,7 +24,7 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    path: "/dashboard",
+    path: "/app",
     element: <DashboardLayout />,
     children: [
       {

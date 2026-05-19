@@ -37,12 +37,12 @@ import { useAuthStore } from "@/store/useAuthStore";
 const navMain = [
   {
     title: "Dashboard",
-    url: "/dashboard",
+    url: "/app",
     icon: LayoutDashboard,
   },
   {
     title: "My Resumes",
-    url: "/dashboard/resumes",
+    url: "/app/resumes",
     icon: FileText,
   },
   {
@@ -55,12 +55,12 @@ const navMain = [
 const navSecondary = [
   {
     title: "Recent Activity",
-    url: "/dashboard/activity",
+    url: "/app/activity",
     icon: History,
   },
   {
     title: "Favorites",
-    url: "/dashboard/favorites",
+    url: "/app/favorites",
     icon: Star,
   },
 ];
@@ -85,7 +85,7 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link to="/dashboard">
+              <Link to="/app">
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                   <Sparkles className="size-4" />
                 </div>
@@ -184,13 +184,13 @@ export function AppSidebar() {
                 sideOffset={4}
               >
                 <DropdownMenuItem asChild>
-                  <Link to="/dashboard/profile" className="flex gap-2">
+                  <Link to="/app/profile" className="flex gap-2">
                     <User className="size-4" />
                     Profile
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/dashboard/settings" className="flex gap-2">
+                  <Link to="/app/settings" className="flex gap-2">
                     <Settings className="size-4" />
                     Settings
                   </Link>

@@ -136,7 +136,7 @@ export default function Dashboard() {
               </Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="gap-2">
-              <Link to="/dashboard/resumes">
+              <Link to="/app/resumes">
                 <FileText className="size-4" />
                 View All
               </Link>
@@ -217,7 +217,7 @@ export default function Dashboard() {
               asChild
               className="gap-1 text-muted-foreground"
             >
-              <Link to="/dashboard/resumes">
+              <Link to="/app/resumes">
                 View all <ArrowRight className="size-3.5" />
               </Link>
             </Button>
@@ -321,7 +321,7 @@ export default function Dashboard() {
                 {
                   icon: Star,
                   label: "View favorites",
-                  to: "/dashboard/favorites",
+                  to: "/app/favorites",
                   color: "text-amber-500",
                   bg: "bg-amber-500/10",
                 },

@@ -40,7 +40,7 @@ export default function MainLayout() {
           <div className="flex items-center gap-4">
             {isAuthenticated ? (
               <Button asChild className="gap-2">
-                <Link to="/dashboard">
+                <Link to="/app">
                   <LayoutDashboard className="w-4 h-4" />
                   Dashboard
                 </Link>
