@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   FileText,
@@ -23,58 +24,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useAuthStore } from "@/store/useAuthStore";
+import { fetchResumes, fetchActivities } from "@/api";
+import type { ResumeResponse, ActivityResponse } from "@/api";
 
-/* ─── Mock data (replace with real API calls later) ─── */
-const mockResumes = [
-  {
-    id: "1",
-    title: "Software Engineer – Google",
-    updatedAt: "2 hours ago",
-    score: 87,
-    status: "complete",
-  },
-  {
-    id: "2",
-    title: "Product Manager – Meta",
-    updatedAt: "Yesterday",
-    score: 74,
-    status: "draft",
-  },
-  {
-    id: "3",
-    title: "Full-Stack Developer – Startup",
-    updatedAt: "3 days ago",
-    score: 91,
-    status: "complete",
-  },
-];
-
-const mockActivity = [
-  {
-    icon: Brain,
-    label: "AI Review completed",
-    sub: "Software Engineer resume scored 87/100",
-    time: "2h ago",
-    color: "text-violet-500",
-    bg: "bg-violet-500/10",
-  },
-  {
-    icon: Download,
-    label: "Resume downloaded",
-    sub: "Full-Stack Developer — PDF",
-    time: "Yesterday",
-    color: "text-emerald-500",
-    bg: "bg-emerald-500/10",
-  },
-  {
-    icon: Sparkles,
-    label: "New resume created",
-    sub: "Product Manager – Meta",
-    time: "2 days ago",
-    color: "text-blue-500",
-    bg: "bg-blue-500/10",
-  },
-];
 
 const tips = [
   "Tailor your resume keywords to each job description for 3× more callbacks.",
@@ -97,11 +49,82 @@ const scoreBar = (score: number) =>
       ? "[&>div]:bg-amber-500"
       : "[&>div]:bg-rose-500";
 
+const formatRelativeTime = (dateStr: string) => {
+  try {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  } catch {
+    return "some time ago";
+  }
+};
+
+const getActivityDetails = (type: string) => {
+  switch (type) {
+    case "ai_review":
+      return { icon: Brain, color: "text-violet-500", bg: "bg-violet-500/10" };
+    case "download":
+      return { icon: Download, color: "text-emerald-500", bg: "bg-emerald-500/10" };
+    case "create":
+    default:
+      return { icon: Sparkles, color: "text-blue-500", bg: "bg-blue-500/10" };
+  }
+};
+
 export default function Dashboard() {
   const { user } = useAuthStore();
   const firstName = user?.name?.split(" ")[0] ?? "there";
 
+  const [resumes, setResumes] = useState<ResumeResponse[]>([]);
+  const [activities, setActivities] = useState<ActivityResponse[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      try {
+        const [resumesData, activitiesData] = await Promise.all([
+          fetchResumes(),
+          fetchActivities(),
+        ]);
+        setResumes(resumesData);
+        setActivities(activitiesData);
+      } catch (err) {
+        console.error("Failed to load dashboard data", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadDashboardData();
+  }, []);
+
+  const totalResumes = resumes.length;
+  const avgScore = resumes.length > 0 
+    ? Math.round(resumes.reduce((sum, r) => sum + (r.score || 0), 0) / resumes.length) 
+    : 0;
+  const downloadsCount = activities.filter(a => a.activity_type === 'download').length;
+  const aiReviewsCount = activities.filter(a => a.activity_type === 'ai_review').length;
+
   const tip = tips[new Date().getDay() % tips.length];
+
+  if (isLoading) {
+    return (
+      <div className="flex h-[50vh] items-center justify-center">
+        <div className="flex flex-col items-center gap-2">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+          <p className="text-sm text-muted-foreground">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -123,7 +146,7 @@ export default function Dashboard() {
             <p className="mt-2 text-muted-foreground max-w-md">
               You have{" "}
               <span className="font-semibold text-foreground">
-                {mockResumes.length} resumes
+                {totalResumes} {totalResumes === 1 ? 'resume' : 'resumes'}
               </span>{" "}
               in your workspace. Ready to land that next role?
             </p>
@@ -150,23 +173,23 @@ export default function Dashboard() {
         {[
           {
             label: "Total Resumes",
-            value: "3",
-            sub: "+1 this week",
+            value: totalResumes.toString(),
+            sub: "In your workspace",
             icon: FileText,
             color: "text-blue-500",
             bg: "bg-blue-500/10",
           },
           {
             label: "Avg. AI Score",
-            value: "84",
-            sub: "↑ 6 pts from last",
+            value: avgScore > 0 ? avgScore.toString() : "N/A",
+            sub: avgScore > 0 ? "Targeting 85+ for callbacks" : "No score yet",
             icon: TrendingUp,
             color: "text-emerald-500",
             bg: "bg-emerald-500/10",
           },
           {
             label: "Downloads",
-            value: "12",
+            value: downloadsCount.toString(),
             sub: "All time",
             icon: Download,
             color: "text-violet-500",
@@ -174,8 +197,8 @@ export default function Dashboard() {
           },
           {
             label: "AI Reviews",
-            value: "5",
-            sub: "Last 30 days",
+            value: aiReviewsCount.toString(),
+            sub: "All time",
             icon: Brain,
             color: "text-amber-500",
             bg: "bg-amber-500/10",
@@ -224,74 +247,91 @@ export default function Dashboard() {
           </div>
 
           <div className="space-y-3">
-            {mockResumes.map((resume) => (
-              <Card
-                key={resume.id}
-                className="border bg-card/60 hover:shadow-md transition-all duration-200 group cursor-pointer"
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-4">
-                    {/* Icon */}
-                    <div className="shrink-0 size-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <FileText className="size-5 text-primary" />
-                    </div>
-
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <p className="font-semibold truncate text-sm">
-                          {resume.title}
-                        </p>
-                        <Badge
-                          variant={
-                            resume.status === "complete"
-                              ? "default"
-                              : "secondary"
-                          }
-                          className="text-[10px] px-1.5 py-0"
-                        >
-                          {resume.status === "complete" ? (
-                            <span className="flex items-center gap-1">
-                              <CheckCircle2 className="size-3" /> Done
-                            </span>
-                          ) : (
-                            "Draft"
-                          )}
-                        </Badge>
+            {resumes.length === 0 ? (
+              <div className="text-center p-8 border border-dashed rounded-xl flex flex-col items-center justify-center bg-card/20">
+                <FileText className="size-8 text-muted-foreground mb-2" />
+                <p className="text-sm font-medium">No resumes found</p>
+                <p className="text-xs text-muted-foreground mt-1 mb-4">
+                  Create your first resume to get started!
+                </p>
+                <Button asChild size="sm">
+                  <Link to="/create" className="gap-2">
+                    <Plus className="size-4" /> Create Resume
+                  </Link>
+                </Button>
+              </div>
+            ) : (
+              resumes.slice(0, 5).map((resume) => (
+                <Card
+                  key={resume.id}
+                  className="border bg-card/60 hover:shadow-md transition-all duration-200 group cursor-pointer"
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-4">
+                      {/* Icon */}
+                      <div className="shrink-0 size-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <FileText className="size-5 text-primary" />
                       </div>
-                      <div className="flex items-center gap-3 mt-1.5">
-                        <div className="flex-1">
-                          <Progress
-                            value={resume.score}
-                            className={`h-1.5 ${scoreBar(resume.score)}`}
-                          />
+
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-semibold truncate text-sm">
+                            {resume.title}
+                          </p>
+                          <Badge
+                            variant={
+                              resume.status.toLowerCase() === "completed"
+                                ? "default"
+                                : "secondary"
+                            }
+                            className="text-[10px] px-1.5 py-0"
+                          >
+                            {resume.status.toLowerCase() === "completed" ? (
+                              <span className="flex items-center gap-1">
+                                <CheckCircle2 className="size-3" /> Done
+                              </span>
+                            ) : resume.status.toLowerCase() === "processing" ? (
+                              "Processing"
+                            ) : (
+                              "Draft"
+                            )}
+                          </Badge>
                         </div>
-                        <span
-                          className={`text-xs font-bold ${scoreColor(resume.score)}`}
+                        <div className="flex items-center gap-3 mt-1.5">
+                          <div className="flex-1">
+                            <Progress
+                              value={resume.score}
+                              className={`h-1.5 ${scoreBar(resume.score)}`}
+                            />
+                          </div>
+                          <span
+                            className={`text-xs font-bold ${scoreColor(resume.score)}`}
+                          >
+                            {resume.score}/100
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Meta */}
+                      <div className="shrink-0 text-right">
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Clock className="size-3" /> {formatRelativeTime(resume.updated_at)}
+                        </p>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          asChild
+                          className="mt-1 h-7 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
                         >
-                          {resume.score}/100
-                        </span>
+                          <Link to={`/create?id=${resume.id}`}>Edit</Link>
+                        </Button>
                       </div>
                     </div>
-
-                    {/* Meta */}
-                    <div className="shrink-0 text-right">
-                      <p className="text-xs text-muted-foreground flex items-center gap-1">
-                        <Clock className="size-3" /> {resume.updatedAt}
-                      </p>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        asChild
-                        className="mt-1 h-7 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <Link to={`/create`}>Edit</Link>
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              ))
+            )}
           </div>
         </div>
 
@@ -350,22 +390,32 @@ export default function Dashboard() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              {mockActivity.map((act) => (
-                <div key={act.label} className="flex items-start gap-3">
-                  <div className={`p-2 rounded-lg shrink-0 ${act.bg}`}>
-                    <act.icon className={`size-3.5 ${act.color}`} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium truncate">{act.label}</p>
-                    <p className="text-[11px] text-muted-foreground truncate">
-                      {act.sub}
-                    </p>
-                  </div>
-                  <span className="text-[11px] text-muted-foreground shrink-0">
-                    {act.time}
-                  </span>
+              {activities.length === 0 ? (
+                <div className="text-center py-6 text-xs text-muted-foreground">
+                  No recent activities
                 </div>
-              ))}
+              ) : (
+                activities.slice(0, 5).map((act) => {
+                  const details = getActivityDetails(act.activity_type);
+                  const IconComponent = details.icon;
+                  return (
+                    <div key={act.id} className="flex items-start gap-3">
+                      <div className={`p-2 rounded-lg shrink-0 ${details.bg}`}>
+                        <IconComponent className={`size-3.5 ${details.color}`} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium truncate">{act.label}</p>
+                        <p className="text-[11px] text-muted-foreground truncate">
+                          {act.sub}
+                        </p>
+                      </div>
+                      <span className="text-[11px] text-muted-foreground shrink-0">
+                        {formatRelativeTime(act.created_at)}
+                      </span>
+                    </div>
+                  );
+                })
+              )}
             </CardContent>
           </Card>
 

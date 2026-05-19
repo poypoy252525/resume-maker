@@ -170,3 +170,67 @@ export const recommendSkills = async (targetRole: string, jobDescription: string
 
   return response.json();
 };
+
+export interface ResumeResponse {
+  id: string;
+  title: string;
+  data: ResumeData;
+  file: string | null;
+  status: string;
+  score: number;
+  is_favorite: boolean;
+  updated_at: string;
+}
+
+export interface ActivityResponse {
+  id: number;
+  activity_type: string;
+  label: string;
+  sub: string;
+  created_at: string;
+}
+
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("auth_token");
+  return token ? { Authorization: `Token ${token}` } : {};
+};
+
+export const fetchResumes = async (): Promise<ResumeResponse[]> => {
+  const response = await fetch(`${API_BASE_URL}/resumes/`, {
+    headers: {
+      ...getAuthHeaders(),
+    },
+  });
+  if (!response.ok) {
+    throw new Error("Failed to fetch resumes");
+  }
+  return response.json();
+};
+
+export const toggleFavoriteResume = async (id: string, isFavorite: boolean): Promise<ResumeResponse> => {
+  const response = await fetch(`${API_BASE_URL}/resumes/${id}/`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeaders(),
+    },
+    body: JSON.stringify({ is_favorite: isFavorite }),
+  });
+  if (!response.ok) {
+    throw new Error("Failed to update resume");
+  }
+  return response.json();
+};
+
+export const fetchActivities = async (): Promise<ActivityResponse[]> => {
+  const response = await fetch(`${API_BASE_URL}/activities/`, {
+    headers: {
+      ...getAuthHeaders(),
+    },
+  });
+  if (!response.ok) {
+    throw new Error("Failed to fetch activities");
+  }
+  return response.json();
+};
+

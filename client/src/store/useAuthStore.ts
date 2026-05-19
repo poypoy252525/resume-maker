@@ -57,8 +57,8 @@ export const useAuthStore = create<AuthState>()(
               user: {
                 id: data.pk ?? data.id,
                 email: data.email,
-                name: data.display_name ?? data.first_name ?? data.email.split("@")[0],
-                avatar: data.avatar ?? undefined,
+                name: data.display_name || data.first_name || data.username || data.email.split("@")[0],
+                avatar: data.avatar || undefined,
               },
               isAuthenticated: true,
             });
