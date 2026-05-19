@@ -4,9 +4,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from celery.result import AsyncResult
-from .models import Resume
+from .models import Resume, Activity
 from .tasks import generate_document_task, analyze_resume_task, paraphrase_bullet_task, recommend_job_description_task, recommend_skills_task
-from .serializers import ResumeModelSerializer, ResumeDataSerializer
+from .serializers import ResumeModelSerializer, ResumeDataSerializer, ActivitySerializer
+
 
 class ResumeViewSet(viewsets.ModelViewSet):
     serializer_class = ResumeModelSerializer
@@ -145,3 +146,10 @@ class TaskStatusView(APIView):
                     "error": str(res.result)
                 })
         return Response({"status": "PENDING"})
+
+class ActivityViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = ActivitySerializer
+
+    def get_queryset(self):
+        return Activity.objects.filter(user=self.request.user)
+

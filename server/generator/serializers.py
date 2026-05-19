@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Resume
+from .models import Resume, Activity
 
 class ExperienceSerializer(serializers.Serializer):
     company_name = serializers.CharField(required=False, allow_blank=True)
@@ -42,5 +42,12 @@ class ResumeModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Resume
-        fields = ['id', 'title', 'data', 'file', 'status', 'updated_at']
+        fields = ['id', 'title', 'data', 'file', 'status', 'score', 'is_favorite', 'updated_at']
         read_only_fields = ['id', 'file', 'updated_at']
+
+class ActivitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Activity
+        fields = ['id', 'activity_type', 'label', 'sub', 'created_at']
+        read_only_fields = ['id', 'created_at']
+

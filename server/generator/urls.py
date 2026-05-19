@@ -1,9 +1,11 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import ResumeViewSet, ResumeStatusView, TaskStatusView
+from .views import ResumeViewSet, ResumeStatusView, TaskStatusView, ActivityViewSet
 
 router = DefaultRouter()
 router.register(r'resumes', ResumeViewSet, basename='resume')
+router.register(r'activities', ActivityViewSet, basename='activity')
+
 
 urlpatterns = [
     path('resumes/status/<uuid:task_id>/<str:file_format>/', ResumeStatusView.as_view(), name='resume-status'),

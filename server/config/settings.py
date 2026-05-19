@@ -204,3 +204,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ),
 }
+
+REST_AUTH = {
+    'USER_DETAILS_SERIALIZER': 'user.serializers.CustomUserDetailsSerializer',
+}
+
