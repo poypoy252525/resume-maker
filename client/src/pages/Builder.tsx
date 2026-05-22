@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { 
   ResizableHandle, 
   ResizablePanel, 
@@ -10,23 +11,52 @@ import BuilderFormPanel from "@/components/builder/BuilderFormPanel";
 import BuilderPreviewPanel from "@/components/builder/BuilderPreviewPanel";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Eye } from "lucide-react";
+import { Eye, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import AIReviewModal from "@/components/builder/AIReviewModal";
 
 export default function Builder() {
   const isDesktop = useMediaQuery("(min-width: 1024px)");
   const [showPreviewMobile, setShowPreviewMobile] = useState(false);
+  const [searchParams] = useSearchParams();
+  const id = searchParams.get("id");
   
   const {
     error,
+    resumeId,
+    loadResume,
+    handleReset,
+    loading,
   } = useResumeStore();
+
+  useEffect(() => {
+    if (id) {
+      if (id !== resumeId) {
+        loadResume(id);
+      }
+    } else {
+      if (resumeId !== null) {
+        handleReset();
+      }
+    }
+  }, [id, resumeId, loadResume, handleReset]);
 
   useEffect(() => {
     if (error) {
       toast.error(error);
     }
   }, [error]);
+
+  if (loading) {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground font-medium">Loading resume...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full w-full overflow-hidden flex flex-col bg-background">

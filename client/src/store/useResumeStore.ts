@@ -9,6 +9,9 @@ import {
   recommendJobDescription,
   recommendSkills,
   checkTaskResult,
+  fetchResume,
+  createResume,
+  updateResume,
 } from "@/api";
 
 interface ResumeState {
@@ -19,10 +22,15 @@ interface ResumeState {
   activeBulletIndex: number | null;
   focusedExperienceIndex: number | null;
 
+  // Data
+  resumeId: string | null;
+  resumeTitle: string;
+
   // Status
   isGenerating: boolean;
   loading: boolean;
   isDownloading: boolean;
+  isSaving: boolean;
   taskId: string | null;
   fileUrl: string | null;
   status: string;
@@ -38,6 +46,7 @@ interface ResumeState {
   setActiveBulletIndex: (index: number | null) => void;
   setFocusedExperienceIndex: (index: number | null) => void;
   setReviewModalOpen: (open: boolean) => void;
+  setResumeTitle: (title: string) => void;
 
   // Async Actions
   triggerAIAnalysis: () => Promise<void>;
@@ -46,6 +55,8 @@ interface ResumeState {
   handleRecommendSkills: () => Promise<string[] | null>;
   handleSubmit: (format?: "pdf" | "docx") => Promise<void>;
   handleReset: () => void;
+  loadResume: (id: string) => Promise<void>;
+  saveResume: () => Promise<string | null>;
 
   // Helpers
   pollTask: <T>(
@@ -78,6 +89,8 @@ export const useResumeStore = create<ResumeState>()(
     (set, get) => ({
       // State
       formData: initialFormData,
+      resumeId: null,
+      resumeTitle: "Untitled Resume",
       step: 1,
       activeExperienceIndex: null,
       activeBulletIndex: null,
@@ -85,6 +98,7 @@ export const useResumeStore = create<ResumeState>()(
       isGenerating: false,
       loading: false,
       isDownloading: false,
+      isSaving: false,
       taskId: null,
       fileUrl: null,
       status: "PENDING",
@@ -108,6 +122,7 @@ export const useResumeStore = create<ResumeState>()(
       setFocusedExperienceIndex: (index) =>
         set({ focusedExperienceIndex: index }),
       setReviewModalOpen: (open) => set({ isReviewModalOpen: open }),
+      setResumeTitle: (resumeTitle) => set({ resumeTitle }),
 
       handleReset: () =>
         set({
@@ -118,6 +133,8 @@ export const useResumeStore = create<ResumeState>()(
           fileUrl: null,
           error: null,
           formData: initialFormData,
+          resumeId: null,
+          resumeTitle: "Untitled Resume",
         }),
 
       pollTask: async (taskId, interval = 2000, maxRetries = 60) => {
@@ -291,10 +308,60 @@ export const useResumeStore = create<ResumeState>()(
           set({ isDownloading: false });
         }
       },
+
+      loadResume: async (id) => {
+        set({ loading: true, error: null });
+        try {
+          const res = await fetchResume(id);
+          set({
+            resumeId: res.id,
+            resumeTitle: res.title,
+            formData: {
+              ...initialFormData,
+              ...res.data,
+            },
+          });
+        } catch (err: unknown) {
+          set({ error: (err as Error).message || "Failed to load resume" });
+        } finally {
+          set({ loading: false });
+        }
+      },
+
+      saveResume: async () => {
+        const { resumeId, resumeTitle, formData } = get();
+        set({ isSaving: true, error: null });
+        try {
+          let res;
+          if (resumeId) {
+            res = await updateResume(resumeId, resumeTitle, formData);
+          } else {
+            res = await createResume(resumeTitle, formData);
+          }
+          set({
+            resumeId: res.id,
+            resumeTitle: res.title,
+            formData: {
+              ...initialFormData,
+              ...res.data,
+            },
+          });
+          return res.id;
+        } catch (err: unknown) {
+          set({ error: (err as Error).message || "Failed to save resume" });
+          return null;
+        } finally {
+          set({ isSaving: false });
+        }
+      },
     }),
     {
       name: "resume-storage",
-      partialize: (state) => ({ formData: state.formData }),
+      partialize: (state) => ({
+        formData: state.formData,
+        resumeId: state.resumeId,
+        resumeTitle: state.resumeTitle,
+      }),
     },
   ),
 );

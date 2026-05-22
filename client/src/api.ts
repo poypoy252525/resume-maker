@@ -234,3 +234,46 @@ export const fetchActivities = async (): Promise<ActivityResponse[]> => {
   return response.json();
 };
 
+export const fetchResume = async (id: string): Promise<ResumeResponse> => {
+  const response = await fetch(`${API_BASE_URL}/resumes/${id}/`, {
+    headers: {
+      ...getAuthHeaders(),
+    },
+  });
+  if (!response.ok) {
+    throw new Error("Failed to fetch resume");
+  }
+  return response.json();
+};
+
+export const createResume = async (title: string, data: ResumeData): Promise<ResumeResponse> => {
+  const response = await fetch(`${API_BASE_URL}/resumes/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeaders(),
+    },
+    body: JSON.stringify({ title, data }),
+  });
+  if (!response.ok) {
+    throw new Error("Failed to save resume");
+  }
+  return response.json();
+};
+
+export const updateResume = async (id: string, title: string, data: ResumeData): Promise<ResumeResponse> => {
+  const response = await fetch(`${API_BASE_URL}/resumes/${id}/`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeaders(),
+    },
+    body: JSON.stringify({ title, data }),
+  });
+  if (!response.ok) {
+    throw new Error("Failed to update resume");
+  }
+  return response.json();
+};
+
+
