@@ -36,6 +36,7 @@ interface ResumeState {
   status: string;
   error: string | null;
   isReviewModalOpen: boolean;
+  isAIAnalyzing: boolean;
 
   // Actions
   setStep: (step: number) => void;
@@ -104,6 +105,7 @@ export const useResumeStore = create<ResumeState>()(
       status: "PENDING",
       error: null,
       isReviewModalOpen: false,
+      isAIAnalyzing: false,
 
       // Actions
       setStep: (step) => set({ step }),
@@ -162,7 +164,7 @@ export const useResumeStore = create<ResumeState>()(
 
       triggerAIAnalysis: async () => {
         const { formData, pollTask, setReviewModalOpen } = get();
-        set({ loading: true, error: null });
+        set({ isAIAnalyzing: true, error: null });
         setReviewModalOpen(true);
         try {
           const { task_id } = await analyzeResume(
@@ -177,13 +179,12 @@ export const useResumeStore = create<ResumeState>()(
         } catch (err: unknown) {
           set({ error: (err as Error).message || "AI analysis failed" });
         } finally {
-          set({ loading: false });
+          set({ isAIAnalyzing: false });
         }
       },
 
       handleParaphrase: async (bulletPoint) => {
         const { formData, pollTask } = get();
-        set({ loading: true });
         try {
           const { task_id } = await paraphraseBullet(
             bulletPoint,
@@ -195,14 +196,11 @@ export const useResumeStore = create<ResumeState>()(
         } catch (err: unknown) {
           set({ error: (err as Error).message || "Paraphrasing failed" });
           return null;
-        } finally {
-          set({ loading: false });
         }
       },
 
       handleRecommendJobDescription: async (jobTitle) => {
         const { formData, pollTask } = get();
-        set({ loading: true });
         try {
           const { task_id } = await recommendJobDescription(
             jobTitle,
@@ -217,14 +215,11 @@ export const useResumeStore = create<ResumeState>()(
               (err as Error).message || "Failed to generate recommendations",
           });
           return null;
-        } finally {
-          set({ loading: false });
         }
       },
 
       handleRecommendSkills: async () => {
         const { formData, pollTask } = get();
-        set({ loading: true });
         try {
           const { task_id } = await recommendSkills(
             formData.target_role || "Professional",
@@ -239,8 +234,6 @@ export const useResumeStore = create<ResumeState>()(
             error: (err as Error).message || "Failed to recommend skills",
           });
           return null;
-        } finally {
-          set({ loading: false });
         }
       },
 

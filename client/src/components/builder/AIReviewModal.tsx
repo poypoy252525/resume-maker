@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 
 export default function AIReviewModal() {
-  const { isReviewModalOpen, setReviewModalOpen, formData, loading } =
+  const { isReviewModalOpen, setReviewModalOpen, formData, isAIAnalyzing } =
     useResumeStore();
   const feedback = formData.ai_feedback;
   const review = feedback?.review;
@@ -58,7 +58,7 @@ export default function AIReviewModal() {
 
         <div className="flex-1 overflow-y-auto">
           <div className="p-6 space-y-8 pb-12">
-            {loading ? (
+            {isAIAnalyzing ? (
               <div className="flex flex-col items-center justify-center py-20 space-y-4">
                 <div className="relative">
                   <div className="size-16 rounded-full border-4 border-primary/10 border-t-primary animate-spin" />
