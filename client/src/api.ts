@@ -190,7 +190,7 @@ export interface ActivityResponse {
   created_at: string;
 }
 
-const getAuthHeaders = () => {
+const getAuthHeaders = (): Record<string, string> => {
   const token = localStorage.getItem("auth_token");
   return token ? { Authorization: `Token ${token}` } : {};
 };

@@ -33,7 +33,7 @@ export default function BuilderLayout() {
 
   const { isAuthenticated } = useAuthStore();
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [, setSearchParams] = useSearchParams();
 
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [localTitle, setLocalTitle] = useState(resumeTitle);
