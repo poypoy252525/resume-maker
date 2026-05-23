@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { ResumeData, AIFeedback } from "@/api";
+import { useAuthStore } from "./useAuthStore";
 import {
   generateResume,
   checkTaskStatus,
@@ -176,6 +177,11 @@ export const useResumeStore = create<ResumeState>()(
           set((state) => ({
             formData: { ...state.formData, ai_feedback: feedback },
           }));
+          
+          // Automatically save the resume if the user is authenticated to trigger backend score update
+          if (useAuthStore.getState().isAuthenticated) {
+            await get().saveResume();
+          }
         } catch (err: unknown) {
           set({ error: (err as Error).message || "AI analysis failed" });
         } finally {

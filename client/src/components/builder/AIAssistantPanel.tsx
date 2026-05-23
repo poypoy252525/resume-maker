@@ -19,6 +19,8 @@ import {
   Zap,
 } from "lucide-react";
 import type { ResumeData } from "@/api";
+import { cn } from "@/lib/utils";
+import { calculateResumeScore } from "@/lib/score";
 
 interface AIAssistantPanelProps {
   formData: ResumeData;
@@ -100,15 +102,36 @@ export default function AIAssistantPanel({
             </p>
           </div>
         </div>
-        {feedback && (
+        {feedback ? (
           <div className="flex flex-col items-end">
             <span className="text-[10px] font-bold text-muted-foreground uppercase">
               ATS Match
             </span>
             <span
-              className={`text-sm font-black ${feedback.ats_score >= 80 ? "text-green-600" : feedback.ats_score >= 60 ? "text-amber-500" : "text-red-500"}`}
+              className={cn(
+                "text-sm font-black",
+                feedback.ats_score >= 80 ? "text-emerald-500" : feedback.ats_score >= 50 ? "text-amber-500" : "text-rose-500"
+              )}
             >
               {feedback.ats_score}%
+            </span>
+          </div>
+        ) : (
+          <div className="flex flex-col items-end">
+            <span className="text-[10px] font-bold text-muted-foreground uppercase">
+              Strength
+            </span>
+            <span
+              className={cn(
+                "text-sm font-black",
+                calculateResumeScore(formData) >= 80
+                  ? "text-emerald-500"
+                  : calculateResumeScore(formData) >= 50
+                    ? "text-amber-500"
+                    : "text-rose-500"
+              )}
+            >
+              {calculateResumeScore(formData)}/100
             </span>
           </div>
         )}

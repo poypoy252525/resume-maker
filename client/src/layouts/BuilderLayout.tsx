@@ -8,6 +8,8 @@ import { useResumeStore } from "../store/useResumeStore";
 import { useAuthStore } from "../store/useAuthStore";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
+import { cn } from "../lib/utils";
+import { calculateResumeScore } from "../lib/score";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,7 +31,11 @@ export default function BuilderLayout() {
     setResumeTitle,
     saveResume,
     isSaving,
+    formData,
+    setReviewModalOpen,
   } = useResumeStore();
+
+  const score = calculateResumeScore(formData);
 
   const { isAuthenticated } = useAuthStore();
   const navigate = useNavigate();
@@ -129,6 +135,32 @@ export default function BuilderLayout() {
         </div>
 
         <div className="flex items-center gap-2 md:gap-4 shrink-0 ml-auto">
+          {/* Resume Score Badge (Interactive) */}
+          <button
+            onClick={() => setReviewModalOpen(true)}
+            className="flex items-center gap-2 bg-muted/40 hover:bg-muted/70 active:scale-95 transition-all px-2.5 py-1.5 md:px-3 rounded-xl border text-[10px] md:text-xs font-semibold cursor-pointer group shrink-0"
+            title="Click to view full AI review and suggestions"
+          >
+            <span className="text-muted-foreground group-hover:text-foreground transition-colors">Score:</span>
+            <div className="flex items-center gap-1.5">
+              <div className="w-12 md:w-16 bg-muted-foreground/10 rounded-full h-1 md:h-1.5 overflow-hidden hidden sm:block">
+                <div 
+                  className={cn(
+                    "h-full transition-all duration-500",
+                    score >= 80 ? "bg-emerald-500" : score >= 50 ? "bg-amber-500" : "bg-rose-500"
+                  )}
+                  style={{ width: `${score}%` }}
+                />
+              </div>
+              <span className={cn(
+                "font-bold font-mono transition-colors",
+                score >= 80 ? "text-emerald-500" : score >= 50 ? "text-amber-500" : "text-rose-500"
+              )}>
+                {score}/100
+              </span>
+            </div>
+          </button>
+
           <Button
             variant="outline"
             size="sm"
