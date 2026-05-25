@@ -13,6 +13,7 @@ import {
   Download,
   Brain,
 } from "lucide-react";
+import { formatRelativeTime, getActivityDetails, scoreColor, scoreBar } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -34,51 +35,6 @@ const tips = [
   "Keep your resume to 1 page if you have less than 10 years of experience.",
   "Quantify achievements — numbers make you stand out instantly.",
 ];
-
-const scoreColor = (score: number) =>
-  score >= 85
-    ? "text-emerald-500"
-    : score >= 70
-      ? "text-amber-500"
-      : "text-rose-500";
-
-const scoreBar = (score: number) =>
-  score >= 85
-    ? "[&>div]:bg-emerald-500"
-    : score >= 70
-      ? "[&>div]:bg-amber-500"
-      : "[&>div]:bg-rose-500";
-
-const formatRelativeTime = (dateStr: string) => {
-  try {
-    const date = new Date(dateStr);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
-
-    if (diffMins < 1) return "Just now";
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays < 7) return `${diffDays}d ago`;
-    return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-  } catch {
-    return "some time ago";
-  }
-};
-
-const getActivityDetails = (type: string) => {
-  switch (type) {
-    case "ai_review":
-      return { icon: Brain, color: "text-violet-500", bg: "bg-violet-500/10" };
-    case "download":
-      return { icon: Download, color: "text-emerald-500", bg: "bg-emerald-500/10" };
-    case "create":
-    default:
-      return { icon: Sparkles, color: "text-blue-500", bg: "bg-blue-500/10" };
-  }
-};
 
 export default function Dashboard() {
   const { user } = useAuthStore();

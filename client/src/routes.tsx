@@ -7,6 +7,11 @@ import Builder from "./pages/Builder";
 import Scratch from "./pages/Scratch";
 import SignUp from "./pages/SignUp";
 import Dashboard from "./pages/Dashboard";
+import Resumes from "./pages/Resumes";
+import Activity from "./pages/Activity";
+import Favorites from "./pages/Favorites";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
 
 export const router = createBrowserRouter([
   {
@@ -30,6 +35,26 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: <Dashboard />,
+      },
+      {
+        path: "resumes",
+        element: <Resumes />,
+      },
+      {
+        path: "activity",
+        element: <Activity />,
+      },
+      {
+        path: "favorites",
+        element: <Favorites />,
+      },
+      {
+        path: "profile",
+        element: <Profile />,
+      },
+      {
+        path: "settings",
+        element: <Settings />,
       },
     ],
   },
