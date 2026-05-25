@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-  <!-- Black rounded square background -->
+  <!-- Black rounded background -->
   <rect width="512" height="512" rx="112" ry="112" fill="#000000"/>
 
-  <!-- Sparkles icon centered and scaled (original 24x24 → scaled ~13.3x, centered at 256,256) -->
+  <!-- Sparkles icon centered and scaled up (original 24x24 → scaled to fit ~320px centered at 256,256) -->
   <g transform="translate(256,256) scale(13.33) translate(-12,-12)" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
     <path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/>
     <path d="M20 2v4"/>
