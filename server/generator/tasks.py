@@ -7,19 +7,35 @@ from .services.ai_service import AIService
 logger = logging.getLogger(__name__)
 
 @shared_task
-def generate_document_task(context):
+def generate_document_task(context, user_id=None):
     logger.info(f"Starting resume generation task for {context.get('full_name')}")
     try:
         service = GenerateDocumentService()
         filename = service.generate(context=context)
         logger.info(f"Successfully generated resume for {context.get('full_name')}")
+        
+        if user_id:
+            try:
+                from django.contrib.auth import get_user_model
+                from .models import Activity
+                User = get_user_model()
+                user = User.objects.get(id=user_id)
+                Activity.objects.create(
+                    user=user,
+                    activity_type='download',
+                    label=f"Downloaded {context.get('full_name', 'Resume')}",
+                    sub="Generated download files"
+                )
+            except Exception as e:
+                logger.error(f"Failed to create download activity: {str(e)}", exc_info=True)
+                
         return filename
     except Exception as e:
         logger.error(f"Failed to generate resume: {str(e)}", exc_info=True)
         raise e
 
 @shared_task
-def analyze_resume_task(resume_data, job_description, target_role):
+def analyze_resume_task(resume_data, job_description, target_role, user_id=None):
     logger.info(f"Starting AI resume analysis for role: {target_role}")
     try:
         ai_service = AIService()
@@ -27,7 +43,7 @@ def analyze_resume_task(resume_data, job_description, target_role):
         skills_result = ai_service.recommend_skills(target_role, job_description)
         review_result = ai_service.review_resume(resume_data, job_description, target_role)
         
-        return {
+        result = {
             'ats_score': ats_result.get('ats_score', 0),
             'keyword_match': ats_result.get('keyword_match', []),
             'missing_keywords': ats_result.get('missing_keywords', []),
@@ -36,6 +52,23 @@ def analyze_resume_task(resume_data, job_description, target_role):
             'skills_reasoning': skills_result.get('reasoning', ''),
             'review': review_result
         }
+        
+        if user_id:
+            try:
+                from django.contrib.auth import get_user_model
+                from .models import Activity
+                User = get_user_model()
+                user = User.objects.get(id=user_id)
+                Activity.objects.create(
+                    user=user,
+                    activity_type='ai_review',
+                    label=f"Reviewed {resume_data.get('full_name', 'Resume')}",
+                    sub=f"ATS Score: {result['ats_score']}/100"
+                )
+            except Exception as e:
+                logger.error(f"Failed to create AI review activity: {str(e)}", exc_info=True)
+                
+        return result
     except Exception as e:
         logger.error(f"AI analysis failed: {str(e)}", exc_info=True)
         raise e

@@ -17,14 +17,21 @@ class ResumeViewSet(viewsets.ModelViewSet):
         return Resume.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        resume = serializer.save(user=self.request.user)
+        Activity.objects.create(
+            user=self.request.user,
+            activity_type='create',
+            label=f"Created {resume.title}",
+            sub="Started a new resume draft"
+        )
 
     @action(detail=False, methods=['post'], url_path='generate')
     def generate_no_id(self, request):
         # Use ResumeDataSerializer to validate the JSON data directly from request
         data_serializer = ResumeDataSerializer(data=request.data)
         if data_serializer.is_valid():
-            task = generate_document_task.delay(data_serializer.validated_data)
+            user_id = request.user.id if request.user.is_authenticated else None
+            task = generate_document_task.delay(data_serializer.validated_data, user_id=user_id)
             
             return Response({
                 "message": "Resume generation started.",
@@ -43,7 +50,8 @@ class ResumeViewSet(viewsets.ModelViewSet):
             resume.status = Resume.Status.PROCESSING
             resume.save()
             
-            task = generate_document_task.delay(data_serializer.validated_data)
+            user_id = request.user.id if request.user.is_authenticated else None
+            task = generate_document_task.delay(data_serializer.validated_data, user_id=user_id)
             
             return Response({
                 "message": "Resume generation started.",
@@ -58,8 +66,9 @@ class ResumeViewSet(viewsets.ModelViewSet):
         job_description = request.data.get('job_description', '')
         target_role = request.data.get('target_role', '')
         
+        user_id = request.user.id if request.user.is_authenticated else None
         try:
-            task = analyze_resume_task.delay(resume_data, job_description, target_role)
+            task = analyze_resume_task.delay(resume_data, job_description, target_role, user_id=user_id)
             return Response({"task_id": task.id}, status=status.HTTP_202_ACCEPTED)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

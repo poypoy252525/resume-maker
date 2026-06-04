@@ -60,6 +60,7 @@ export const generateResume = async (data: ResumeData) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      ...getAuthHeaders(),
     },
     body: JSON.stringify(data),
   });
@@ -93,6 +94,7 @@ export const analyzeResume = async (resumeData: ResumeData, jobDescription: stri
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      ...getAuthHeaders(),
     },
     body: JSON.stringify({
       resume_data: resumeData,
