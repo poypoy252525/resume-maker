@@ -9,7 +9,7 @@ interface ResumePreviewProps {
 export default function ResumePreview({ data }: ResumePreviewProps) {
   return (
     <Card className="w-full h-full bg-white text-slate-900 shadow-sm overflow-auto font-sans p-24 print:p-0 print:shadow-none print:w-full">
-      <div className="mx-auto space-y-7">
+      <div className="w-full mx-auto space-y-7">
         {/* Header */}
         <header className="text-left space-y-3">
           <h1 className="text-4xl font-extrabold tracking-tight uppercase text-slate-900 truncate">
