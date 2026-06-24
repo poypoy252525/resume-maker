@@ -1,9 +1,19 @@
+# ==============================================================================
+# Resumaker Dev Mode Orchestrator
+# ==============================================================================
 
-docker compose -f docker-compose.dev.yml up --build -d
+# Ensure environment files exist
+if (-not (Test-Path "server/.env")) {
+    Write-Host "Creating server/.env from example template..." -ForegroundColor Yellow
+    Copy-Item "server/.env.example" "server/.env"
+    Write-Host "Please edit server/.env and add your GEMINI_API_KEY to enable AI features!" -ForegroundColor Cyan
+}
 
-cd server
+if (-not (Test-Path "client/.env")) {
+    Write-Host "Creating client/.env from example template..." -ForegroundColor Yellow
+    Copy-Item "client/.env.example" "client/.env"
+}
 
-venv/scripts/activate
-
-python manage.py runserver
-
+# Start the dockerized dev environment
+Write-Host "Launching Resumaker Dev Environment..." -ForegroundColor Green
+docker compose -f docker-compose.dev.yml up --build
