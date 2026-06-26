@@ -1,11 +1,20 @@
 import { useEffect, useRef, useState } from "react";
-import { Eye } from "lucide-react";
+import { Eye, LayoutTemplate } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ResumePreview from "@/components/ResumePreview";
 import { useResumeStore } from "@/store/useResumeStore";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function BuilderPreviewPanel() {
   const formData = useResumeStore((state) => state.formData);
+  const setFormData = useResumeStore((state) => state.setFormData);
+  const currentTemplate = formData.template || "modern";
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
 
@@ -40,11 +49,38 @@ export default function BuilderPreviewPanel() {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">
-            Syncing
-          </span>
+        
+        <div className="flex items-center gap-4">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 gap-1.5 rounded-lg border-primary/20 hover:bg-primary/5 hover:text-primary transition-all text-xs font-semibold"
+              >
+                <LayoutTemplate className="size-3.5" />
+                <span>Template: {currentTemplate.charAt(0).toUpperCase() + currentTemplate.slice(1)}</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuItem onClick={() => setFormData({ template: "modern" })} className="cursor-pointer">
+                Modern
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setFormData({ template: "classic" })} className="cursor-pointer">
+                Classic
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setFormData({ template: "minimal" })} className="cursor-pointer">
+                Minimal
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <div className="flex items-center gap-1.5">
+            <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest hidden sm:inline">
+              Syncing
+            </span>
+          </div>
         </div>
       </header>
       <ScrollArea className="flex-1 min-h-0 h-full bg-slate-200/50">

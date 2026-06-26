@@ -53,6 +53,7 @@ export interface ResumeData {
   job_description?: string;
   target_role?: string;
   ai_feedback?: AIFeedback;
+  template?: "modern" | "classic" | "minimal";
 }
 
 export const generateResume = async (data: ResumeData) => {

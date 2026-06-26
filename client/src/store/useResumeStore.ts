@@ -84,6 +84,7 @@ const initialFormData: ResumeData = {
   job_description: "",
   target_role: "",
   ai_feedback: undefined,
+  template: "modern",
 };
 
 export const useResumeStore = create<ResumeState>()(

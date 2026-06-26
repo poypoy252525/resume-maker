@@ -36,6 +36,7 @@ class ResumeDataSerializer(serializers.Serializer):
     job_description = serializers.CharField(required=False, allow_blank=True, default="")
     target_role = serializers.CharField(required=False, allow_blank=True, default="")
     ai_feedback = serializers.JSONField(required=False, default=dict)
+    template = serializers.CharField(required=False, default="modern", allow_blank=True)
 
 class ResumeModelSerializer(serializers.ModelSerializer):
     data = ResumeDataSerializer()
