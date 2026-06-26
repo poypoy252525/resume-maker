@@ -9,6 +9,7 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useResumeStore } from "@/store/useResumeStore";
 import BuilderFormPanel from "@/components/builder/BuilderFormPanel";
 import BuilderPreviewPanel from "@/components/builder/BuilderPreviewPanel";
+import TemplatePicker, { type ResumeTemplateId } from "@/components/builder/TemplatePicker";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Eye, Loader2 } from "lucide-react";
@@ -27,14 +28,19 @@ export default function Builder() {
     loadResume,
     handleReset,
     loading,
+    setFormData,
   } = useResumeStore();
+
+  const [showTemplatePicker, setShowTemplatePicker] = useState(!id);
 
   useEffect(() => {
     if (id) {
+      setShowTemplatePicker(false);
       if (id !== resumeId) {
         loadResume(id);
       }
     } else {
+      setShowTemplatePicker(true);
       if (resumeId !== null) {
         handleReset();
       }
@@ -47,6 +53,11 @@ export default function Builder() {
     }
   }, [error]);
 
+  const selectTemplate = (template: ResumeTemplateId) => {
+    setFormData({ template });
+    setShowTemplatePicker(false);
+  };
+
   if (loading) {
     return (
       <div className="flex h-screen w-screen items-center justify-center bg-background">
@@ -56,6 +67,10 @@ export default function Builder() {
         </div>
       </div>
     );
+  }
+
+  if (showTemplatePicker) {
+    return <TemplatePicker onSelect={selectTemplate} />;
   }
 
   return (
