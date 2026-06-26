@@ -7,6 +7,7 @@ from celery.result import AsyncResult
 from .models import Resume, Activity
 from .tasks import generate_document_task, analyze_resume_task, paraphrase_bullet_task, recommend_job_description_task, recommend_skills_task
 from .serializers import ResumeModelSerializer, ResumeDataSerializer, ActivitySerializer
+from .services.ai_service import AIService
 
 
 class ResumeViewSet(viewsets.ModelViewSet):
@@ -83,8 +84,9 @@ class ResumeViewSet(viewsets.ModelViewSet):
             return Response({"error": "Bullet point is required."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            task = paraphrase_bullet_task.delay(bullet_point, target_role, job_description)
-            return Response({"task_id": task.id}, status=status.HTTP_202_ACCEPTED)
+            ai_service = AIService()
+            result = ai_service.paraphrase_bullet(bullet_point, target_role, job_description)
+            return Response(result, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -98,8 +100,9 @@ class ResumeViewSet(viewsets.ModelViewSet):
             return Response({"error": "Job title is required."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            task = recommend_job_description_task.delay(job_title, target_role, job_description)
-            return Response({"task_id": task.id}, status=status.HTTP_202_ACCEPTED)
+            ai_service = AIService()
+            result = ai_service.recommend_job_description(job_title, target_role, job_description)
+            return Response(result, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -109,8 +112,9 @@ class ResumeViewSet(viewsets.ModelViewSet):
         job_description = request.data.get('job_description', '')
 
         try:
-            task = recommend_skills_task.delay(target_role, job_description)
-            return Response({"task_id": task.id}, status=status.HTTP_202_ACCEPTED)
+            ai_service = AIService()
+            result = ai_service.recommend_skills(target_role, job_description)
+            return Response(result, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

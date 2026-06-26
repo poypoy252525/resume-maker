@@ -1,4 +1,5 @@
 import logging
+import concurrent.futures
 from celery import shared_task
 from .services.generate_document_service import GenerateDocumentService
 
@@ -34,14 +35,27 @@ def generate_document_task(context, user_id=None):
         logger.error(f"Failed to generate resume: {str(e)}", exc_info=True)
         raise e
 
-@shared_task
-def analyze_resume_task(resume_data, job_description, target_role, user_id=None):
-    logger.info(f"Starting AI resume analysis for role: {target_role}")
+@shared_task(
+    bind=True,
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+    retry_kwargs={'max_retries': 3},
+    retry_jitter=True
+)
+def analyze_resume_task(self, resume_data, job_description, target_role, user_id=None):
+    logger.info(f"Starting AI resume analysis for role: {target_role} (attempt {self.request.retries + 1})")
     try:
         ai_service = AIService()
-        ats_result = ai_service.evaluate_ats(resume_data, job_description)
-        skills_result = ai_service.recommend_skills(target_role, job_description)
-        review_result = ai_service.review_resume(resume_data, job_description, target_role)
+        
+        # Parallelize the independent AI queries to run concurrently
+        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+            future_ats = executor.submit(ai_service.evaluate_ats, resume_data, job_description)
+            future_skills = executor.submit(ai_service.recommend_skills, target_role, job_description)
+            future_review = executor.submit(ai_service.review_resume, resume_data, job_description, target_role)
+            
+            ats_result = future_ats.result()
+            skills_result = future_skills.result()
+            review_result = future_review.result()
         
         result = {
             'ats_score': ats_result.get('ats_score', 0),
@@ -70,7 +84,7 @@ def analyze_resume_task(resume_data, job_description, target_role, user_id=None)
                 
         return result
     except Exception as e:
-        logger.error(f"AI analysis failed: {str(e)}", exc_info=True)
+        logger.error(f"AI analysis failed on attempt {self.request.retries + 1}: {str(e)}", exc_info=True)
         raise e
 
 @shared_task

@@ -51,7 +51,7 @@ class AIAgent:
             
         self.client = genai.Client(api_key=api_key)
         # Load model from environment or default to what was initially there
-        self.model_name = os.getenv('GEMINI_MODEL', 'gemma-4-31b-it')
+        self.model_name = os.getenv('GEMINI_MODEL', 'gemini-2.5-flash')
 
     def _load_prompt(self) -> str:
         prompt_path = os.path.join(settings.BASE_DIR, 'generator', 'prompts', self.prompt_file)

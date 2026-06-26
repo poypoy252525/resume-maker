@@ -112,7 +112,7 @@ export const analyzeResume = async (resumeData: ResumeData, jobDescription: stri
   return response.json();
 };
 
-export const paraphraseBullet = async (bulletPoint: string, jobDescription: string, targetRole: string): Promise<{ task_id: string }> => {
+export const paraphraseBullet = async (bulletPoint: string, jobDescription: string, targetRole: string): Promise<{ suggestions: string[] }> => {
   const response = await fetch(`${API_BASE_URL}/resumes/paraphrase/`, {
     method: "POST",
     headers: {
@@ -133,7 +133,7 @@ export const paraphraseBullet = async (bulletPoint: string, jobDescription: stri
   return response.json();
 };
 
-export const recommendJobDescription = async (jobTitle: string, jobDescription: string, targetRole: string): Promise<{ task_id: string }> => {
+export const recommendJobDescription = async (jobTitle: string, jobDescription: string, targetRole: string): Promise<{ job_description: string[] }> => {
   const response = await fetch(`${API_BASE_URL}/resumes/recommend_job_description/`, {
     method: "POST",
     headers: {
@@ -154,7 +154,7 @@ export const recommendJobDescription = async (jobTitle: string, jobDescription: 
   return response.json();
 };
 
-export const recommendSkills = async (targetRole: string, jobDescription: string): Promise<{ task_id: string }> => {
+export const recommendSkills = async (targetRole: string, jobDescription: string): Promise<{ recommended_skills: string[] }> => {
   const response = await fetch(`${API_BASE_URL}/resumes/recommend_skills/`, {
     method: "POST",
     headers: {

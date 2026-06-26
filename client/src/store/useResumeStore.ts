@@ -191,14 +191,13 @@ export const useResumeStore = create<ResumeState>()(
       },
 
       handleParaphrase: async (bulletPoint) => {
-        const { formData, pollTask } = get();
+        const { formData } = get();
         try {
-          const { task_id } = await paraphraseBullet(
+          const result = await paraphraseBullet(
             bulletPoint,
             formData.job_description || "",
             formData.target_role || "",
           );
-          const result = await pollTask<{ suggestions: string[] }>(task_id);
           return result.suggestions;
         } catch (err: unknown) {
           set({ error: (err as Error).message || "Paraphrasing failed" });
@@ -207,14 +206,13 @@ export const useResumeStore = create<ResumeState>()(
       },
 
       handleRecommendJobDescription: async (jobTitle) => {
-        const { formData, pollTask } = get();
+        const { formData } = get();
         try {
-          const { task_id } = await recommendJobDescription(
+          const result = await recommendJobDescription(
             jobTitle,
             formData.job_description || "",
             formData.target_role || "",
           );
-          const result = await pollTask<{ job_description: string[] }>(task_id);
           return result.job_description;
         } catch (err: unknown) {
           set({
@@ -226,14 +224,11 @@ export const useResumeStore = create<ResumeState>()(
       },
 
       handleRecommendSkills: async () => {
-        const { formData, pollTask } = get();
+        const { formData } = get();
         try {
-          const { task_id } = await recommendSkills(
+          const result = await recommendSkills(
             formData.target_role || "Professional",
             formData.job_description || "",
-          );
-          const result = await pollTask<{ recommended_skills: string[] }>(
-            task_id,
           );
           return result.recommended_skills;
         } catch (err: unknown) {
