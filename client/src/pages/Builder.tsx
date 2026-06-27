@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { 
   ResizableHandle, 
@@ -33,11 +33,14 @@ export default function Builder() {
 
   const [showTemplatePicker, setShowTemplatePicker] = useState(!id);
 
-  // Sync resumeId to URL search params if it's created/saved
+  const prevResumeIdRef = useRef<string | null>(resumeId);
+
+  // Sync resumeId to URL search params only if it's newly created/saved in this session
   useEffect(() => {
-    if (resumeId && !id) {
+    if (resumeId && !id && prevResumeIdRef.current === null) {
       setSearchParams({ id: resumeId }, { replace: true });
     }
+    prevResumeIdRef.current = resumeId;
   }, [resumeId, id, setSearchParams]);
 
   useEffect(() => {
