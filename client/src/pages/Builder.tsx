@@ -19,7 +19,7 @@ import AIReviewModal from "@/components/builder/AIReviewModal";
 export default function Builder() {
   const isDesktop = useMediaQuery("(min-width: 1024px)");
   const [showPreviewMobile, setShowPreviewMobile] = useState(false);
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const id = searchParams.get("id");
   
   const {
@@ -32,6 +32,13 @@ export default function Builder() {
   } = useResumeStore();
 
   const [showTemplatePicker, setShowTemplatePicker] = useState(!id);
+
+  // Sync resumeId to URL search params if it's created/saved
+  useEffect(() => {
+    if (resumeId && !id) {
+      setSearchParams({ id: resumeId }, { replace: true });
+    }
+  }, [resumeId, id, setSearchParams]);
 
   useEffect(() => {
     if (id) {
