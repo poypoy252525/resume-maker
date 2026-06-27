@@ -29,9 +29,9 @@ export default function Builder() {
     handleReset,
     loading,
     setFormData,
+    showTemplatePicker,
+    setShowTemplatePicker,
   } = useResumeStore();
-
-  const [showTemplatePicker, setShowTemplatePicker] = useState(!id);
 
   const prevResumeIdRef = useRef<string | null>(resumeId);
 
@@ -55,7 +55,7 @@ export default function Builder() {
         handleReset();
       }
     }
-  }, [id, resumeId, loadResume, handleReset]);
+  }, [id, resumeId, loadResume, handleReset, setShowTemplatePicker]);
 
   useEffect(() => {
     if (error) {

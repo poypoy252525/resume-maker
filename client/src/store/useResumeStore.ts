@@ -38,8 +38,10 @@ interface ResumeState {
   error: string | null;
   isReviewModalOpen: boolean;
   isAIAnalyzing: boolean;
+  showTemplatePicker: boolean;
 
   // Actions
+  setShowTemplatePicker: (show: boolean) => void;
   setStep: (step: number) => void;
   setFormData: (
     data: Partial<ResumeData> | ((prev: ResumeData) => ResumeData),
@@ -108,8 +110,10 @@ export const useResumeStore = create<ResumeState>()(
       error: null,
       isReviewModalOpen: false,
       isAIAnalyzing: false,
+      showTemplatePicker: true,
 
       // Actions
+      setShowTemplatePicker: (show) => set({ showTemplatePicker: show }),
       setStep: (step) => set({ step }),
 
       setFormData: (data) => {
@@ -139,6 +143,7 @@ export const useResumeStore = create<ResumeState>()(
           formData: initialFormData,
           resumeId: null,
           resumeTitle: "Untitled Resume",
+          showTemplatePicker: true,
         }),
 
       pollTask: async (taskId, interval = 2000, maxRetries = 60) => {
@@ -311,6 +316,7 @@ export const useResumeStore = create<ResumeState>()(
           set({
             resumeId: res.id,
             resumeTitle: res.title,
+            showTemplatePicker: false,
             formData: {
               ...initialFormData,
               ...res.data,
