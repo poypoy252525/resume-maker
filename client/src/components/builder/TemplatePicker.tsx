@@ -96,8 +96,8 @@ export default function TemplatePicker({ onSelect }: TemplatePickerProps) {
   ];
 
   return (
-    <div className="min-h-screen w-full bg-slate-50/50 dark:bg-slate-900/50 flex flex-col justify-center items-center p-6 md:p-12 overflow-y-auto animate-in fade-in duration-300">
-      <div className="max-w-4xl w-full space-y-8 md:space-y-12">
+    <div className="h-full w-full bg-slate-50/50 dark:bg-slate-900/50 flex flex-col items-center p-6 md:p-12 overflow-y-auto animate-in fade-in duration-300">
+      <div className="max-w-4xl w-full space-y-8 md:space-y-12 my-auto">
         
         {/* Header */}
         <div className="text-center space-y-4">
