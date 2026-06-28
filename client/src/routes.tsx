@@ -8,7 +8,7 @@ import Scratch from "./pages/Scratch";
 import SignUp from "./pages/SignUp";
 import Dashboard from "./pages/Dashboard";
 import Resumes from "./pages/Resumes";
-import Activity from "./pages/Activity";
+import Activity from "./pages/activity/page";
 import Favorites from "./pages/Favorites";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
