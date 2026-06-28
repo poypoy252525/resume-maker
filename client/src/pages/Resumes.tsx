@@ -49,7 +49,7 @@ function ResumeThumbnail({ resume }: { resume: ResumeResponse }) {
   return (
     <div
       ref={containerRef}
-      className="w-full aspect-[4/3] overflow-hidden relative bg-white rounded-t-xl"
+      className="w-full aspect-[3/3] overflow-hidden relative bg-white rounded-t-xl"
     >
       <div
         className="absolute top-0 left-0 pointer-events-none"
@@ -122,11 +122,10 @@ function ResumeCard({
             </Badge>
             <button
               onClick={() => onToggleFavorite(resume.id, resume.is_favorite)}
-              className={`p-1.5 rounded-lg transition-colors hover:bg-muted ${
-                resume.is_favorite
-                  ? "text-amber-500"
-                  : "text-muted-foreground/40 hover:text-amber-400"
-              }`}
+              className={`p-1.5 rounded-lg transition-colors hover:bg-muted ${resume.is_favorite
+                ? "text-amber-500"
+                : "text-muted-foreground/40 hover:text-amber-400"
+                }`}
               aria-label={
                 resume.is_favorite ? "Remove from favorites" : "Add to favorites"
               }
