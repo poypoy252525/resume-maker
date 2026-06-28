@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "../ui/button";
 import {
@@ -8,8 +9,41 @@ import {
   Users,
   ShieldCheck,
 } from "lucide-react";
+import { fetchPublicStats } from "../../api";
+
+const formatCount = (value: number, suffix: string = '') => {
+  if (value >= 1000000) {
+    return (value / 1000000).toFixed(1).replace(/\.0$/, '') + 'M' + suffix;
+  }
+  if (value >= 1000) {
+    return (value / 1000).toFixed(1).replace(/\.0$/, '') + 'k' + suffix;
+  }
+  return value.toString() + suffix;
+};
 
 export default function Hero() {
+  const [stats, setStats] = useState({
+    resumesBuilt: "50k+",
+    successRate: "94%",
+    activeUsers: "12k",
+    atsPassRate: "99.9%"
+  });
+
+  useEffect(() => {
+    fetchPublicStats()
+      .then((data) => {
+        setStats({
+          resumesBuilt: formatCount(data.resumes_built, data.resumes_built > 0 ? "+" : ""),
+          successRate: `${data.success_rate.toString().replace(/\.0$/, "")}%`,
+          activeUsers: formatCount(data.active_users),
+          atsPassRate: `${data.ats_pass_rate.toString().replace(/\.0$/, "")}%`
+        });
+      })
+      .catch((err) => {
+        console.error("Failed to fetch public stats", err);
+      });
+  }, []);
+
   return (
     <section className="relative pt-14 pb-32 overflow-hidden">
       <div className="container mx-auto px-4 relative z-10">
@@ -48,10 +82,10 @@ export default function Hero() {
           {/* Social Proof/Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-24 w-full pt-12 border-t border-white/5 animate-in fade-in duration-1000 delay-500">
             {[
-              { label: "Resumes Built", value: "50k+", icon: FileText },
-              { label: "Success Rate", value: "94%", icon: Trophy },
-              { label: "Active Users", value: "12k", icon: Users },
-              { label: "ATS Pass Rate", value: "99.9%", icon: ShieldCheck },
+              { label: "Resumes Built", value: stats.resumesBuilt, icon: FileText },
+              { label: "Success Rate", value: stats.successRate, icon: Trophy },
+              { label: "Active Users", value: stats.activeUsers, icon: Users },
+              { label: "ATS Pass Rate", value: stats.atsPassRate, icon: ShieldCheck },
             ].map((stat, i) => (
               <div key={i} className="flex flex-col items-center">
                 <div className="p-3 rounded-2xl bg-primary/5 mb-3">

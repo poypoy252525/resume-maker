@@ -279,4 +279,20 @@ export const updateResume = async (id: string, title: string, data: ResumeData):
   return response.json();
 };
 
+export interface PublicStatsResponse {
+  resumes_built: number;
+  success_rate: number;
+  active_users: number;
+  ats_pass_rate: number;
+}
+
+export const fetchPublicStats = async (): Promise<PublicStatsResponse> => {
+  const response = await fetch(`${API_BASE_URL}/public-stats/`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch public stats");
+  }
+  return response.json();
+};
+
+
 

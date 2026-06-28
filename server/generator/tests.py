@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.urls import reverse
 from django.contrib.auth import get_user_model
 from .models import Resume
 
@@ -77,4 +78,51 @@ class ResumeScoreTestCase(TestCase):
         )
         # Should fall back to completeness score (4 profile fields = 20)
         self.assertEqual(resume.score, 20)
+
+
+class PublicStatsTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="password")
+        self.other_user = User.objects.create_user(username="otheruser", password="password")
+
+    def test_public_stats_empty_database(self):
+        url = reverse('public-stats')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data['resumes_built'], 0)
+        self.assertEqual(data['active_users'], 2)
+        self.assertEqual(data['ats_pass_rate'], 99.9)
+        self.assertEqual(data['success_rate'], 94.0)
+
+    def test_public_stats_with_data(self):
+        Resume.objects.create(
+            user=self.user,
+            title="Resume 1",
+            data={
+                "full_name": "User 1",
+                "email": "1@ex.com",
+                "job_description": "JD",
+                "ai_feedback": {"ats_score": 80}
+            }
+        )
+        Resume.objects.create(
+            user=self.other_user,
+            title="Resume 2",
+            data={
+                "full_name": "User 2",
+                "email": "2@ex.com",
+                "job_description": "JD",
+                "ai_feedback": {"ats_score": 50}
+            }
+        )
+
+        url = reverse('public-stats')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data['resumes_built'], 2)
+        self.assertEqual(data['active_users'], 2)
+        self.assertEqual(data['ats_pass_rate'], 65.0)
+        self.assertEqual(data['success_rate'], 50.0)
 
