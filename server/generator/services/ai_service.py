@@ -71,7 +71,7 @@ class ParsedResume(BaseModel):
     phone_number: str = Field(default="", description="Candidate's phone number.")
     location: str = Field(default="", description="Candidate's location (city, state/country).")
     has_skill: bool = Field(default=True, description="Should be True if skills are present.")
-    skill_description: str = Field(default="", description="A short summary of skills.")
+    skill_description: str = Field(default="", description="Professional summary, profile paragraph, or career objective from the resume.")
     skills: List[str] = Field(default_factory=list, description="List of skills.")
     has_experience: bool = Field(default=True, description="Should be True if experiences are present.")
     experiences: List[ParsedExperience] = Field(default_factory=list, description="List of work experiences.")
