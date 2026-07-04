@@ -159,3 +159,40 @@ class AISummaryTestCase(TestCase):
         )
 
 
+class AITailorTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="password")
+        from rest_framework.authtoken.models import Token
+        self.token = Token.objects.create(user=self.user)
+
+    @patch('generator.views.tailor_resume_task')
+    def test_tailor_resume_endpoint_starts_task(self, mock_tailor_task):
+        class DummyTask:
+            id = "test-task-uuid-1234"
+        mock_tailor_task.delay.return_value = DummyTask()
+
+        url = reverse('resume-tailor')
+        payload = {
+            "resume_data": {"full_name": "Test User"},
+            "target_role": "Backend Engineer",
+            "job_description": "We need a Django expert."
+        }
+        
+        response = self.client.post(
+            url, 
+            payload, 
+            content_type='application/json',
+            HTTP_AUTHORIZATION=f"Token {self.token.key}"
+        )
+        self.assertEqual(response.status_code, 202)
+        self.assertEqual(response.json(), {"task_id": "test-task-uuid-1234"})
+        mock_tailor_task.delay.assert_called_once_with(
+            {"full_name": "Test User"},
+            "Backend Engineer",
+            "We need a Django expert.",
+            user_id=self.user.id
+        )
+
+
+
+

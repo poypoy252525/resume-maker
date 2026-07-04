@@ -37,6 +37,17 @@ class ResumeReview(BaseModel):
 class SummaryRecommendation(BaseModel):
     summary: str = Field(..., description="A professional summary of 3-4 sentences tailored to the target role and job description.")
 
+class TailoredExperience(BaseModel):
+    index: int = Field(..., description="The index of the experience in the original experiences array.")
+    original_bullets: List[str] = Field(..., description="List of original experience bullet points.")
+    tailored_bullets: List[str] = Field(..., description="List of optimized, tailored experience bullet points.")
+    reasoning: str = Field(..., description="Short explanation of what keywords or changes were introduced.")
+
+class TailoredResume(BaseModel):
+    tailored_summary: str = Field(..., description="Optimized professional summary tailored to the job description.")
+    tailored_experiences: List[TailoredExperience] = Field(..., description="List of tailored experience objects, one for each experience containing bullet points.")
+    skills_to_add: List[str] = Field(..., description="Suggested skills from the job description that are missing from the resume.")
+
 # --- Core Agent ---
 
 class AIAgent:
@@ -106,6 +117,7 @@ class AIService:
         self.job_description_recommender = AIAgent('job_description_recommender.txt', JobDescriptionRecommendation, temperature=0.5)
         self.reviewer = AIAgent('resume_reviewer.txt', ResumeReview, temperature=0.3)
         self.summary_recommender = AIAgent('summary_generator.txt', SummaryRecommendation, temperature=0.5)
+        self.tailor_recommender = AIAgent('tailor_resume.txt', TailoredResume, temperature=0.3)
 
     def evaluate_ats(self, resume_data: dict, job_description: str) -> dict:
         return self.ats_evaluator.generate(
@@ -143,6 +155,13 @@ class AIService:
 
     def recommend_summary(self, resume_data: dict, target_role: str, job_description: Optional[str]) -> dict:
         return self.summary_recommender.generate(
+            resume_data=json.dumps(resume_data, indent=2),
+            target_role=target_role,
+            job_description=job_description
+        )
+
+    def tailor_resume(self, resume_data: dict, target_role: str, job_description: str) -> dict:
+        return self.tailor_recommender.generate(
             resume_data=json.dumps(resume_data, indent=2),
             target_role=target_role,
             job_description=job_description

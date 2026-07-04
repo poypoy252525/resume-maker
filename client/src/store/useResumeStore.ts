@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { ResumeData, AIFeedback } from "@/api";
+import type { ResumeData, AIFeedback, TailoredResumeResult } from "@/api";
 import { useAuthStore } from "./useAuthStore";
 import {
   generateResume,
@@ -14,6 +14,7 @@ import {
   fetchResume,
   createResume,
   updateResume,
+  tailorResume,
 } from "@/api";
 
 interface ResumeState {
@@ -41,6 +42,9 @@ interface ResumeState {
   isAIAnalyzing: boolean;
   showTemplatePicker: boolean;
   isRecommendingSummary: boolean;
+  isTailoring: boolean;
+  isTailorModalOpen: boolean;
+  tailorResult: TailoredResumeResult | null;
 
   // Actions
   setShowTemplatePicker: (show: boolean) => void;
@@ -52,10 +56,13 @@ interface ResumeState {
   setActiveBulletIndex: (index: number | null) => void;
   setFocusedExperienceIndex: (index: number | null) => void;
   setReviewModalOpen: (open: boolean) => void;
+  setTailorModalOpen: (open: boolean) => void;
   setResumeTitle: (title: string) => void;
 
   // Async Actions
   triggerAIAnalysis: () => Promise<void>;
+  triggerTailorResume: () => Promise<void>;
+  applyTailoredResume: (selectedExperienceIndexes: number[], applySummary: boolean, applySkills: boolean) => void;
   handleParaphrase: (bulletPoint: string) => Promise<string[] | null>;
   handleRecommendJobDescription: (jobTitle: string) => Promise<string[] | null>;
   handleRecommendSkills: () => Promise<string[] | null>;
@@ -115,6 +122,9 @@ export const useResumeStore = create<ResumeState>()(
       isAIAnalyzing: false,
       showTemplatePicker: true,
       isRecommendingSummary: false,
+      isTailoring: false,
+      isTailorModalOpen: false,
+      tailorResult: null,
 
       // Actions
       setShowTemplatePicker: (show) => set({ showTemplatePicker: show }),
@@ -134,6 +144,7 @@ export const useResumeStore = create<ResumeState>()(
       setFocusedExperienceIndex: (index) =>
         set({ focusedExperienceIndex: index }),
       setReviewModalOpen: (open) => set({ isReviewModalOpen: open }),
+      setTailorModalOpen: (open) => set({ isTailorModalOpen: open }),
       setResumeTitle: (resumeTitle) => set({ resumeTitle }),
 
       handleReset: () =>
@@ -197,6 +208,72 @@ export const useResumeStore = create<ResumeState>()(
         } finally {
           set({ isAIAnalyzing: false });
         }
+      },
+
+      triggerTailorResume: async () => {
+        const { formData, pollTask, setTailorModalOpen } = get();
+        set({ isTailoring: true, error: null, tailorResult: null });
+        setTailorModalOpen(true);
+        try {
+          const { task_id } = await tailorResume(
+            formData,
+            formData.job_description || "",
+            formData.target_role || "",
+          );
+          const result = await pollTask<TailoredResumeResult>(task_id);
+          set({ tailorResult: result });
+        } catch (err: unknown) {
+          set({ error: (err as Error).message || "AI tailoring failed" });
+          setTailorModalOpen(false);
+        } finally {
+          set({ isTailoring: false });
+        }
+      },
+
+      applyTailoredResume: (selectedExperienceIndexes, applySummary, applySkills) => {
+        const { tailorResult } = get();
+        if (!tailorResult) return;
+
+        set((state) => {
+          const updatedFormData = { ...state.formData };
+
+          // 1. Apply summary
+          if (applySummary && tailorResult.tailored_summary) {
+            updatedFormData.skill_description = tailorResult.tailored_summary;
+          }
+
+          // 2. Apply skills
+          if (applySkills && tailorResult.skills_to_add && tailorResult.skills_to_add.length > 0) {
+            const currentSkills = updatedFormData.skills || [];
+            const newSkills = [...currentSkills];
+            tailorResult.skills_to_add.forEach((skill) => {
+              if (!newSkills.includes(skill)) {
+                newSkills.push(skill);
+              }
+            });
+            updatedFormData.skills = newSkills;
+          }
+
+          // 3. Apply experiences
+          if (tailorResult.tailored_experiences && tailorResult.tailored_experiences.length > 0) {
+            const newExperiences = [...updatedFormData.experiences];
+            tailorResult.tailored_experiences.forEach((item) => {
+              if (selectedExperienceIndexes.includes(item.index) && newExperiences[item.index]) {
+                newExperiences[item.index] = {
+                  ...newExperiences[item.index],
+                  bullet_points: item.tailored_bullets,
+                };
+              }
+            });
+            updatedFormData.experiences = newExperiences;
+          }
+
+          return {
+            formData: updatedFormData,
+            isTailorModalOpen: false,
+            tailorResult: null,
+          };
+        });
       },
 
       handleParaphrase: async (bulletPoint) => {

@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from celery.result import AsyncResult
 from .models import Resume, Activity
-from .tasks import generate_document_task, analyze_resume_task, paraphrase_bullet_task, recommend_job_description_task, recommend_skills_task
+from .tasks import generate_document_task, analyze_resume_task, paraphrase_bullet_task, recommend_job_description_task, recommend_skills_task, tailor_resume_task
 from .serializers import ResumeModelSerializer, ResumeDataSerializer, ActivitySerializer
 from .services.ai_service import AIService
 
@@ -74,6 +74,19 @@ class ResumeViewSet(viewsets.ModelViewSet):
         user_id = request.user.id if request.user.is_authenticated else None
         try:
             task = analyze_resume_task.delay(resume_data, job_description, target_role, user_id=user_id)
+            return Response({"task_id": task.id}, status=status.HTTP_202_ACCEPTED)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @action(detail=False, methods=['post'])
+    def tailor(self, request):
+        resume_data = request.data.get('resume_data', {})
+        job_description = request.data.get('job_description', '')
+        target_role = request.data.get('target_role', '')
+        
+        user_id = request.user.id if request.user.is_authenticated else None
+        try:
+            task = tailor_resume_task.delay(resume_data, target_role, job_description, user_id=user_id)
             return Response({"task_id": task.id}, status=status.HTTP_202_ACCEPTED)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

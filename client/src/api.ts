@@ -320,5 +320,44 @@ export const fetchPublicStats = async (): Promise<PublicStatsResponse> => {
   return response.json();
 };
 
+export interface TailoredExperience {
+  index: number;
+  original_bullets: string[];
+  tailored_bullets: string[];
+  reasoning: string;
+}
+
+export interface TailoredResumeResult {
+  tailored_summary: string;
+  tailored_experiences: TailoredExperience[];
+  skills_to_add: string[];
+}
+
+export const tailorResume = async (
+  resumeData: ResumeData,
+  jobDescription: string,
+  targetRole: string
+): Promise<{ task_id: string }> => {
+  const response = await fetch(`${API_BASE_URL}/resumes/tailor/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeaders(),
+    },
+    body: JSON.stringify({
+      resume_data: resumeData,
+      job_description: jobDescription,
+      target_role: targetRole,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to tailor resume");
+  }
+
+  return response.json();
+};
+
 
 

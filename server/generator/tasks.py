@@ -113,3 +113,37 @@ def recommend_skills_task(target_role, job_description):
     except Exception as e:
         logger.error(f"Skills recommendation failed: {str(e)}", exc_info=True)
         raise e
+
+@shared_task(
+    bind=True,
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+    retry_kwargs={'max_retries': 3},
+    retry_jitter=True
+)
+def tailor_resume_task(self, resume_data, target_role, job_description, user_id=None):
+    logger.info(f"Starting AI resume tailoring for role: {target_role} (attempt {self.request.retries + 1})")
+    try:
+        ai_service = AIService()
+        result = ai_service.tailor_resume(resume_data, target_role, job_description)
+        
+        if user_id:
+            try:
+                from django.contrib.auth import get_user_model
+                from .models import Activity
+                User = get_user_model()
+                user = User.objects.get(id=user_id)
+                Activity.objects.create(
+                    user=user,
+                    activity_type='ai_tailor',
+                    label=f"Tailored {resume_data.get('full_name', 'Resume')}",
+                    sub=f"Role: {target_role}"
+                )
+            except Exception as e:
+                logger.error(f"Failed to create AI tailor activity: {str(e)}", exc_info=True)
+                
+        return result
+    except Exception as e:
+        logger.error(f"AI tailoring failed on attempt {self.request.retries + 1}: {str(e)}", exc_info=True)
+        raise e
+

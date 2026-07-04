@@ -14,6 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Wand2,
+  Sparkles,
 } from "lucide-react";
 import EducationSection from "./EducationSection";
 import ExperienceSection from "./ExperienceSection";
@@ -28,11 +29,13 @@ export default function BuilderFormPanel() {
     setFormData,
     loading,
     isAIAnalyzing,
+    isTailoring,
     setActiveExperienceIndex,
     setActiveBulletIndex,
     focusedExperienceIndex,
     setFocusedExperienceIndex,
     triggerAIAnalysis,
+    triggerTailorResume,
     handleParaphrase,
     handleRecommendSkills,
     handleRecommendJobDescription,
@@ -91,12 +94,23 @@ export default function BuilderFormPanel() {
           <Button
             variant="outline"
             size="sm"
-            className="h-8 text-[10px] font-bold uppercase tracking-wider rounded-lg border-primary/20 hover:bg-primary/5 hover:text-primary transition-all"
+            className="h-8 text-[10px] font-bold uppercase tracking-wider rounded-lg border-primary/20 hover:bg-primary/5 hover:text-primary transition-all gap-1.5"
             onClick={triggerAIAnalysis}
             disabled={loading || isAIAnalyzing}
           >
-            <Wand2 className="w-3 h-3 mr-1.5" />
+            <Wand2 className="w-3 h-3" />
             AI Analyze
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 text-[10px] font-bold uppercase tracking-wider rounded-lg border-primary/20 hover:bg-primary/5 hover:text-primary transition-all gap-1.5"
+            onClick={triggerTailorResume}
+            disabled={loading || isTailoring || !formData.job_description}
+            title={!formData.job_description ? "Please set a Job Description in Setup tab first" : ""}
+          >
+            <Sparkles className="w-3 h-3 text-primary animate-pulse" />
+            AI Tailor
           </Button>
         </div>
       </header>
