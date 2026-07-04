@@ -472,7 +472,7 @@ export default function Features() {
         {/* Dynamic CTA at bottom */}
         <div className="mt-20 text-center">
           <Button asChild size="lg" className="rounded-2xl h-14 px-8 text-md font-semibold gap-2 shadow-lg shadow-primary/20">
-            <a href="/create">
+            <a href="/create?new=true">
               Try the AI Tools Live
               <ArrowRight className="w-4 h-4" />
             </a>

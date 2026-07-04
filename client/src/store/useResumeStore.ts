@@ -517,6 +517,10 @@ export const useResumeStore = create<ResumeState>()(
             compileError: null,
           });
           toast.success("Resume details extracted successfully!");
+          
+          if (useAuthStore.getState().isAuthenticated) {
+            await get().saveResume();
+          }
         } catch (err: any) {
           const errMsg = err.message || "Failed to parse resume PDF.";
           set({ error: errMsg });

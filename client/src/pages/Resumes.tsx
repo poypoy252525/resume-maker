@@ -69,7 +69,7 @@ export default function Resumes() {
           </p>
         </div>
         <Button asChild className="gap-2 shrink-0">
-          <Link to="/create">
+          <Link to="/create?new=true">
             <Plus className="size-4" /> New Resume
           </Link>
         </Button>
@@ -153,7 +153,7 @@ export default function Resumes() {
                   </p>
                   {tab !== "favorites" && (
                     <Button asChild size="sm">
-                      <Link to="/create" className="gap-2">
+                      <Link to="/create?new=true" className="gap-2">
                         <Plus className="size-4" /> Create Resume
                       </Link>
                     </Button>

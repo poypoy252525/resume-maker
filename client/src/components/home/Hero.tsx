@@ -74,7 +74,7 @@ export default function Hero() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-16 duration-1000">
             <Button asChild size="lg" className="h-16 px-10 text-xl">
-              <Link to="/create">
+              <Link to="/create?new=true">
                 <Wand2 className="w-6 h-6" />
                 Build My Resume
               </Link>

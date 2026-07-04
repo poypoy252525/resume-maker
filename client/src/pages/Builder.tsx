@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/resizable";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { useResumeStore } from "@/store/useResumeStore";
+import { useAuthStore } from "@/store/useAuthStore";
 import BuilderFormPanel from "@/components/builder/BuilderFormPanel";
 import BuilderPreviewPanel from "@/components/builder/BuilderPreviewPanel";
 import TemplatePicker, { type ResumeTemplateId } from "@/components/builder/TemplatePicker";
@@ -32,6 +33,9 @@ export default function Builder() {
     setFormData,
     showTemplatePicker,
     setShowTemplatePicker,
+    saveResume,
+    formData,
+    resumeTitle,
   } = useResumeStore();
 
   const prevResumeIdRef = useRef<string | null>(resumeId);
@@ -45,6 +49,13 @@ export default function Builder() {
   }, [resumeId, id, setSearchParams]);
 
   useEffect(() => {
+    const isNew = searchParams.get("new") === "true";
+    if (isNew) {
+      handleReset();
+      setSearchParams({}, { replace: true });
+      return;
+    }
+
     if (id) {
       setShowTemplatePicker(false);
       if (id !== resumeId) {
@@ -55,7 +66,7 @@ export default function Builder() {
         handleReset();
       }
     }
-  }, [id, resumeId, loadResume, handleReset, setShowTemplatePicker]);
+  }, [id, resumeId, loadResume, handleReset, setShowTemplatePicker, searchParams, setSearchParams]);
 
   useEffect(() => {
     if (error) {
@@ -63,10 +74,25 @@ export default function Builder() {
     }
   }, [error]);
 
-  const selectTemplate = (template: ResumeTemplateId) => {
+  // Debounced auto-save for authenticated users
+  useEffect(() => {
+    if (!resumeId || loading || !useAuthStore.getState().isAuthenticated) return;
+    
+    const delayDebounceFn = setTimeout(() => {
+      saveResume();
+    }, 2500);
+    
+    return () => clearTimeout(delayDebounceFn);
+  }, [formData, resumeTitle, resumeId, saveResume, loading]);
+
+  const selectTemplate = async (template: ResumeTemplateId) => {
     handleReset();
     setFormData({ template });
     setShowTemplatePicker(false);
+    
+    if (useAuthStore.getState().isAuthenticated) {
+      await saveResume();
+    }
   };
 
   if (loading) {

@@ -109,7 +109,7 @@ export default function Dashboard() {
           </div>
           <div className="flex flex-col sm:flex-row gap-3">
             <Button asChild size="lg" className="gap-2">
-              <Link to="/create">
+              <Link to="/create?new=true">
                 <Plus className="size-4" />
                 New Resume
               </Link>
@@ -211,7 +211,7 @@ export default function Dashboard() {
                   Create your first resume to get started!
                 </p>
                 <Button asChild size="sm">
-                  <Link to="/create" className="gap-2">
+                  <Link to="/create?new=true" className="gap-2">
                     <Plus className="size-4" /> Create Resume
                   </Link>
                 </Button>
@@ -303,14 +303,14 @@ export default function Dashboard() {
                 {
                   icon: Plus,
                   label: "Create new resume",
-                  to: "/create",
+                  to: "/create?new=true",
                   color: "text-primary",
                   bg: "bg-primary/10",
                 },
                 {
                   icon: Zap,
                   label: "AI Resume Review",
-                  to: "/create",
+                  to: "/create?new=true",
                   color: "text-violet-500",
                   bg: "bg-violet-500/10",
                 },

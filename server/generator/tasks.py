@@ -8,13 +8,23 @@ from .services.ai_service import AIService
 logger = logging.getLogger(__name__)
 
 @shared_task
-def generate_document_task(context, user_id=None):
+def generate_document_task(context, user_id=None, resume_id=None):
     logger.info(f"Starting resume generation task for {context.get('full_name')}")
     try:
         service = GenerateDocumentService()
         filename = service.generate(context=context)
         logger.info(f"Successfully generated resume for {context.get('full_name')}")
         
+        if resume_id:
+            try:
+                from .models import Resume
+                resume = Resume.objects.get(id=resume_id)
+                resume.status = Resume.Status.COMPLETED
+                resume.file = f"resumes/{filename}.pdf"
+                resume.save()
+            except Exception as e:
+                logger.error(f"Failed to update resume object: {str(e)}", exc_info=True)
+
         if user_id:
             try:
                 from django.contrib.auth import get_user_model

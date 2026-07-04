@@ -51,7 +51,7 @@ export default function MainLayout() {
                   <Link to="/signup">Sign up</Link>
                 </Button>
                 <Button asChild>
-                  <Link to="/create">Get Started</Link>
+                  <Link to="/create?new=true">Get Started</Link>
                 </Button>
               </>
             )}

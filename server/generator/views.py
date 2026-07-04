@@ -56,7 +56,11 @@ class ResumeViewSet(viewsets.ModelViewSet):
             resume.save()
             
             user_id = request.user.id if request.user.is_authenticated else None
-            task = generate_document_task.delay(data_serializer.validated_data, user_id=user_id)
+            task = generate_document_task.delay(
+                data_serializer.validated_data, 
+                user_id=user_id,
+                resume_id=str(resume.id)
+            )
             
             return Response({
                 "message": "Resume generation started.",

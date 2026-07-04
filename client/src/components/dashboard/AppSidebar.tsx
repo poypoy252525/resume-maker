@@ -47,7 +47,7 @@ const navMain = [
   },
   {
     title: "Create New",
-    url: "/create",
+    url: "/create?new=true",
     icon: Plus,
   },
 ];
