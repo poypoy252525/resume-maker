@@ -122,6 +122,19 @@ class ResumeViewSet(viewsets.ModelViewSet):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    @action(detail=False, methods=['post'])
+    def recommend_summary(self, request):
+        resume_data = request.data.get('resume_data', {})
+        target_role = request.data.get('target_role', '')
+        job_description = request.data.get('job_description', '')
+
+        try:
+            ai_service = AIService()
+            result = ai_service.recommend_summary(resume_data, target_role, job_description)
+            return Response(result, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 class ResumeStatusView(APIView):
     def get(self, request, task_id, file_format='pdf', *args, **kwargs):
         res = AsyncResult(str(task_id))

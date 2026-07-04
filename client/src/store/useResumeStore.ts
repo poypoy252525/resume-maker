@@ -9,6 +9,7 @@ import {
   paraphraseBullet,
   recommendJobDescription,
   recommendSkills,
+  recommendSummary,
   checkTaskResult,
   fetchResume,
   createResume,
@@ -39,6 +40,7 @@ interface ResumeState {
   isReviewModalOpen: boolean;
   isAIAnalyzing: boolean;
   showTemplatePicker: boolean;
+  isRecommendingSummary: boolean;
 
   // Actions
   setShowTemplatePicker: (show: boolean) => void;
@@ -57,6 +59,7 @@ interface ResumeState {
   handleParaphrase: (bulletPoint: string) => Promise<string[] | null>;
   handleRecommendJobDescription: (jobTitle: string) => Promise<string[] | null>;
   handleRecommendSkills: () => Promise<string[] | null>;
+  handleRecommendSummary: () => Promise<string | null>;
   handleSubmit: (format?: "pdf" | "docx") => Promise<void>;
   handleReset: () => void;
   loadResume: (id: string) => Promise<void>;
@@ -111,6 +114,7 @@ export const useResumeStore = create<ResumeState>()(
       isReviewModalOpen: false,
       isAIAnalyzing: false,
       showTemplatePicker: true,
+      isRecommendingSummary: false,
 
       // Actions
       setShowTemplatePicker: (show) => set({ showTemplatePicker: show }),
@@ -241,6 +245,26 @@ export const useResumeStore = create<ResumeState>()(
             error: (err as Error).message || "Failed to recommend skills",
           });
           return null;
+        }
+      },
+
+      handleRecommendSummary: async () => {
+        const { formData } = get();
+        set({ isRecommendingSummary: true, error: null });
+        try {
+          const result = await recommendSummary(
+            formData,
+            formData.target_role || "Professional",
+            formData.job_description || "",
+          );
+          return result.summary;
+        } catch (err: unknown) {
+          set({
+            error: (err as Error).message || "Failed to recommend summary",
+          });
+          return null;
+        } finally {
+          set({ isRecommendingSummary: false });
         }
       },
 

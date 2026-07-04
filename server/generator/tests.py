@@ -126,3 +126,36 @@ class PublicStatsTestCase(TestCase):
         self.assertEqual(data['ats_pass_rate'], 65.0)
         self.assertEqual(data['success_rate'], 50.0)
 
+
+from unittest.mock import patch
+
+class AISummaryTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="password")
+        self.client.force_login(self.user)
+
+    @patch('generator.views.AIService')
+    def test_recommend_summary_success(self, mock_ai_service_class):
+        # Configure the mock to return a dummy summary
+        mock_instance = mock_ai_service_class.return_value
+        mock_instance.recommend_summary.return_value = {
+            "summary": "This is a mocked professional summary."
+        }
+
+        url = reverse('resume-recommend-summary')
+        payload = {
+            "resume_data": {"full_name": "Test User"},
+            "target_role": "Software Engineer",
+            "job_description": "We need a Python developer."
+        }
+        
+        response = self.client.post(url, payload, content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"summary": "This is a mocked professional summary."})
+        mock_instance.recommend_summary.assert_called_once_with(
+            {"full_name": "Test User"},
+            "Software Engineer",
+            "We need a Python developer."
+        )
+
+

@@ -34,6 +34,9 @@ class ResumeReview(BaseModel):
     what_to_improve: Optional[str] = Field(None, description="General improvements for the entire resume.")
     section_analysis: List[SectionAnalysis] = Field(..., description="Detailed analysis for each key section of the resume.")
 
+class SummaryRecommendation(BaseModel):
+    summary: str = Field(..., description="A professional summary of 3-4 sentences tailored to the target role and job description.")
+
 # --- Core Agent ---
 
 class AIAgent:
@@ -102,6 +105,7 @@ class AIService:
         self.paraphraser = AIAgent('paraphraser.txt', ParaphraseResult, temperature=0.4)
         self.job_description_recommender = AIAgent('job_description_recommender.txt', JobDescriptionRecommendation, temperature=0.5)
         self.reviewer = AIAgent('resume_reviewer.txt', ResumeReview, temperature=0.3)
+        self.summary_recommender = AIAgent('summary_generator.txt', SummaryRecommendation, temperature=0.5)
 
     def evaluate_ats(self, resume_data: dict, job_description: str) -> dict:
         return self.ats_evaluator.generate(
@@ -135,4 +139,11 @@ class AIService:
             resume_data=json.dumps(resume_data, indent=2),
             job_description=job_description,
             target_role=target_role
+        )
+
+    def recommend_summary(self, resume_data: dict, target_role: str, job_description: Optional[str]) -> dict:
+        return self.summary_recommender.generate(
+            resume_data=json.dumps(resume_data, indent=2),
+            target_role=target_role,
+            job_description=job_description
         )

@@ -174,6 +174,32 @@ export const recommendSkills = async (targetRole: string, jobDescription: string
   return response.json();
 };
 
+export const recommendSummary = async (
+  resumeData: ResumeData,
+  targetRole: string,
+  jobDescription: string,
+): Promise<{ summary: string }> => {
+  const response = await fetch(`${API_BASE_URL}/resumes/recommend_summary/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeaders(),
+    },
+    body: JSON.stringify({
+      resume_data: resumeData,
+      target_role: targetRole,
+      job_description: jobDescription,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to recommend summary");
+  }
+
+  return response.json();
+};
+
 export interface ResumeResponse {
   id: string;
   title: string;
