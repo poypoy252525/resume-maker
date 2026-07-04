@@ -68,7 +68,7 @@ services:
     restart: always
     volumes:
       - ./client:/app
-      - /app/node_modules/
+      - client_node_modules:/app/node_modules
     env_file:
       - ./client/.env
     ports:
@@ -78,3 +78,4 @@ services:
 
 volumes:
   postgres_dev_data:
+  client_node_modules:

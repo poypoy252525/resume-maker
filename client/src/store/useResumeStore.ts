@@ -85,6 +85,12 @@ interface ResumeState {
     maxRetries?: number,
   ) => Promise<T>;
   updateStatus: (taskId: string) => Promise<void>;
+
+  // PDF Preview State & Actions
+  pdfPreviewUrl: string | null;
+  isCompilingPdf: boolean;
+  compileError: string | null;
+  compilePdf: () => Promise<void>;
 }
 
 const initialFormData: ResumeData = {
@@ -132,6 +138,9 @@ export const useResumeStore = create<ResumeState>()(
       isTailorModalOpen: false,
       tailorResult: null,
       isImporting: false,
+      pdfPreviewUrl: null,
+      isCompilingPdf: false,
+      compileError: null,
 
 
       // Actions
@@ -487,6 +496,59 @@ export const useResumeStore = create<ResumeState>()(
           throw err;
         } finally {
           set({ isImporting: false });
+        }
+      },
+
+      compilePdf: async () => {
+        const { formData } = get();
+        set({ isCompilingPdf: true, compileError: null });
+        try {
+          const cleanedData = {
+            ...formData,
+            experiences: formData.experiences
+              .map((exp) => ({
+                ...exp,
+                bullet_points: exp.bullet_points.filter(
+                  (bp) => bp.trim() !== "",
+                ),
+              }))
+              .filter((exp) => exp.company_name || exp.job_title),
+          };
+
+          cleanedData.experiences.forEach((exp) => {
+            if (exp.bullet_points.length === 0) {
+              exp.bullet_points = ["General duties and responsibilities"];
+            }
+          });
+
+          const result = await generateResume(cleanedData);
+          const taskId = result.task_id;
+
+          // Poll until success
+          let pollRetries = 0;
+          const maxRetries = 30; // 60 seconds total (2s interval)
+
+          const poll = async (): Promise<string> => {
+            const res = await checkTaskStatus(taskId, "pdf");
+            if (res.status === "SUCCESS") return res.file_url;
+            if (res.status === "FAILURE")
+              throw new Error(res.error || "Generation failed");
+
+            if (pollRetries >= maxRetries)
+              throw new Error("PDF compilation timed out. Please try again.");
+
+            pollRetries++;
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+            return poll();
+          };
+
+          const fileUrl = await poll();
+          set({ pdfPreviewUrl: fileUrl, isCompilingPdf: false });
+        } catch (err: unknown) {
+          set({
+            compileError: (err as Error).message || "Failed to compile PDF",
+            isCompilingPdf: false,
+          });
         }
       },
 
