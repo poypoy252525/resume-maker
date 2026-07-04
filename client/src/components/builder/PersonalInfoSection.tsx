@@ -90,40 +90,6 @@ export default function PersonalInfoSection({ data, onChange }: PersonalInfoSect
         </div>
       </div>
 
-      {/* Target Job Context */}
-      <div className="space-y-4 pt-6 border-t border-muted-foreground/10">
-        <div>
-          <h3 className="text-sm font-bold uppercase tracking-wider text-primary">Target Job Details</h3>
-          <p className="text-xs text-muted-foreground">
-            Provide details about your desired role and job description to power AI suggestions throughout your resume.
-          </p>
-        </div>
-        <div className="grid grid-cols-1 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="target_role">Target Role</Label>
-            <Input
-              id="target_role"
-              name="target_role"
-              placeholder="e.g. Senior Software Engineer"
-              value={data.target_role || ""}
-              onChange={onChange}
-              className="rounded-xl"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="job_description">Job Description</Label>
-            <Textarea
-              id="job_description"
-              name="job_description"
-              placeholder="Paste the job description here to optimize your resume for ATS..."
-              className="min-h-24 rounded-xl resize-none shadow-inner bg-background/50 focus:bg-background transition-colors p-3 text-sm"
-              value={data.job_description || ""}
-              onChange={onChange}
-            />
-          </div>
-        </div>
-      </div>
-
       {/* Professional Summary */}
       <div className="space-y-2 pt-6 border-t border-muted-foreground/10">
         <div className="flex items-center justify-between">

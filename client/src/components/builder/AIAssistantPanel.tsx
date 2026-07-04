@@ -171,25 +171,40 @@ export default function AIAssistantPanel({
               {step === 1 && (
                 <div className="space-y-4 animate-in slide-in-from-right-4 duration-500">
                   <h4 className="text-xs font-bold flex items-center gap-2">
-                    <Target className="size-3.5 text-primary" /> Personal
-                    Branding
+                    <Target className="size-3.5 text-primary" /> Target Job Setup
                   </h4>
                   <ul className="space-y-2 text-[11px] text-muted-foreground">
                     <li className="flex gap-2">
                       <div className="size-1.5 bg-primary/40 rounded-full mt-1.5 shrink-0" />
-                      Ensure your LinkedIn profile URL is professional and
-                      clean.
+                      Setting a specific target role helps the AI focus its suggestions.
                     </li>
                     <li className="flex gap-2">
                       <div className="size-1.5 bg-primary/40 rounded-full mt-1.5 shrink-0" />
-                      Use a professional email address (e.g.,
-                      firstname.lastname@email.com).
+                      Pasting the job description enables smart keyword matching and tailored experience suggestions.
                     </li>
                   </ul>
                 </div>
               )}
 
               {step === 2 && (
+                <div className="space-y-4 animate-in slide-in-from-right-4 duration-500">
+                  <h4 className="text-xs font-bold flex items-center gap-2">
+                    <Target className="size-3.5 text-primary" /> Personal Branding
+                  </h4>
+                  <ul className="space-y-2 text-[11px] text-muted-foreground">
+                    <li className="flex gap-2">
+                      <div className="size-1.5 bg-primary/40 rounded-full mt-1.5 shrink-0" />
+                      Ensure your LinkedIn profile URL is professional and clean.
+                    </li>
+                    <li className="flex gap-2">
+                      <div className="size-1.5 bg-primary/40 rounded-full mt-1.5 shrink-0" />
+                      Use a professional email address (e.g., firstname.lastname@email.com).
+                    </li>
+                  </ul>
+                </div>
+              )}
+
+              {step === 3 && (
                 <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
                   {/* Focused experience context header */}
                   {focusedExperienceIndex !== null ? (
@@ -209,8 +224,6 @@ export default function AIAssistantPanel({
                             ?.job_title || "No job title yet"}
                         </p>
                       </div>
-
-
 
                       {/* Job Description Ideas */}
                       <div className="space-y-4 pt-4 border-t border-dashed">
@@ -290,7 +303,7 @@ export default function AIAssistantPanel({
                 </div>
               )}
 
-              {step === 4 && feedback && (
+              {step === 5 && feedback && (
                 <div className="space-y-4 animate-in slide-in-from-right-4 duration-500">
                   <h4 className="text-xs font-bold flex items-center gap-2">
                     <Plus className="size-3.5 text-primary" /> Recommended

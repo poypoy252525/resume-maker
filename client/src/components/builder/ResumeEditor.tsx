@@ -7,6 +7,7 @@ import PersonalInfoSection from "./PersonalInfoSection";
 import ExperienceSection from "./ExperienceSection";
 import EducationSection from "./EducationSection";
 import SkillsSection from "./SkillsSection";
+import TargetJobSection from "./TargetJobSection";
 import ResumeStepper from "./ResumeStepper";
 import { sidebarItems } from "@/constants/builder";
 import type { ResumeData, Experience, Education } from "@/api";
@@ -91,7 +92,7 @@ export default function ResumeEditor({
   };
 
   // Hide the Next/Previous navigation while an experience is being edited
-  const isEditingExperience = step === 2 && focusedExperienceIndex !== null;
+  const isEditingExperience = step === 3 && focusedExperienceIndex !== null;
 
   return (
     <main className="h-full bg-muted/5 flex flex-col overflow-hidden">
@@ -130,12 +131,18 @@ export default function ResumeEditor({
 
           <StepperPanel className="space-y-8">
             <StepperContent value={1}>
-              <PersonalInfoSection
+              <TargetJobSection
                 data={formData}
                 onChange={handleInputChange}
               />
             </StepperContent>
             <StepperContent value={2}>
+              <PersonalInfoSection
+                data={formData}
+                onChange={handleInputChange}
+              />
+            </StepperContent>
+            <StepperContent value={3}>
               <ExperienceSection
                 experiences={formData.experiences}
                 onChange={handleExperienceChange}
@@ -150,7 +157,7 @@ export default function ResumeEditor({
                 onDoneEditing={handleDoneEditing}
               />
             </StepperContent>
-            <StepperContent value={3}>
+            <StepperContent value={4}>
               <EducationSection
                 educations={formData.educations}
                 onChange={handleEducationChange}
@@ -158,7 +165,7 @@ export default function ResumeEditor({
                 onRemove={removeEducation}
               />
             </StepperContent>
-            <StepperContent value={4}>
+            <StepperContent value={5}>
               <SkillsSection
                 skills={formData.skills || []}
                 onChange={handleSkillsChange}
@@ -181,11 +188,11 @@ export default function ResumeEditor({
                   <ChevronLeft className="w-4 h-4 mr-2" /> Previous
                 </Button>
 
-                {step !== 4 ? (
+                {step !== sidebarItems.length ? (
                   <Button
                     size="lg"
                     onClick={() => {
-                      if (step < 4) setStep(step + 1);
+                      if (step < sidebarItems.length) setStep(step + 1);
                     }}
                     className="rounded-xl px-8"
                   >

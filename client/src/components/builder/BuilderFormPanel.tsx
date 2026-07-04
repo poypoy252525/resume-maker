@@ -20,6 +20,7 @@ import EducationSection from "./EducationSection";
 import ExperienceSection from "./ExperienceSection";
 import PersonalInfoSection from "./PersonalInfoSection";
 import SkillsSection from "./SkillsSection";
+import TargetJobSection from "./TargetJobSection";
 
 export default function BuilderFormPanel() {
   const {
@@ -59,7 +60,7 @@ export default function BuilderFormPanel() {
     setFormData({ [name]: value });
   };
 
-  const isEditingExperience = step === 2 && focusedExperienceIndex !== null;
+  const isEditingExperience = step === 3 && focusedExperienceIndex !== null;
 
   return (
     <div className="h-full bg-background flex flex-col overflow-hidden">
@@ -176,12 +177,18 @@ export default function BuilderFormPanel() {
                 </AccordionTrigger>
                 <AccordionContent className="pt-6 px-1">
                   {item.step === 1 && (
-                    <PersonalInfoSection
+                    <TargetJobSection
                       data={formData}
                       onChange={handleInputChange}
                     />
                   )}
                   {item.step === 2 && (
+                    <PersonalInfoSection
+                      data={formData}
+                      onChange={handleInputChange}
+                    />
+                  )}
+                  {item.step === 3 && (
                     <ExperienceSection
                       experiences={formData.experiences}
                       onChange={(index, field, value) => {
@@ -240,7 +247,7 @@ export default function BuilderFormPanel() {
                       onDoneEditing={() => setFocusedExperienceIndex(null)}
                     />
                   )}
-                  {item.step === 3 && (
+                  {item.step === 4 && (
                     <EducationSection
                       educations={formData.educations}
                       onChange={(index, field, value) => {
@@ -271,7 +278,7 @@ export default function BuilderFormPanel() {
                       }}
                     />
                   )}
-                  {item.step === 4 && (
+                  {item.step === 5 && (
                     <SkillsSection
                       skills={formData.skills || []}
                       onChange={(skills) => setFormData({ skills })}
@@ -295,7 +302,7 @@ export default function BuilderFormPanel() {
                 <ChevronLeft className="w-4 h-4 mr-2" /> Previous
               </Button>
 
-              {step !== 4 && (
+              {step !== sidebarItems.length && (
                 <Button
                   size="lg"
                   onClick={handleNext}
