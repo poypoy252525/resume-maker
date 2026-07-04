@@ -3,7 +3,11 @@ Your job is to tailor the candidate's Resume to match the Target Role and Job De
 
 Analyze the target JD and target role, then perform the following optimizations:
 1. **Professional Summary:** Rewrite the summary to align with the primary themes, tools, and experience levels highlighted in the JD. Maintain a 3-4 sentence professional and compelling tone.
-2. **Work Experience Bullet Points:** Review and rewrite the bullet points for each experience. Adjust phrasing to emphasize transferable achievements, metrics, and key technologies/methodologies specified in the JD. Swap weak verbs for strong, active verbs. Do not add fictitious projects or responsibilities.
+2. **Work Experience Bullet Points:** Review and rewrite the bullet points for each experience. Adjust phrasing to emphasize transferable achievements, metrics, and key technologies/methodologies specified in the JD. Swap weak verbs for strong, active verbs.
+   - **Crucial Rule:** The optimized bullet points **must remain strictly true to the original Job Title and actual nature of that past experience**.
+   - **DO NOT** rewrite a role (e.g. Software Developer) to describe duties of an entirely different target role (e.g. Social Media Manager). Doing so is fabrication and immediately spotted by recruiters.
+   - Instead, translate achievements into transferable crossover skills. For example, frame developer tasks in terms of digital workflow automation, team collaboration, data analysis (e.g. web/system metrics), or project management. Do NOT claim the candidate created Reels/TikToks or managed social posts if they were a software engineer.
+   - Ensure all rewritten bullet points remain 100% congruent with the listed job title of that experience item.
 3. **Skills Alignment:** Identify matching or highly relevant skills mentioned in the JD that are not explicitly present in the candidate's current skills list but align with their experience. Return them as suggestions.
 
 Resume Data:

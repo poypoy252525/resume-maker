@@ -67,7 +67,7 @@ interface ResumeState {
   triggerAIAnalysis: () => Promise<void>;
   triggerTailorResume: () => Promise<void>;
   applyTailoredResume: (selectedExperienceIndexes: number[], applySummary: boolean, applySkills: boolean) => void;
-  handleParaphrase: (bulletPoint: string) => Promise<string[] | null>;
+  handleParaphrase: (bulletPoint: string, jobTitle: string) => Promise<string[] | null>;
   handleRecommendJobDescription: (jobTitle: string) => Promise<string[] | null>;
   handleRecommendSkills: () => Promise<string[] | null>;
   handleRecommendSummary: () => Promise<string | null>;
@@ -293,13 +293,14 @@ export const useResumeStore = create<ResumeState>()(
         });
       },
 
-      handleParaphrase: async (bulletPoint) => {
+      handleParaphrase: async (bulletPoint, jobTitle) => {
         const { formData } = get();
         try {
           const result = await paraphraseBullet(
             bulletPoint,
             formData.job_description || "",
             formData.target_role || "",
+            jobTitle,
           );
           return result.suggestions;
         } catch (err: unknown) {

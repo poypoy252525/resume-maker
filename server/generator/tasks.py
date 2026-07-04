@@ -88,10 +88,10 @@ def analyze_resume_task(self, resume_data, job_description, target_role, user_id
         raise e
 
 @shared_task
-def paraphrase_bullet_task(bullet_point, target_role, job_description):
+def paraphrase_bullet_task(bullet_point, target_role, job_description, job_title=""):
     try:
         ai_service = AIService()
-        return ai_service.paraphrase_bullet(bullet_point, target_role, job_description)
+        return ai_service.paraphrase_bullet(bullet_point, target_role, job_description, job_title)
     except Exception as e:
         logger.error(f"Paraphrase task failed: {str(e)}", exc_info=True)
         raise e

@@ -50,7 +50,7 @@ interface ExperienceSectionProps {
   onRemove: (index: number) => void;
   onFocusExperience: (index: number) => void;
   onFocusBullet: (index: number, bulletIndex: number) => void;
-  onParaphrase: (bullet: string) => Promise<string[] | null>;
+  onParaphrase: (bullet: string, jobTitle: string) => Promise<string[] | null>;
   onRecommendJobDescription?: (jobTitle: string) => Promise<string[] | null>;
   onUpdateBullet: (
     expIndex: number,
@@ -119,14 +119,14 @@ export default function ExperienceSection({
     onChange(viewingSuggestionsIdx, "bullet_points", [...currentBullets, ...newSuggestions]);
   };
 
-  const handleOptimizeBullet = async (bullet: string, bulletIdx: number) => {
+  const handleOptimizeBullet = async (bullet: string, bulletIdx: number, jobTitle: string) => {
     if (!bullet.trim()) return;
     setOptimizingIdx(bulletIdx);
     setIsOptimizing(true);
     setIsModalOpen(true);
     setOptimizationResults(null);
 
-    const results = await onParaphrase(bullet);
+    const results = await onParaphrase(bullet, jobTitle);
     setOptimizationResults(results);
     setIsOptimizing(false);
   };
@@ -329,7 +329,7 @@ export default function ExperienceSection({
                                     variant="ghost"
                                     size="icon"
                                     className="shrink-0 h-7 w-7 text-primary/40 hover:text-primary hover:bg-primary/10"
-                                    onClick={() => handleOptimizeBullet(bp, bpIndex)}
+                                    onClick={() => handleOptimizeBullet(bp, bpIndex, exp.job_title)}
                                     disabled={!bp.trim()}
                                   >
                                     <Sparkles className="w-3 h-3" />
@@ -525,6 +525,7 @@ export default function ExperienceSection({
                         handleOptimizeBullet(
                           experiences[focusedIndex].bullet_points[optimizingIdx],
                           optimizingIdx,
+                          experiences[focusedIndex].job_title,
                         );
                       }
                     }}

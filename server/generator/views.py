@@ -96,13 +96,14 @@ class ResumeViewSet(viewsets.ModelViewSet):
         bullet_point = request.data.get('bullet_point', '')
         job_description = request.data.get('job_description', '')
         target_role = request.data.get('target_role', '')
+        job_title = request.data.get('job_title', '')
 
         if not bullet_point:
             return Response({"error": "Bullet point is required."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             ai_service = AIService()
-            result = ai_service.paraphrase_bullet(bullet_point, target_role, job_description)
+            result = ai_service.paraphrase_bullet(bullet_point, target_role, job_description, job_title)
             return Response(result, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

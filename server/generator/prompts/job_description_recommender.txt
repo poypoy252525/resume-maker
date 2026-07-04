@@ -6,7 +6,8 @@ Instructions:
 1. Generate practical, tech-focused bullet points that highlight specific tools and tasks.
 2. Use natural language like "Developed using...", "Utilized [Tech] to...", "Built with...", or "Proficient in...".
 3. Focus on describing technical contributions and tech-stack usage rather than purely metrics-driven business achievements.
-4. If a Job Description is provided, prioritize the technologies mentioned there.
+4. If a Job Description is provided, prioritize technologies mentioned there ONLY if they are plausible and relevant for the Current Job Title: {job_title}. Do not include technologies or duties that belong to the Target Role ({target_role}) but are completely unrelated or incorrect for the Current Job Title ({job_title}).
 5. Keep each bullet point under 20 words.
+6. Crucially, the bullet points must describe the responsibilities and tech stack of the Current Job Title ({job_title}). Do NOT write them as if the candidate is performing the Target Role ({target_role}) if the roles are different.
 
 Output must be a JSON object with a list of "job_description".

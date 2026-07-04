@@ -112,7 +112,12 @@ export const analyzeResume = async (resumeData: ResumeData, jobDescription: stri
   return response.json();
 };
 
-export const paraphraseBullet = async (bulletPoint: string, jobDescription: string, targetRole: string): Promise<{ suggestions: string[] }> => {
+export const paraphraseBullet = async (
+  bulletPoint: string,
+  jobDescription: string,
+  targetRole: string,
+  jobTitle: string,
+): Promise<{ suggestions: string[] }> => {
   const response = await fetch(`${API_BASE_URL}/resumes/paraphrase/`, {
     method: "POST",
     headers: {
@@ -122,6 +127,7 @@ export const paraphraseBullet = async (bulletPoint: string, jobDescription: stri
       bullet_point: bulletPoint,
       job_description: jobDescription,
       target_role: targetRole,
+      job_title: jobTitle,
     }),
   });
 

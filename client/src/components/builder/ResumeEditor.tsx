@@ -37,7 +37,7 @@ interface ResumeEditorProps {
   handleSkillsChange: (skills: string[]) => void;
   onFocusExperience: (index: number) => void;
   onFocusBullet: (index: number, bulletIndex: number) => void;
-  onParaphrase: (bullet: string) => Promise<string[] | null>;
+  onParaphrase: (bullet: string, jobTitle: string) => Promise<string[] | null>;
   onUpdateBullet: (
     expIndex: number,
     bulletIndex: number,

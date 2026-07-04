@@ -11,5 +11,6 @@ Instructions:
 3. Use phrases like "Proficient in...", "Experienced with...", or "Developed... using...".
 4. Avoid corporate jargon; focus on describing exactly what was done and with what tools.
 5. Provide exactly THREE optimized versions.
+6. Crucially, the optimized bullet points must stay true to the responsibilities of the Current Job Title ({job_title}). Do not paraphrase them to represent duties of the Target Role ({target_role}) if the roles are different; keep the focus on what was actually done in this role, utilizing relevant transferable skills where appropriate.
 
 Output must be a JSON object with a list of "suggestions".
