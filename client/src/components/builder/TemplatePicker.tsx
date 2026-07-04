@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Sparkles, ArrowRight, ArrowLeft, Upload, Loader2, FileText } from "lucide-react";
+import { Sparkles, ArrowRight, ArrowLeft, Upload, Loader2, FileText, Mail, Phone, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useResumeStore } from "@/store/useResumeStore";
@@ -90,23 +90,56 @@ export default function TemplatePicker({ onSelect }: TemplatePickerProps) {
       title: "Modern",
       description: "Clean sans-serif typography, header borders, and blue accents. Best for tech, startup, and design roles.",
       preview: (
-        <div className="w-full aspect-210/297 bg-slate-100 rounded-lg p-3 flex flex-col space-y-3 h-48 overflow-hidden select-none border border-slate-200">
-          <div className="space-y-1 text-left">
-            <div className="h-3 w-1/2 bg-slate-800 rounded-xs" />
-            <div className="h-1.5 w-1/3 bg-primary/50 rounded-xs" />
-            <div className="h-1.5 w-1/4 bg-slate-450 rounded-xs" />
-          </div>
-          <div className="border-b border-slate-300 pb-0.5">
-            <div className="h-2 w-1/4 bg-slate-500 rounded-xs" />
-          </div>
-          <div className="space-y-1.5 flex-1 pt-0.5">
-            <div className="flex justify-between items-center">
-              <div className="h-2.5 w-1/3 bg-slate-700 rounded-xs" />
-              <div className="h-1.5 w-1/5 bg-slate-400 rounded-xs" />
+        <div className="w-full aspect-210/297 bg-white text-slate-800 rounded-xl p-3 flex flex-col space-y-2.5 h-48 overflow-hidden select-none border border-slate-200 font-sans shadow-xs">
+          {/* Header */}
+          <div className="text-left">
+            <h4 className="text-[7.5px] font-extrabold text-slate-900 uppercase tracking-tight leading-tight">Jonathan Doe</h4>
+            <p className="text-[5px] font-semibold text-primary mt-0.5 leading-none">Software Engineer</p>
+            <div className="flex flex-col gap-0.5 mt-1 text-[3.8px] text-slate-500 font-medium leading-none">
+              <div className="flex items-center gap-0.5">
+                <Mail className="w-1 h-1 text-slate-400" />
+                <span>jonathan.doe@email.com</span>
+              </div>
+              <div className="flex items-center gap-0.5">
+                <Phone className="w-1 h-1 text-slate-400" />
+                <span>(555) 019-2834</span>
+              </div>
+              <div className="flex items-center gap-0.5">
+                <MapPin className="w-1 h-1 text-slate-400" />
+                <span>San Francisco, CA</span>
+              </div>
             </div>
-            <div className="space-y-1 pl-2">
-              <div className="h-1 w-5/6 bg-slate-350 rounded-xs" />
-              <div className="h-1 w-3/4 bg-slate-350 rounded-xs" />
+          </div>
+          
+          {/* Divider line */}
+          <div className="border-b border-slate-200 w-full" />
+
+          {/* Professional Summary */}
+          <div className="space-y-0.5">
+            <h5 className="text-[4.5px] font-bold uppercase tracking-wider text-slate-500 leading-none">Professional Summary</h5>
+            <p className="text-[3.8px] leading-[4.8px] text-slate-650">
+              Results-driven Software Engineer with 5+ years of experience building and deploying scalable web applications using React, Node.js, and TypeScript.
+            </p>
+          </div>
+
+          {/* Experience */}
+          <div className="space-y-0.5">
+            <h5 className="text-[4.5px] font-bold uppercase tracking-wider text-slate-500 leading-none">Experience</h5>
+            <div className="space-y-0.5">
+              <div className="flex justify-between items-baseline leading-none">
+                <span className="text-[4px] font-bold text-slate-900">Senior Software Engineer</span>
+                <span className="text-[3.5px] text-slate-400 font-medium">2023 — Pres.</span>
+              </div>
+              <div className="flex justify-between items-baseline leading-none">
+                <span className="text-[3.8px] font-medium text-slate-700">TechCorp Inc.</span>
+                <span className="text-[3.5px] italic text-slate-400">San Francisco, CA</span>
+              </div>
+              <div className="space-y-0.5 text-slate-650 mt-0.5">
+                <p className="text-[3.8px] leading-[4.8px] pl-1.5 relative">
+                  <span className="absolute left-0 text-slate-400">•</span>
+                  Led design and implementation of a new API Gateway, reducing latency by 35%.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -117,22 +150,41 @@ export default function TemplatePicker({ onSelect }: TemplatePickerProps) {
       title: "Classic",
       description: "Traditional centered serif design with bullet spacing. Perfect for corporate, finance, law, or academic roles.",
       preview: (
-        <div className="w-full aspect-210/297 bg-slate-100 rounded-lg p-3 flex flex-col space-y-3 h-48 overflow-hidden select-none border border-slate-200">
-          <div className="space-y-1 text-center flex flex-col items-center">
-            <div className="h-3 w-1/2 bg-slate-800 rounded-xs" />
-            <div className="h-1.5 w-3/5 bg-slate-450 rounded-xs" />
+        <div className="w-full aspect-210/297 bg-white text-slate-800 rounded-xl p-3 flex flex-col space-y-2.5 h-48 overflow-hidden select-none border border-slate-200 font-serif shadow-xs">
+          {/* Header */}
+          <div className="text-center space-y-0.5">
+            <h4 className="text-[8px] font-bold text-slate-900 uppercase tracking-wider leading-tight">Jonathan Doe</h4>
+            <p className="text-[3.8px] text-slate-500 font-medium leading-none">
+              jonathan.doe@email.com  •  (555) 019-2834  •  San Francisco, CA
+            </p>
           </div>
-          <div className="flex flex-col items-center border-none">
-            <div className="h-2 w-1/4 bg-slate-500 rounded-xs" />
+
+          {/* Professional Summary */}
+          <div className="space-y-0.5 text-center">
+            <h5 className="text-[4.5px] font-bold uppercase tracking-[0.15em] text-slate-900 leading-none">Professional Summary</h5>
+            <p className="text-[3.8px] leading-[4.8px] text-slate-650 px-1 text-center">
+              Results-driven Software Engineer with 5+ years of experience building and deploying scalable web applications using React, Node.js, and TypeScript.
+            </p>
           </div>
-          <div className="space-y-1.5 flex-1 pt-0.5">
-            <div className="flex justify-between items-center">
-              <div className="h-2.5 w-1/3 bg-slate-700 rounded-xs" />
-              <div className="h-1.5 w-1/5 bg-slate-400 rounded-xs" />
-            </div>
-            <div className="space-y-1 pl-2 font-serif">
-              <div className="h-1 w-5/6 bg-slate-350 rounded-xs" />
-              <div className="h-1 w-3/4 bg-slate-350 rounded-xs" />
+
+          {/* Experience */}
+          <div className="space-y-0.5">
+            <h5 className="text-[4.5px] font-bold uppercase tracking-[0.15em] text-slate-900 text-center leading-none">Professional Experience</h5>
+            <div className="space-y-0.5">
+              <div className="flex justify-between items-baseline leading-none">
+                <span className="text-[4px] font-bold text-slate-900">Senior Software Engineer</span>
+                <span className="text-[3.5px] text-slate-400 font-medium">2023 — Pres.</span>
+              </div>
+              <div className="flex justify-between items-baseline leading-none">
+                <span className="text-[3.8px] font-bold text-slate-700">TechCorp Inc.</span>
+                <span className="text-[3.5px] italic text-slate-400">San Francisco, CA</span>
+              </div>
+              <div className="space-y-0.5 text-slate-650 mt-0.5 text-left">
+                <p className="text-[3.8px] leading-[4.8px] pl-1.5 relative">
+                  <span className="absolute left-0 text-slate-400">•</span>
+                  Led team of 4 to design and implement a new API Gateway, reducing latency by 35%.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -143,26 +195,51 @@ export default function TemplatePicker({ onSelect }: TemplatePickerProps) {
       title: "Minimal",
       description: "High-density clean layouts with tight margins and small font scaling. Great for detailed multi-year histories.",
       preview: (
-        <div className="w-full aspect-210/297 bg-slate-100 rounded-lg p-3 flex flex-col space-y-2 h-48 overflow-hidden select-none border border-slate-200">
-          <div className="space-y-1 text-left">
-            <div className="h-2.5 w-2/5 bg-slate-800 rounded-xs" />
-            <div className="h-1.5 w-2/3 bg-slate-450 rounded-xs" />
+        <div className="w-full aspect-210/297 bg-white text-slate-800 rounded-xl p-3 flex flex-col space-y-2 h-48 overflow-hidden select-none border border-slate-200 font-sans shadow-xs">
+          {/* Header */}
+          <div className="text-left">
+            <h4 className="text-[7.5px] font-bold text-slate-900 tracking-tight leading-tight">Jonathan Doe</h4>
+            <p className="text-[3.8px] text-slate-500 font-medium leading-none mt-0.5">
+              jonathan.doe@email.com  |  (555) 019-2834  |  San Francisco, CA
+            </p>
           </div>
-          <div>
-            <div className="h-1.5 w-1/5 bg-slate-500 rounded-xs" />
+
+          {/* Professional Summary */}
+          <div className="space-y-0.5">
+            <h5 className="text-[4px] font-bold uppercase tracking-wider text-slate-800 leading-none">Professional Summary</h5>
+            <p className="text-[3.5px] leading-[4.5px] text-slate-650">
+              Results-driven Software Engineer with 5+ years of experience building and deploying scalable web applications.
+            </p>
           </div>
-          <div className="space-y-1.5 flex-1">
-            <div className="flex justify-between items-center">
-              <div className="h-2 w-1/3 bg-slate-700 rounded-xs" />
-              <div className="h-1.5 w-1/5 bg-slate-400 rounded-xs" />
-            </div>
-            <div className="space-y-0.5 pl-2">
-              <div className="h-1 w-5/6 bg-slate-350 rounded-xs" />
-              <div className="h-1 w-2/3 bg-slate-350 rounded-xs" />
-            </div>
-            <div className="flex justify-between items-center pt-0.5">
-              <div className="h-2 w-1/3 bg-slate-700 rounded-xs" />
-              <div className="h-1.5 w-1/5 bg-slate-400 rounded-xs" />
+
+          {/* Experience */}
+          <div className="space-y-0.5">
+            <h5 className="text-[4px] font-bold uppercase tracking-wider text-slate-800 leading-none">Experience</h5>
+            <div className="space-y-1">
+              <div className="space-y-0.5">
+                <div className="flex justify-between items-baseline leading-none">
+                  <span className="text-[3.8px] font-bold text-slate-900">Senior Software Engineer</span>
+                  <span className="text-[3.5px] text-slate-450 font-medium">2023 — Pres.</span>
+                </div>
+                <div className="flex justify-between items-baseline leading-none">
+                  <span className="text-[3.8px] text-slate-600">TechCorp Inc. — San Francisco, CA</span>
+                </div>
+                <div className="space-y-0.5 text-slate-650 mt-0.5">
+                  <p className="text-[3.5px] leading-[4.5px] pl-1.5 relative">
+                    <span className="absolute left-0 text-slate-400">•</span>
+                    Led API Gateway redesign, reducing latency by 35%.
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-0.5">
+                <div className="flex justify-between items-baseline leading-none">
+                  <span className="text-[3.8px] font-bold text-slate-900">Software Engineer</span>
+                  <span className="text-[3.5px] text-slate-450 font-medium">2020 — 2023</span>
+                </div>
+                <div className="flex justify-between items-baseline leading-none">
+                  <span className="text-[3.8px] text-slate-600">SoftSolutions LLC — Seattle, WA</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
