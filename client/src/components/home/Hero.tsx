@@ -61,9 +61,7 @@ export default function Hero() {
           </h1>
 
           <p className="text-md md:text-xl text-muted-foreground max-w-2xl mx-auto mb-6 md:mb-10 leading-relaxed animate-in fade-in slide-in-from-bottom-12 duration-1000">
-            Create a professional, high-impact resume in minutes. Our
-            intelligent system optimizes every word for ATS systems and human
-            eyes alike.
+            Create a professional, high-impact resume in minutes. Auto-tailor your experiences to job descriptions, check your ATS compatibility score, and refine content with our AI writing assistant.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-16 duration-1000">

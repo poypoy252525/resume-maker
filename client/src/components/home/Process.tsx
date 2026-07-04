@@ -18,20 +18,20 @@ export default function Process() {
           {[
             {
               step: "01",
-              title: "Input Your Details",
-              desc: "Fill out our intuitive form with your experience, education, and skills. No formatting required.",
+              title: "Choose Template & Input",
+              desc: "Pick from our professional, ATS-optimized layouts (Modern, Classic, Minimal) and quickly fill in your details with no formatting required.",
               icon: Zap,
             },
             {
               step: "02",
-              title: "AI Optimization",
-              desc: "Our engine analyzes your content and optimizes it for both ATS filters and human recruiters.",
+              title: "AI Tailoring & Feedback",
+              desc: "Submit a job description to automatically align your experiences, generate keyword suggestions, and view a comprehensive ATS compatibility score.",
               icon: Sparkles,
             },
             {
               step: "03",
               title: "Download & Apply",
-              desc: "Export your polished, professional resume as a high-quality PDF and start your application.",
+              desc: "Export your beautifully tailored, professional resume as a high-quality PDF and confidently submit it to recruiters.",
               icon: Download,
             },
           ].map((item, i) => (
