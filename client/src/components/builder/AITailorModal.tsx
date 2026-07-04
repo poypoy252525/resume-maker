@@ -9,14 +9,11 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Sparkles,
   CheckCircle2,
-  X,
   Bot,
   Zap,
-  ArrowRight,
   Info,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
