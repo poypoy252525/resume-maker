@@ -147,7 +147,7 @@ export default function BuilderPreviewPanel() {
   }, [pdfPreviewUrl, compileSeed]);
 
   return (
-    <aside className="h-full border-l bg-muted/30 flex flex-col overflow-hidden">
+    <aside className="h-full lg:border-l bg-muted/30 flex flex-col overflow-hidden">
       {/* ── Header ────────────────────────────────────────────────────────── */}
       <header className="h-14 border-b bg-background px-4 flex items-center justify-between shrink-0 shadow-sm z-10 gap-2">
         {/* Title */}

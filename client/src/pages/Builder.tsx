@@ -11,8 +11,12 @@ import { useAuthStore } from "@/store/useAuthStore";
 import BuilderFormPanel from "@/components/builder/BuilderFormPanel";
 import BuilderPreviewPanel from "@/components/builder/BuilderPreviewPanel";
 import TemplatePicker, { type ResumeTemplateId } from "@/components/builder/TemplatePicker";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Eye, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import AIReviewModal from "@/components/builder/AIReviewModal";
@@ -131,21 +135,21 @@ export default function Builder() {
           <BuilderFormPanel />
           
           {/* Mobile Preview Toggle */}
-          <Sheet open={showPreviewMobile} onOpenChange={setShowPreviewMobile}>
-            <SheetTrigger asChild>
+          <Drawer open={showPreviewMobile} onOpenChange={setShowPreviewMobile}>
+            <DrawerTrigger asChild>
               <Button
                 size="icon"
                 className="fixed bottom-6 right-6 size-14 rounded-full shadow-2xl shadow-primary/40 z-50 animate-in zoom-in-50 duration-300 bg-primary text-primary-foreground"
               >
                 <Eye className="size-6" />
               </Button>
-            </SheetTrigger>
-            <SheetContent side="bottom" className="h-[90vh] p-0 rounded-t-3xl border-t-2 border-primary/20">
-              <div className="h-full pt-4">
+            </DrawerTrigger>
+            <DrawerContent className="h-[90vh] data-[vaul-drawer-direction=bottom]:max-h-[90vh] p-0 rounded-t-3xl border-t border-muted bg-background">
+              <div className="flex-1 flex flex-col overflow-hidden min-h-0">
                 <BuilderPreviewPanel />
               </div>
-            </SheetContent>
-          </Sheet>
+            </DrawerContent>
+          </Drawer>
         </div>
       )}
     </div>

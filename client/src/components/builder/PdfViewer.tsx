@@ -27,6 +27,43 @@ export default function PdfViewer({ blobUrl, isLoading }: PdfViewerProps) {
   const renderTaskRef = useRef<pdfjsLib.RenderTask | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Set scale based on container width to fit the page
+  const fitToWidth = useCallback(async () => {
+    if (!pdf || !containerRef.current) return;
+    try {
+      const page = await pdf.getPage(currentPage);
+      const viewport = page.getViewport({ scale: 1 });
+      const containerWidth = containerRef.current.clientWidth;
+      
+      // Subtracting 48px to account for container padding (p-6 = 24px each side)
+      const padding = 48;
+      const targetWidth = Math.max(100, containerWidth - padding);
+      const newScale = targetWidth / viewport.width;
+      
+      // Cap scale between 0.4 and 2.0
+      setScale(Math.max(0.4, Math.min(2.0, +newScale.toFixed(2))));
+    } catch (err) {
+      console.error("Error auto-fitting PDF scale:", err);
+    }
+  }, [pdf, currentPage]);
+
+  // Auto-fit scale on load or container resize
+  useEffect(() => {
+    if (!pdf) return;
+    
+    // Initial fit
+    fitToWidth();
+    
+    const container = containerRef.current;
+    if (!container) return;
+    
+    const observer = new ResizeObserver(() => {
+      fitToWidth();
+    });
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [pdf, fitToWidth]);
+
   // Load PDF whenever blobUrl changes
   useEffect(() => {
     if (!blobUrl) {
@@ -111,7 +148,7 @@ export default function PdfViewer({ blobUrl, isLoading }: PdfViewerProps) {
   const goToNext = () => setCurrentPage((p) => Math.min(numPages, p + 1));
   const zoomIn = () => setScale((s) => Math.min(3, +(s + 0.2).toFixed(1)));
   const zoomOut = () => setScale((s) => Math.max(0.4, +(s - 0.2).toFixed(1)));
-  const resetZoom = () => setScale(1.2);
+  const resetZoom = () => fitToWidth();
 
   if (isLoading && !blobUrl) return null; // parent handles spinner
 

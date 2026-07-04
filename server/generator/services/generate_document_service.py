@@ -315,7 +315,8 @@ class GenerateDocumentService:
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
             
-        full_name_slug = context.get('full_name', 'resume').lower().replace(' ', '_')
+        full_name = context.get('full_name') or 'resume'
+        full_name_slug = full_name.strip().lower().replace(' ', '_')
         output_path = os.path.join(output_dir, f'{full_name_slug}.docx')
         self.doc.save(output_path)
         
