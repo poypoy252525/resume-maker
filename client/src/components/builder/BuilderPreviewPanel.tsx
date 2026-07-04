@@ -38,7 +38,7 @@ export default function BuilderPreviewPanel() {
   const compileError = useResumeStore((state) => state.compileError);
   const compilePdf = useResumeStore((state) => state.compilePdf);
 
-  const [activeTab, setActiveTab] = useState<PreviewTab>("web");
+  const [activeTab, setActiveTab] = useState<PreviewTab>("pdf");
   // Track what data snapshot was last compiled so we only re-compile on real changes
   const lastCompiledRef = useRef<string>("");
 
