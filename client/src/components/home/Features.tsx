@@ -31,6 +31,17 @@ export default function Features() {
   const [activeTemplate, setActiveTemplate] = useState<"modern" | "classic" | "minimal">("modern");
   const [score, setScore] = useState(55);
 
+  // Listen for external trigger to show preview demo
+  useEffect(() => {
+    const handleShowPreview = () => {
+      setActiveFeature("templates");
+    };
+    window.addEventListener("show-preview-demo", handleShowPreview);
+    return () => {
+      window.removeEventListener("show-preview-demo", handleShowPreview);
+    };
+  }, []);
+
   // Auto-animate score when review tab is selected
   useEffect(() => {
     if (activeFeature === "review") {
@@ -121,7 +132,7 @@ export default function Features() {
   ];
 
   return (
-    <section className="py-24 bg-slate-50/50 dark:bg-slate-900/30 border-b border-white/5 relative">
+    <section id="interactive-demo" className="py-24 bg-slate-50/50 dark:bg-slate-900/30 border-b border-white/5 relative">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-20 space-y-4">

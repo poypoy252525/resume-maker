@@ -44,6 +44,14 @@ export default function Hero() {
       });
   }, []);
 
+  const handleLivePreviewClick = () => {
+    window.dispatchEvent(new CustomEvent("show-preview-demo"));
+    const demoElement = document.getElementById("interactive-demo");
+    if (demoElement) {
+      demoElement.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <section className="relative pt-14 pb-32 overflow-hidden">
       <div className="container mx-auto px-4 relative z-10">
@@ -71,7 +79,12 @@ export default function Hero() {
                 Build My Resume
               </Link>
             </Button>
-            <Button variant="outline" size="lg" className="h-16 px-10 text-xl">
+            <Button 
+              variant="outline" 
+              size="lg" 
+              className="h-16 px-10 text-xl"
+              onClick={handleLivePreviewClick}
+            >
               <FileText className="w-6 h-6" />
               Live Preview
             </Button>
