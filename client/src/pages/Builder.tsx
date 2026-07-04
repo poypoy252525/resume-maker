@@ -65,6 +65,7 @@ export default function Builder() {
   }, [error]);
 
   const selectTemplate = (template: ResumeTemplateId) => {
+    handleReset();
     setFormData({ template });
     setShowTemplatePicker(false);
   };
