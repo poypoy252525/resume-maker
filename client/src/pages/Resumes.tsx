@@ -23,7 +23,7 @@ type SortKey = "updated_at" | "score" | "title";
 type TabFilter = "all" | "favorites" | "draft" | "completed";
 
 export default function Resumes() {
-  const { resumes, isLoading, toggleFavorite } = useResumes();
+  const { resumes, isLoading, toggleFavorite, deleteResume } = useResumes();
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("updated_at");
 
@@ -166,6 +166,7 @@ export default function Resumes() {
                       key={resume.id}
                       resume={resume}
                       onToggleFavorite={toggleFavorite}
+                      onDelete={deleteResume}
                     />
                   ))}
                 </div>

@@ -1,5 +1,5 @@
-import { useMemo } from "react";
-import { Link } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   FileText,
   Plus,
@@ -7,6 +7,8 @@ import {
   Clock,
   CheckCircle2,
   Edit2,
+  Trash2,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,86 +18,182 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useResumes } from "@/hooks/useResumes";
 import { formatRelativeTime, scoreColor, scoreBar } from "@/lib/utils";
 import type { ResumeResponse } from "@/api";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+  ContextMenuSeparator,
+} from "@/components/ui/context-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 function FavoriteCard({
   resume,
   onRemoveFavorite,
+  onDelete,
 }: {
   resume: ResumeResponse;
   onRemoveFavorite: (id: string, current: boolean) => void;
+  onDelete?: (id: string) => Promise<void>;
 }) {
   const status = resume.status.toLowerCase();
+  const navigate = useNavigate();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleConfirmDelete = async () => {
+    if (!onDelete) return;
+    setIsDeleting(true);
+    try {
+      await onDelete(resume.id);
+      toast.success("Resume deleted successfully");
+      setShowDeleteDialog(false);
+    } catch (error) {
+      toast.error("Failed to delete resume");
+      console.error(error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   return (
-    <Card className="border bg-card/60 hover:shadow-md transition-all duration-200 group">
-      <CardContent className="p-4">
-        <div className="flex items-center gap-4">
-          {/* Icon */}
-          <div className="shrink-0 size-11 rounded-xl bg-amber-500/10 flex items-center justify-center">
-            <FileText className="size-5 text-amber-500" />
-          </div>
+    <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+      <ContextMenu>
+        <ContextMenuTrigger asChild>
+          <Card className="border bg-card/60 hover:shadow-md transition-all duration-200 group">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-4">
+                {/* Icon */}
+                <div className="shrink-0 size-11 rounded-xl bg-amber-500/10 flex items-center justify-center">
+                  <FileText className="size-5 text-amber-500" />
+                </div>
 
-          {/* Info */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <p className="font-semibold text-sm truncate">{resume.title}</p>
-              <Badge
-                variant={status === "completed" ? "default" : "secondary"}
-                className="text-[10px] px-1.5 py-0 shrink-0"
-              >
-                {status === "completed" ? (
-                  <span className="flex items-center gap-1">
-                    <CheckCircle2 className="size-3" /> Done
-                  </span>
-                ) : status === "processing" ? (
-                  "Processing"
-                ) : (
-                  "Draft"
-                )}
-              </Badge>
-            </div>
-            <div className="flex items-center gap-3 mt-2">
-              <div className="flex-1">
-                <Progress
-                  value={resume.score}
-                  className={`h-1.5 ${scoreBar(resume.score)}`}
-                />
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="font-semibold text-sm truncate">{resume.title}</p>
+                    <Badge
+                      variant={status === "completed" ? "default" : "secondary"}
+                      className="text-[10px] px-1.5 py-0 shrink-0"
+                    >
+                      {status === "completed" ? (
+                        <span className="flex items-center gap-1">
+                          <CheckCircle2 className="size-3" /> Done
+                        </span>
+                      ) : status === "processing" ? (
+                        "Processing"
+                      ) : (
+                        "Draft"
+                      )}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center gap-3 mt-2">
+                    <div className="flex-1">
+                      <Progress
+                        value={resume.score}
+                        className={`h-1.5 ${scoreBar(resume.score)}`}
+                      />
+                    </div>
+                    <span className={`text-xs font-bold shrink-0 ${scoreColor(resume.score)}`}>
+                      {resume.score}/100
+                    </span>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="shrink-0 flex flex-col items-end gap-2">
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => onRemoveFavorite(resume.id, resume.is_favorite)}
+                      className="p-1.5 rounded-lg transition-colors hover:bg-muted text-amber-500"
+                      aria-label="Remove from favorites"
+                    >
+                      <Star className="size-4 fill-amber-500" />
+                    </button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      asChild
+                      className="h-7 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Link to={`/create?id=${resume.id}`}>
+                        <Edit2 className="size-3 mr-1" /> Edit
+                      </Link>
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground flex items-center gap-1">
+                    <Clock className="size-3" />
+                    {formatRelativeTime(resume.updated_at)}
+                  </p>
+                </div>
               </div>
-              <span className={`text-xs font-bold shrink-0 ${scoreColor(resume.score)}`}>
-                {resume.score}/100
-              </span>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
+        </ContextMenuTrigger>
+        <ContextMenuContent className="w-48">
+          <ContextMenuItem onClick={() => navigate(`/create?id=${resume.id}`)}>
+            <Edit2 className="size-4 mr-2" />
+            Edit Resume
+          </ContextMenuItem>
+          <ContextMenuItem onClick={() => onRemoveFavorite(resume.id, resume.is_favorite)}>
+            <Star className={`size-4 mr-2 ${resume.is_favorite ? "fill-amber-500 text-amber-500" : ""}`} />
+            {resume.is_favorite ? "Remove Favorite" : "Make Favorite"}
+          </ContextMenuItem>
+          {onDelete && (
+            <>
+              <ContextMenuSeparator />
+              <ContextMenuItem
+                variant="destructive"
+                onClick={() => setShowDeleteDialog(true)}
+              >
+                <Trash2 className="size-4 mr-2" />
+                Delete Resume
+              </ContextMenuItem>
+            </>
+          )}
+        </ContextMenuContent>
+      </ContextMenu>
 
-          {/* Actions */}
-          <div className="shrink-0 flex flex-col items-end gap-2">
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => onRemoveFavorite(resume.id, resume.is_favorite)}
-                className="p-1.5 rounded-lg transition-colors hover:bg-muted text-amber-500"
-                aria-label="Remove from favorites"
-              >
-                <Star className="size-4 fill-amber-500" />
-              </button>
-              <Button
-                variant="ghost"
-                size="sm"
-                asChild
-                className="h-7 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <Link to={`/create?id=${resume.id}`}>
-                  <Edit2 className="size-3 mr-1" /> Edit
-                </Link>
-              </Button>
-            </div>
-            <p className="text-xs text-muted-foreground flex items-center gap-1">
-              <Clock className="size-3" />
-              {formatRelativeTime(resume.updated_at)}
-            </p>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Delete Resume</DialogTitle>
+          <DialogDescription>
+            Are you sure you want to delete "{resume.title}"? This action cannot be undone.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="flex sm:justify-end gap-2 pt-4">
+          <Button
+            variant="outline"
+            onClick={() => setShowDeleteDialog(false)}
+            disabled={isDeleting}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={handleConfirmDelete}
+            disabled={isDeleting}
+          >
+            {isDeleting ? (
+              <>
+                <Loader2 className="size-4 mr-2 animate-spin" />
+                Deleting...
+              </>
+            ) : (
+              "Delete"
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -117,7 +215,7 @@ function FavoriteSkeleton() {
 }
 
 export default function Favorites() {
-  const { resumes, isLoading, toggleFavorite } = useResumes();
+  const { resumes, isLoading, toggleFavorite, deleteResume } = useResumes();
 
   const favorites = useMemo(
     () => resumes.filter((r) => r.is_favorite),
@@ -168,6 +266,7 @@ export default function Favorites() {
               key={resume.id}
               resume={resume}
               onRemoveFavorite={toggleFavorite}
+              onDelete={deleteResume}
             />
           ))
         )}
@@ -175,3 +274,4 @@ export default function Favorites() {
     </div>
   );
 }
+

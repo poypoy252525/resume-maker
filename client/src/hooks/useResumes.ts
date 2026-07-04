@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { fetchResumes, toggleFavoriteResume } from "@/api";
+import { fetchResumes, toggleFavoriteResume, deleteResume } from "@/api";
 import type { ResumeResponse } from "@/api";
 
 export function useResumes() {
@@ -42,5 +42,27 @@ export function useResumes() {
     []
   );
 
-  return { resumes, isLoading, error, refetch: load, toggleFavorite };
+  const removeResume = useCallback(
+    async (id: string) => {
+      // Keep copy for fallback
+      let deletedResume: ResumeResponse | undefined;
+      setResumes((prev) => {
+        deletedResume = prev.find((r) => r.id === id);
+        return prev.filter((r) => r.id !== id);
+      });
+      try {
+        await deleteResume(id);
+      } catch (err) {
+        // Revert on failure
+        if (deletedResume) {
+          setResumes((prev) => [...prev, deletedResume!]);
+        }
+        throw err;
+      }
+    },
+    []
+  );
+
+  return { resumes, isLoading, error, refetch: load, toggleFavorite, deleteResume: removeResume };
 }
+

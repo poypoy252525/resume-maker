@@ -311,6 +311,19 @@ export const updateResume = async (id: string, title: string, data: ResumeData):
   return response.json();
 };
 
+export const deleteResume = async (id: string): Promise<void> => {
+  const response = await fetch(`${API_BASE_URL}/resumes/${id}/`, {
+    method: "DELETE",
+    headers: {
+      ...getAuthHeaders(),
+    },
+  });
+  if (!response.ok) {
+    throw new Error("Failed to delete resume");
+  }
+};
+
+
 export interface PublicStatsResponse {
   resumes_built: number;
   success_rate: number;

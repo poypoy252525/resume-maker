@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   FileText,
   Plus,
@@ -12,6 +12,9 @@ import {
   Star,
   Download,
   Brain,
+  Edit2,
+  Trash2,
+  Loader2,
 } from "lucide-react";
 import { formatRelativeTime, getActivityDetails, scoreColor, scoreBar } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -25,8 +28,24 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useAuthStore } from "@/store/useAuthStore";
-import { fetchResumes, fetchActivities } from "@/api";
+import { fetchResumes, fetchActivities, deleteResume, toggleFavoriteResume } from "@/api";
 import type { ResumeResponse, ActivityResponse } from "@/api";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+  ContextMenuSeparator,
+} from "@/components/ui/context-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 
 const tips = [
@@ -39,10 +58,54 @@ const tips = [
 export default function Dashboard() {
   const { user } = useAuthStore();
   const firstName = user?.name?.split(" ")[0] ?? "there";
+  const navigate = useNavigate();
 
   const [resumes, setResumes] = useState<ResumeResponse[]>([]);
   const [activities, setActivities] = useState<ActivityResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const [selectedResume, setSelectedResume] = useState<ResumeResponse | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDeleteClick = (resume: ResumeResponse) => {
+    setSelectedResume(resume);
+    setShowDeleteDialog(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedResume) return;
+    setIsDeleting(true);
+    try {
+      await deleteResume(selectedResume.id);
+      setResumes((prev) => prev.filter((r) => r.id !== selectedResume.id));
+      toast.success("Resume deleted successfully");
+      setShowDeleteDialog(false);
+      const activitiesData = await fetchActivities();
+      setActivities(activitiesData);
+    } catch (error) {
+      toast.error("Failed to delete resume");
+      console.error(error);
+    } finally {
+      setIsDeleting(false);
+      setSelectedResume(null);
+    }
+  };
+
+  const handleToggleFavorite = async (resume: ResumeResponse) => {
+    setResumes((prev) =>
+      prev.map((r) => (r.id === resume.id ? { ...r, is_favorite: !resume.is_favorite } : r))
+    );
+    try {
+      await toggleFavoriteResume(resume.id, !resume.is_favorite);
+      toast.success(resume.is_favorite ? "Removed from favorites" : "Added to favorites");
+    } catch {
+      setResumes((prev) =>
+        prev.map((r) => (r.id === resume.id ? { ...r, is_favorite: resume.is_favorite } : r))
+      );
+      toast.error("Failed to update favorite status");
+    }
+  };
 
   useEffect(() => {
     const loadDashboardData = async () => {
@@ -218,74 +281,96 @@ export default function Dashboard() {
               </div>
             ) : (
               resumes.slice(0, 5).map((resume) => (
-                <Card
-                  key={resume.id}
-                  className="border bg-card/60 hover:shadow-md transition-all duration-200 group cursor-pointer"
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-4">
-                      {/* Icon */}
-                      <div className="shrink-0 size-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <FileText className="size-5 text-primary" />
-                      </div>
-
-                      {/* Info */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <p className="font-semibold truncate text-sm">
-                            {resume.title}
-                          </p>
-                          <Badge
-                            variant={
-                              resume.status.toLowerCase() === "completed"
-                                ? "default"
-                                : "secondary"
-                            }
-                            className="text-[10px] px-1.5 py-0"
-                          >
-                            {resume.status.toLowerCase() === "completed" ? (
-                              <span className="flex items-center gap-1">
-                                <CheckCircle2 className="size-3" /> Done
-                              </span>
-                            ) : resume.status.toLowerCase() === "processing" ? (
-                              "Processing"
-                            ) : (
-                              "Draft"
-                            )}
-                          </Badge>
-                        </div>
-                        <div className="flex items-center gap-3 mt-1.5">
-                          <div className="flex-1">
-                            <Progress
-                              value={resume.score}
-                              className={`h-1.5 ${scoreBar(resume.score)}`}
-                            />
+                <ContextMenu key={resume.id}>
+                  <ContextMenuTrigger asChild>
+                    <Card
+                      className="border bg-card/60 hover:shadow-md transition-all duration-200 group cursor-pointer"
+                      onClick={() => navigate(`/create?id=${resume.id}`)}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-4">
+                          {/* Icon */}
+                          <div className="shrink-0 size-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                            <FileText className="size-5 text-primary" />
                           </div>
-                          <span
-                            className={`text-xs font-bold ${scoreColor(resume.score)}`}
-                          >
-                            {resume.score}/100
-                          </span>
-                        </div>
-                      </div>
 
-                      {/* Meta */}
-                      <div className="shrink-0 text-right">
-                        <p className="text-xs text-muted-foreground flex items-center gap-1">
-                          <Clock className="size-3" /> {formatRelativeTime(resume.updated_at)}
-                        </p>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          asChild
-                          className="mt-1 h-7 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <Link to={`/create?id=${resume.id}`}>Edit</Link>
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                          {/* Info */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <p className="font-semibold truncate text-sm">
+                                {resume.title}
+                              </p>
+                              <Badge
+                                variant={
+                                  resume.status.toLowerCase() === "completed"
+                                    ? "default"
+                                    : "secondary"
+                                }
+                                className="text-[10px] px-1.5 py-0"
+                              >
+                                {resume.status.toLowerCase() === "completed" ? (
+                                  <span className="flex items-center gap-1">
+                                    <CheckCircle2 className="size-3" /> Done
+                                  </span>
+                                ) : resume.status.toLowerCase() === "processing" ? (
+                                  "Processing"
+                                ) : (
+                                  "Draft"
+                                )}
+                              </Badge>
+                            </div>
+                            <div className="flex items-center gap-3 mt-1.5">
+                              <div className="flex-1">
+                                <Progress
+                                  value={resume.score}
+                                  className={`h-1.5 ${scoreBar(resume.score)}`}
+                                />
+                              </div>
+                              <span
+                                className={`text-xs font-bold ${scoreColor(resume.score)}`}
+                              >
+                                {resume.score}/100
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Meta */}
+                          <div className="shrink-0 text-right" onClick={(e) => e.stopPropagation()}>
+                            <p className="text-xs text-muted-foreground flex items-center gap-1">
+                              <Clock className="size-3" /> {formatRelativeTime(resume.updated_at)}
+                            </p>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              asChild
+                              className="mt-1 h-7 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <Link to={`/create?id=${resume.id}`}>Edit</Link>
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </ContextMenuTrigger>
+                  <ContextMenuContent className="w-48">
+                    <ContextMenuItem onClick={() => navigate(`/create?id=${resume.id}`)}>
+                      <Edit2 className="size-4 mr-2" />
+                      Edit Resume
+                    </ContextMenuItem>
+                    <ContextMenuItem onClick={() => handleToggleFavorite(resume)}>
+                      <Star className={`size-4 mr-2 ${resume.is_favorite ? "fill-amber-500 text-amber-500" : ""}`} />
+                      {resume.is_favorite ? "Remove Favorite" : "Make Favorite"}
+                    </ContextMenuItem>
+                    <ContextMenuSeparator />
+                    <ContextMenuItem
+                      variant="destructive"
+                      onClick={() => handleDeleteClick(resume)}
+                    >
+                      <Trash2 className="size-4 mr-2" />
+                      Delete Resume
+                    </ContextMenuItem>
+                  </ContextMenuContent>
+                </ContextMenu>
               ))
             )}
           </div>
@@ -393,6 +478,40 @@ export default function Dashboard() {
           </Card>
         </div>
       </section>
+
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete Resume</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete "{selectedResume?.title}"? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex sm:justify-end gap-2 pt-4">
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteDialog(false)}
+              disabled={isDeleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmDelete}
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="size-4 mr-2 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

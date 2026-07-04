@@ -30,6 +30,19 @@ class ResumeViewSet(viewsets.ModelViewSet):
             sub="Started a new resume draft"
         )
 
+    def perform_destroy(self, instance):
+        title = instance.title
+        if instance.file:
+            instance.file.delete(save=False)
+        instance.delete()
+        Activity.objects.create(
+            user=self.request.user,
+            activity_type='delete',
+            label=f"Deleted {title}",
+            sub="Removed resume from workspace"
+        )
+
+
     @action(detail=False, methods=['post'], url_path='generate')
     def generate_no_id(self, request):
         # Use ResumeDataSerializer to validate the JSON data directly from request
