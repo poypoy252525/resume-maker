@@ -51,7 +51,6 @@ export default function Builder() {
         loadResume(id);
       }
     } else {
-      setShowTemplatePicker(true);
       if (resumeId !== null) {
         handleReset();
       }

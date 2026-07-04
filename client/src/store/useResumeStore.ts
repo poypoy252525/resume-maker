@@ -449,6 +449,7 @@ export const useResumeStore = create<ResumeState>()(
             resumeId: res.id,
             resumeTitle: res.title,
             showTemplatePicker: false,
+            step: 1,
             formData: {
               ...initialFormData,
               ...res.data,
@@ -586,6 +587,8 @@ export const useResumeStore = create<ResumeState>()(
         formData: state.formData,
         resumeId: state.resumeId,
         resumeTitle: state.resumeTitle,
+        showTemplatePicker: state.showTemplatePicker,
+        step: state.step,
       }),
     },
   ),
