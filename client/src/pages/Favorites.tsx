@@ -9,6 +9,7 @@ import {
   Edit2,
   Trash2,
   Loader2,
+  MoreVertical,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -25,6 +26,13 @@ import {
   ContextMenuTrigger,
   ContextMenuSeparator,
 } from "@/components/ui/context-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import {
   Dialog,
   DialogContent,
@@ -128,6 +136,38 @@ function FavoriteCard({
                         <Edit2 className="size-3 mr-1" /> Edit
                       </Link>
                     </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button
+                          className="p-1.5 rounded-lg transition-colors hover:bg-muted text-muted-foreground/60 hover:text-foreground md:opacity-0 md:group-hover:opacity-100 focus:opacity-100"
+                          aria-label="More options"
+                        >
+                          <MoreVertical className="size-4" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-40">
+                        <DropdownMenuItem onClick={() => navigate(`/create?id=${resume.id}`)}>
+                          <Edit2 className="size-4 mr-2" />
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => onRemoveFavorite(resume.id, resume.is_favorite)}>
+                          <Star className={`size-4 mr-2 ${resume.is_favorite ? "fill-amber-500 text-amber-500" : ""}`} />
+                          {resume.is_favorite ? "Unfavorite" : "Favorite"}
+                        </DropdownMenuItem>
+                        {onDelete && (
+                          <>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              variant="destructive"
+                              onClick={() => setShowDeleteDialog(true)}
+                            >
+                              <Trash2 className="size-4 mr-2" />
+                              Delete
+                            </DropdownMenuItem>
+                          </>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                   <p className="text-xs text-muted-foreground flex items-center gap-1">
                     <Clock className="size-3" />

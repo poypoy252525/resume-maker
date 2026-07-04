@@ -15,6 +15,7 @@ import {
   Edit2,
   Trash2,
   Loader2,
+  MoreVertical,
 } from "lucide-react";
 import { formatRelativeTime, getActivityDetails, scoreColor, scoreBar } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -37,6 +38,13 @@ import {
   ContextMenuTrigger,
   ContextMenuSeparator,
 } from "@/components/ui/context-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import {
   Dialog,
   DialogContent,
@@ -335,18 +343,48 @@ export default function Dashboard() {
                           </div>
 
                           {/* Meta */}
-                          <div className="shrink-0 text-right" onClick={(e) => e.stopPropagation()}>
-                            <p className="text-xs text-muted-foreground flex items-center gap-1">
-                              <Clock className="size-3" /> {formatRelativeTime(resume.updated_at)}
-                            </p>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              asChild
-                              className="mt-1 h-7 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                            >
-                              <Link to={`/create?id=${resume.id}`}>Edit</Link>
-                            </Button>
+                          <div className="shrink-0 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                            <div className="text-right">
+                              <p className="text-xs text-muted-foreground flex items-center gap-1 justify-end">
+                                <Clock className="size-3" /> {formatRelativeTime(resume.updated_at)}
+                              </p>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                asChild
+                                className="mt-1 h-7 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                <Link to={`/create?id=${resume.id}`}>Edit</Link>
+                              </Button>
+                            </div>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <button
+                                  className="p-1.5 rounded-lg transition-colors hover:bg-muted text-muted-foreground/60 hover:text-foreground md:opacity-0 md:group-hover:opacity-100 focus:opacity-100 shrink-0"
+                                  aria-label="More options"
+                                >
+                                  <MoreVertical className="size-4" />
+                                </button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-40">
+                                <DropdownMenuItem onClick={() => navigate(`/create?id=${resume.id}`)}>
+                                  <Edit2 className="size-4 mr-2" />
+                                  Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleToggleFavorite(resume)}>
+                                  <Star className={`size-4 mr-2 ${resume.is_favorite ? "fill-amber-500 text-amber-500" : ""}`} />
+                                  {resume.is_favorite ? "Unfavorite" : "Favorite"}
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                  variant="destructive"
+                                  onClick={() => handleDeleteClick(resume)}
+                                >
+                                  <Trash2 className="size-4 mr-2" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </div>
                         </div>
                       </CardContent>
