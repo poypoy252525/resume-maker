@@ -359,5 +359,26 @@ export const tailorResume = async (
   return response.json();
 };
 
+export const importResumePdf = async (file: File): Promise<ResumeData> => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await fetch(`${API_BASE_URL}/resumes/import-pdf/`, {
+    method: "POST",
+    headers: {
+      ...getAuthHeaders(),
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to parse PDF resume");
+  }
+
+  return response.json();
+};
+
+
 
 

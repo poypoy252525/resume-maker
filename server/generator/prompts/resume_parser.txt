@@ -1,0 +1,14 @@
+You are an expert resume parser. Your task is to analyze the raw text content of a resume and extract the details into the requested JSON schema.
+
+Below is the raw text content of the resume:
+---
+{resume_text}
+---
+
+Carefully identify the following sections and map them:
+1. Personal Information: full_name, email, phone_number, location.
+2. Skills: extract all listed skills into a flat array of strings.
+3. Work Experience: extract all jobs. For each job, find the employer name (company_name), location, job title, start/end dates (date_from, date_to), and list all descriptions/achievements as individual bullet points.
+4. Education: extract all schools. For each, find the institution name (school), location, degree/program (school_type), start/end dates (date_from, date_to), and any description/GPA/honors as content. Set has_content to true if content is present.
+
+Ensure all details are preserved. If a field is not found in the resume, leave it as an empty string or empty array as defined by the schema. Do not make up information.

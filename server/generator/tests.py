@@ -194,5 +194,52 @@ class AITailorTestCase(TestCase):
         )
 
 
+class ResumeImportTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="password")
+        from rest_framework.authtoken.models import Token
+        self.token = Token.objects.create(user=self.user)
+
+    @patch('generator.views.AIService')
+    @patch('pypdf.PdfReader')
+    def test_import_pdf_success(self, mock_pdf_reader, mock_ai_service_class):
+        # Configure PdfReader mock pages
+        mock_pages = []
+        mock_page = type('MockPage', (), {})()
+        mock_page.extract_text = lambda: "John Doe\nSoftware Engineer\nPython, Django"
+        mock_pages.append(mock_page)
+        
+        mock_pdf_reader.return_value.pages = mock_pages
+        
+        # Configure AIService mock
+        mock_instance = mock_ai_service_class.return_value
+        mock_instance.parse_resume_text.return_value = {
+            "full_name": "John Doe",
+            "email": "",
+            "phone_number": "",
+            "location": "",
+            "has_skill": True,
+            "skills": ["Python", "Django"],
+            "experiences": [],
+            "educations": []
+        }
+
+        # Create dummy PDF file
+        import io
+        dummy_pdf = io.BytesIO(b"%PDF-1.4 dummy content")
+        dummy_pdf.name = "test_resume.pdf"
+
+        url = reverse('resume-import-pdf')
+        response = self.client.post(
+            url,
+            {"file": dummy_pdf},
+            HTTP_AUTHORIZATION=f"Token {self.token.key}"
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["full_name"], "John Doe")
+        self.assertEqual(response.json()["skills"], ["Python", "Django"])
+
+
+
 
 

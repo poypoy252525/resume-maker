@@ -148,6 +148,48 @@ class ResumeViewSet(viewsets.ModelViewSet):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    @action(detail=False, methods=['post'], url_path='import-pdf')
+    def import_pdf(self, request):
+        file_obj = request.FILES.get('file')
+        if not file_obj:
+            return Response({"error": "No file uploaded."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not file_obj.name.lower().endswith('.pdf'):
+            return Response({"error": "Only PDF files are supported."}, status=status.HTTP_400_BAD_REQUEST)
+            
+        try:
+            import io
+            from pypdf import PdfReader
+            
+            pdf_bytes = file_obj.read()
+            reader = PdfReader(io.BytesIO(pdf_bytes))
+            text = ""
+            for page in reader.pages:
+                page_text = page.extract_text()
+                if page_text:
+                    text += page_text + "\n"
+            
+            if not text.strip():
+                return Response({
+                    "error": "Could not extract any text from the PDF. Please make sure the PDF contains selectable text (is not a scanned image)."
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            ai_service = AIService()
+            parsed_data = ai_service.parse_resume_text(text)
+            
+            # Log Activity if authenticated
+            if request.user.is_authenticated:
+                Activity.objects.create(
+                    user=request.user,
+                    activity_type='create',
+                    label=f"Imported resume from PDF",
+                    sub=f"Extracted details from {file_obj.name}"
+                )
+                
+            return Response(parsed_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 class ResumeStatusView(APIView):
     def get(self, request, task_id, file_format='pdf', *args, **kwargs):
         res = AsyncResult(str(task_id))

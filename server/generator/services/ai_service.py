@@ -48,7 +48,38 @@ class TailoredResume(BaseModel):
     tailored_experiences: List[TailoredExperience] = Field(..., description="List of tailored experience objects, one for each experience containing bullet points.")
     skills_to_add: List[str] = Field(..., description="Suggested skills from the job description that are missing from the resume.")
 
+class ParsedExperience(BaseModel):
+    company_name: str = Field(default="", description="Name of the company/employer.")
+    location: str = Field(default="", description="City and state/country of the job.")
+    job_title: str = Field(default="", description="Job title/role.")
+    date_from: str = Field(default="", description="Start date (e.g., 'Jan 2020').")
+    date_to: str = Field(default="", description="End date (e.g., 'Present' or 'Dec 2022').")
+    bullet_points: List[str] = Field(default_factory=list, description="List of achievements/duties as bullet points.")
+
+class ParsedEducation(BaseModel):
+    school: str = Field(default="", description="Name of the school/university.")
+    location: str = Field(default="", description="City and state/country of the school.")
+    school_type: str = Field(default="", description="Degree, certificate or program (e.g., 'B.S. in Computer Science').")
+    date_from: str = Field(default="", description="Start date (e.g., '2016').")
+    date_to: str = Field(default="", description="End date (e.g., '2020').")
+    has_content: bool = Field(default=False, description="Set to True if there are bullet points/details.")
+    content: str = Field(default="", description="Details, GPA, honors, or description of study.")
+
+class ParsedResume(BaseModel):
+    full_name: str = Field(default="", description="Candidate's full name.")
+    email: str = Field(default="", description="Candidate's email address.")
+    phone_number: str = Field(default="", description="Candidate's phone number.")
+    location: str = Field(default="", description="Candidate's location (city, state/country).")
+    has_skill: bool = Field(default=True, description="Should be True if skills are present.")
+    skill_description: str = Field(default="", description="A short summary of skills.")
+    skills: List[str] = Field(default_factory=list, description="List of skills.")
+    has_experience: bool = Field(default=True, description="Should be True if experiences are present.")
+    experiences: List[ParsedExperience] = Field(default_factory=list, description="List of work experiences.")
+    has_education: bool = Field(default=True, description="Should be True if educations are present.")
+    educations: List[ParsedEducation] = Field(default_factory=list, description="List of educations.")
+
 # --- Core Agent ---
+
 
 class AIAgent:
     """
@@ -118,6 +149,8 @@ class AIService:
         self.reviewer = AIAgent('resume_reviewer.txt', ResumeReview, temperature=0.3)
         self.summary_recommender = AIAgent('summary_generator.txt', SummaryRecommendation, temperature=0.5)
         self.tailor_recommender = AIAgent('tailor_resume.txt', TailoredResume, temperature=0.3)
+        self.resume_parser = AIAgent('resume_parser.txt', ParsedResume, temperature=0.1)
+
 
     def evaluate_ats(self, resume_data: dict, job_description: str) -> dict:
         return self.ats_evaluator.generate(
@@ -166,3 +199,9 @@ class AIService:
             target_role=target_role,
             job_description=job_description
         )
+
+    def parse_resume_text(self, resume_text: str) -> dict:
+        return self.resume_parser.generate(
+            resume_text=resume_text
+        )
+

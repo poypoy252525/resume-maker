@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { ResumeData, AIFeedback, TailoredResumeResult } from "@/api";
 import { useAuthStore } from "./useAuthStore";
+import { toast } from "sonner";
 import {
   generateResume,
   checkTaskStatus,
@@ -15,7 +16,9 @@ import {
   createResume,
   updateResume,
   tailorResume,
+  importResumePdf,
 } from "@/api";
+
 
 interface ResumeState {
   // Data
@@ -38,6 +41,7 @@ interface ResumeState {
   fileUrl: string | null;
   status: string;
   error: string | null;
+  isImporting: boolean;
   isReviewModalOpen: boolean;
   isAIAnalyzing: boolean;
   showTemplatePicker: boolean;
@@ -71,6 +75,8 @@ interface ResumeState {
   handleReset: () => void;
   loadResume: (id: string) => Promise<void>;
   saveResume: () => Promise<string | null>;
+  importResume: (file: File) => Promise<void>;
+
 
   // Helpers
   pollTask: <T>(
@@ -125,6 +131,8 @@ export const useResumeStore = create<ResumeState>()(
       isTailoring: false,
       isTailorModalOpen: false,
       tailorResult: null,
+      isImporting: false,
+
 
       // Actions
       setShowTemplatePicker: (show) => set({ showTemplatePicker: show }),
@@ -456,6 +464,32 @@ export const useResumeStore = create<ResumeState>()(
           set({ isSaving: false });
         }
       },
+
+      importResume: async (file: File) => {
+        set({ isImporting: true, error: null });
+        try {
+          const parsedData = await importResumePdf(file);
+          set({
+            formData: {
+              ...initialFormData,
+              ...parsedData,
+              template: get().formData.template || "modern",
+            },
+            showTemplatePicker: false,
+            step: 1,
+            resumeTitle: parsedData.full_name ? `${parsedData.full_name}'s Resume` : "Imported Resume",
+          });
+          toast.success("Resume details extracted successfully!");
+        } catch (err: any) {
+          const errMsg = err.message || "Failed to parse resume PDF.";
+          set({ error: errMsg });
+          toast.error(errMsg);
+          throw err;
+        } finally {
+          set({ isImporting: false });
+        }
+      },
+
     }),
     {
       name: "resume-storage",
