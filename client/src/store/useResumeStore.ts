@@ -548,7 +548,7 @@ export const useResumeStore = create<ResumeState>()(
           }
         }
         
-        set({ loading: true, error: null });
+        set({ error: null });
         try {
           const res = await uploadResumePhoto(activeId, file);
           set((state) => ({
@@ -562,8 +562,6 @@ export const useResumeStore = create<ResumeState>()(
         } catch (err: unknown) {
           set({ error: (err as Error).message || "Failed to upload photo" });
           toast.error((err as Error).message || "Failed to upload photo");
-        } finally {
-          set({ loading: false });
         }
       },
 
@@ -571,7 +569,7 @@ export const useResumeStore = create<ResumeState>()(
         const { resumeId, saveResume } = get();
         if (!resumeId) return;
         
-        set({ loading: true, error: null });
+        set({ error: null });
         try {
           await deleteResumePhoto(resumeId);
           set((state) => ({
@@ -585,8 +583,6 @@ export const useResumeStore = create<ResumeState>()(
         } catch (err: unknown) {
           set({ error: (err as Error).message || "Failed to delete photo" });
           toast.error((err as Error).message || "Failed to delete photo");
-        } finally {
-          set({ loading: false });
         }
       },
 
