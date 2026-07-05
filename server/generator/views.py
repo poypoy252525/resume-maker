@@ -34,6 +34,8 @@ class ResumeViewSet(viewsets.ModelViewSet):
         title = instance.title
         if instance.file:
             instance.file.delete(save=False)
+        if instance.photo:
+            instance.photo.delete(save=False)
         instance.delete()
         Activity.objects.create(
             user=self.request.user,
@@ -42,6 +44,36 @@ class ResumeViewSet(viewsets.ModelViewSet):
             sub="Removed resume from workspace"
         )
 
+    @action(detail=True, methods=['post', 'delete'], url_path='upload-photo')
+    def upload_photo(self, request, pk=None):
+        resume = self.get_object()
+        
+        if request.method == 'DELETE':
+            if resume.photo:
+                resume.photo.delete(save=True)
+            if isinstance(resume.data, dict) and 'photo' in resume.data:
+                resume.data['photo'] = ""
+                resume.save()
+            return Response({"message": "Photo removed successfully."}, status=status.HTTP_200_OK)
+            
+        file_obj = request.FILES.get('photo')
+        if not file_obj:
+            return Response({"error": "No image file provided."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if resume.photo:
+            resume.photo.delete(save=False)
+            
+        resume.photo = file_obj
+        resume.save()
+        
+        photo_url = request.build_absolute_uri(resume.photo.url)
+        if isinstance(resume.data, dict):
+            resume.data['photo'] = photo_url
+            resume.save()
+            
+        return Response({
+            "photo_url": photo_url
+        }, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['post'], url_path='generate')
     def generate_no_id(self, request):

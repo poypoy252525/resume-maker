@@ -17,6 +17,8 @@ import {
   updateResume,
   tailorResume,
   importResumePdf,
+  uploadResumePhoto,
+  deleteResumePhoto,
 } from "@/api";
 
 
@@ -76,6 +78,8 @@ interface ResumeState {
   loadResume: (id: string) => Promise<void>;
   saveResume: () => Promise<string | null>;
   importResume: (file: File) => Promise<void>;
+  uploadPhoto: (file: File) => Promise<void>;
+  deletePhoto: () => Promise<void>;
 
 
   // Helpers
@@ -98,6 +102,7 @@ const initialFormData: ResumeData = {
   email: "",
   phone_number: "",
   location: "",
+  photo: "",
   has_skill: true,
   skill_description: "",
   skills: [],
@@ -528,6 +533,60 @@ export const useResumeStore = create<ResumeState>()(
           throw err;
         } finally {
           set({ isImporting: false });
+        }
+      },
+
+      uploadPhoto: async (file: File) => {
+        const { resumeId, saveResume } = get();
+        
+        let activeId = resumeId;
+        if (!activeId) {
+          activeId = await saveResume();
+          if (!activeId) {
+            toast.error("Failed to create resume draft for photo upload.");
+            return;
+          }
+        }
+        
+        set({ loading: true, error: null });
+        try {
+          const res = await uploadResumePhoto(activeId, file);
+          set((state) => ({
+            formData: {
+              ...state.formData,
+              photo: res.photo_url,
+            },
+          }));
+          toast.success("Photo uploaded successfully!");
+          await saveResume();
+        } catch (err: unknown) {
+          set({ error: (err as Error).message || "Failed to upload photo" });
+          toast.error((err as Error).message || "Failed to upload photo");
+        } finally {
+          set({ loading: false });
+        }
+      },
+
+      deletePhoto: async () => {
+        const { resumeId, saveResume } = get();
+        if (!resumeId) return;
+        
+        set({ loading: true, error: null });
+        try {
+          await deleteResumePhoto(resumeId);
+          set((state) => ({
+            formData: {
+              ...state.formData,
+              photo: "",
+            },
+          }));
+          toast.success("Photo removed successfully!");
+          await saveResume();
+        } catch (err: unknown) {
+          set({ error: (err as Error).message || "Failed to delete photo" });
+          toast.error((err as Error).message || "Failed to delete photo");
+        } finally {
+          set({ loading: false });
         }
       },
 

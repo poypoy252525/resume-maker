@@ -309,6 +309,63 @@ class ResumePreviewDownloadActivityTestCase(TestCase):
         self.assertEqual(kwargs.get('is_preview'), True)
 
 
+class ResumePhotoTestCase(TestCase):
+    def setUp(self):
+        from rest_framework.authtoken.models import Token
+        self.user = User.objects.create_user(username="testuser", password="password")
+        self.token = Token.objects.create(user=self.user)
+        self.resume = Resume.objects.create(
+            user=self.user,
+            title="Photo Resume",
+            data={
+                "full_name": "Jane Doe",
+                "email": "jane@example.com",
+                "phone_number": "123",
+                "location": "SF",
+                "has_skill": False,
+                "has_experience": False,
+                "has_education": False
+            }
+        )
+
+    def test_upload_and_delete_photo(self):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        
+        # 1. Test POST upload
+        photo_file = SimpleUploadedFile(
+            "profile.gif",
+            b'\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\xff\xff\xff\x21\xf9\x04\x01\x00\x00\x00\x00\x2c\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3b',
+            content_type="image/gif"
+        )
+        
+        url = reverse('resume-upload-photo', kwargs={'pk': self.resume.id})
+        response = self.client.post(
+            url,
+            {'photo': photo_file},
+            HTTP_AUTHORIZATION=f"Token {self.token.key}"
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("photo_url", response.json())
+        
+        # Verify db model is updated
+        self.resume.refresh_from_db()
+        self.assertTrue(self.resume.photo)
+        self.assertIn(self.resume.photo.url, self.resume.data.get('photo', ''))
+        
+        # 2. Test DELETE removal
+        response_delete = self.client.delete(
+            url,
+            HTTP_AUTHORIZATION=f"Token {self.token.key}"
+        )
+        self.assertEqual(response_delete.status_code, 200)
+        
+        self.resume.refresh_from_db()
+        self.assertFalse(self.resume.photo)
+        self.assertEqual(self.resume.data.get('photo'), "")
+
+
+
 
 
 

@@ -43,6 +43,7 @@ export interface ResumeData {
   email: string;
   phone_number: string;
   location: string;
+  photo?: string;
   has_skill: boolean;
   skill_description: string;
   skills?: string[];
@@ -212,6 +213,7 @@ export interface ResumeResponse {
   title: string;
   data: ResumeData;
   file: string | null;
+  photo: string | null;
   status: string;
   score: number;
   is_favorite: boolean;
@@ -397,6 +399,40 @@ export const importResumePdf = async (file: File): Promise<ResumeData> => {
   }
 
   return response.json();
+};
+
+export const uploadResumePhoto = async (id: string, file: File): Promise<{ photo_url: string }> => {
+  const formData = new FormData();
+  formData.append("photo", file);
+
+  const response = await fetch(`${API_BASE_URL}/resumes/${id}/upload-photo/`, {
+    method: "POST",
+    headers: {
+      ...getAuthHeaders(),
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to upload photo");
+  }
+
+  return response.json();
+};
+
+export const deleteResumePhoto = async (id: string): Promise<void> => {
+  const response = await fetch(`${API_BASE_URL}/resumes/${id}/upload-photo/`, {
+    method: "DELETE",
+    headers: {
+      ...getAuthHeaders(),
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to delete photo");
+  }
 };
 
 

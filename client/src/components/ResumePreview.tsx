@@ -26,59 +26,76 @@ export default function ResumePreview({ data }: ResumePreviewProps) {
         {/* Header */}
         <header
           className={cn(
-            "text-left space-y-3",
-            isClassic && "text-center space-y-2",
-            isMinimal && "space-y-1.5"
+            "flex gap-6 items-start text-left",
+            isMinimal && "gap-4",
+            !data.photo && isClassic && "flex-col text-center space-y-2 justify-center items-center",
+            !data.photo && !isClassic && "flex-col text-left space-y-3",
+            data.photo && isClassic && "flex-row text-left space-y-0"
           )}
         >
-          <h1
-            className={cn(
-              "font-extrabold tracking-tight uppercase text-slate-900 truncate",
-              isClassic ? "text-3xl font-bold font-serif" : "text-4xl",
-              isMinimal ? "text-2xl normal-case" : ""
-            )}
-          >
-            {data.full_name || "Your Name"}
-          </h1>
+          <div className="flex-1 min-w-0 space-y-2">
+            <h1
+              className={cn(
+                "font-extrabold tracking-tight uppercase text-slate-900 truncate",
+                isClassic ? "text-3xl font-bold font-serif" : "text-4xl",
+                isMinimal ? "text-2xl normal-case" : ""
+              )}
+            >
+              {data.full_name || "Your Name"}
+            </h1>
 
-          {isClassic ? (
-            <div className="flex justify-center items-center gap-x-3 text-xs sm:text-sm text-slate-600 font-medium flex-wrap">
-              {data.email && <span>{data.email}</span>}
-              {data.email && (data.phone_number || data.location) && <span>•</span>}
-              {data.phone_number && <span>{data.phone_number}</span>}
-              {data.phone_number && data.location && <span>•</span>}
-              {data.location && <span>{data.location}</span>}
-            </div>
-          ) : isMinimal ? (
-            <div className="flex justify-start items-center gap-x-2 text-xs text-slate-600 font-medium flex-wrap">
-              {data.email && <span>{data.email}</span>}
-              {data.email && (data.phone_number || data.location) && <span className="opacity-55">|</span>}
-              {data.phone_number && <span>{data.phone_number}</span>}
-              {data.phone_number && data.location && <span className="opacity-55">|</span>}
-              {data.location && <span>{data.location}</span>}
-            </div>
-          ) : (
-            // Modern
-            <div className="flex flex-col justify-start gap-y-1 text-sm text-slate-600 font-medium">
-              {data.email && (
-                <div className="flex items-center gap-2">
-                  <Mail className="w-3.5 h-3.5" />
-                  {data.email}
-                </div>
+            {isClassic ? (
+              <div className={cn(
+                "flex items-center gap-x-3 text-xs sm:text-sm text-slate-600 font-medium flex-wrap",
+                !data.photo && "justify-center"
+              )}>
+                {data.email && <span>{data.email}</span>}
+                {data.email && (data.phone_number || data.location) && <span>•</span>}
+                {data.phone_number && <span>{data.phone_number}</span>}
+                {data.phone_number && data.location && <span>•</span>}
+                {data.location && <span>{data.location}</span>}
+              </div>
+            ) : isMinimal ? (
+              <div className="flex justify-start items-center gap-x-2 text-xs text-slate-600 font-medium flex-wrap">
+                {data.email && <span>{data.email}</span>}
+                {data.email && (data.phone_number || data.location) && <span className="opacity-55">|</span>}
+                {data.phone_number && <span>{data.phone_number}</span>}
+                {data.phone_number && data.location && <span className="opacity-55">|</span>}
+                {data.location && <span>{data.location}</span>}
+              </div>
+            ) : (
+              // Modern
+              <div className="flex flex-col justify-start gap-y-1 text-sm text-slate-600 font-medium">
+                {data.email && (
+                  <div className="flex items-center gap-2">
+                    <Mail className="w-3.5 h-3.5" />
+                    {data.email}
+                  </div>
+                )}
+                {data.phone_number && (
+                  <div className="flex items-center gap-2">
+                    <Phone className="w-3.5 h-3.5" />
+                    {data.phone_number}
+                  </div>
+                )}
+                {data.location && (
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-3.5 h-3.5" />
+                    {data.location}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          {data.photo && (
+            <img
+              src={data.photo}
+              alt={data.full_name || "Profile"}
+              className={cn(
+                "w-24 h-24 object-cover border border-slate-200 shadow-sm flex-shrink-0",
+                isClassic ? "rounded-full" : "rounded-xl"
               )}
-              {data.phone_number && (
-                <div className="flex items-center gap-2">
-                  <Phone className="w-3.5 h-3.5" />
-                  {data.phone_number}
-                </div>
-              )}
-              {data.location && (
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-3.5 h-3.5" />
-                  {data.location}
-                </div>
-              )}
-            </div>
+            />
           )}
         </header>
 

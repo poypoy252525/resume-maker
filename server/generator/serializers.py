@@ -17,12 +17,12 @@ class EducationSerializer(serializers.Serializer):
     date_to = serializers.CharField(required=False, allow_blank=True)
     has_content = serializers.BooleanField(default=False)
     content = serializers.CharField(required=False, allow_blank=True)
-
 class ResumeDataSerializer(serializers.Serializer):
     full_name = serializers.CharField(required=False, allow_blank=True)
     email = serializers.EmailField(required=False, allow_blank=True)
     phone_number = serializers.CharField(required=False, allow_blank=True)
     location = serializers.CharField(required=False, allow_blank=True)
+    photo = serializers.CharField(required=False, allow_blank=True, default="")
     
     has_skill = serializers.BooleanField(default=True)
     skill_description = serializers.CharField(required=False, allow_blank=True)
@@ -43,8 +43,8 @@ class ResumeModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Resume
-        fields = ['id', 'title', 'data', 'file', 'status', 'score', 'is_favorite', 'updated_at']
-        read_only_fields = ['id', 'file', 'updated_at']
+        fields = ['id', 'title', 'data', 'file', 'photo', 'status', 'score', 'is_favorite', 'updated_at']
+        read_only_fields = ['id', 'file', 'photo', 'updated_at']
 
 class ActivitySerializer(serializers.ModelSerializer):
     class Meta:

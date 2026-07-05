@@ -1,6 +1,9 @@
 import os
 import subprocess
 import logging
+import base64
+import io
+import urllib.parse
 from docx import Document
 from docx.shared import Pt, RGBColor, Inches
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -91,9 +94,69 @@ class GenerateDocumentService:
             section.left_margin = margin
             section.right_margin = margin
 
+        # Photo Processing
+        photo_data = context.get('photo')
+        has_photo = False
+        image_stream = None
+        
+        if photo_data:
+            try:
+                if photo_data.startswith('data:image'):
+                    # Base64 data URL
+                    if ',' in photo_data:
+                        header, base64_data = photo_data.split(',', 1)
+                    else:
+                        base64_data = photo_data
+                    image_bytes = base64.b64decode(base64_data)
+                    image_stream = io.BytesIO(image_bytes)
+                    has_photo = True
+                elif photo_data.startswith('http://') or photo_data.startswith('https://') or '/media/' in photo_data:
+                    # Media URL from local server
+                    parsed_url = urllib.parse.urlparse(photo_data)
+                    path = parsed_url.path  # e.g., "/media/photos/pic.jpg"
+                    media_url = settings.MEDIA_URL  # e.g., "/media/"
+                    if path.startswith(media_url):
+                        relative_path = path[len(media_url):]
+                        local_path = os.path.join(settings.MEDIA_ROOT, relative_path)
+                        if os.path.exists(local_path):
+                            image_stream = local_path
+                            has_photo = True
+            except Exception as e:
+                logger.error(f"Failed to load profile photo: {e}")
+
+        # Set up header container if photo is present
+        if has_photo:
+            # Create a 3-column table: Info, Spacer, Photo
+            header_table = self.doc.add_table(rows=1, cols=3)
+            header_table.autofit = False
+            
+            # Width calculation:
+            w_info = Inches(5.57 if self.template == 'minimal' else 5.2)
+            w_spacer = Inches(0.2)
+            w_photo = Inches(1.1)
+            
+            for i, w in enumerate([w_info, w_spacer, w_photo]):
+                header_table.columns[i].width = w
+                header_table.cell(0, i).width = w
+                
+            info_container = header_table.cell(0, 0)
+            
+            photo_cell = header_table.cell(0, 2)
+            p_photo = photo_cell.paragraphs[0]
+            p_photo.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+            p_photo.paragraph_format.space_before = Pt(0)
+            p_photo.paragraph_format.space_after = Pt(0)
+            run_photo = p_photo.add_run()
+            try:
+                run_photo.add_picture(image_stream, width=Inches(1.0))
+            except Exception as e:
+                logger.error(f"Failed to insert photo in docx: {e}")
+        else:
+            info_container = None
+
         # Name
-        name_p = self.doc.add_paragraph()
-        if self.template == 'classic':
+        name_p = info_container.paragraphs[0] if has_photo else self.doc.add_paragraph()
+        if self.template == 'classic' and not has_photo:
             name_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
             
         name_text = context.get('full_name', '').upper() if self.template != 'minimal' else context.get('full_name', '')
@@ -111,8 +174,9 @@ class GenerateDocumentService:
         if context.get('location'): contact_items.append(context['location'])
 
         if self.template == 'classic':
-            contact_p = self.doc.add_paragraph()
-            contact_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            contact_p = info_container.add_paragraph() if has_photo else self.doc.add_paragraph()
+            if not has_photo:
+                contact_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
             contact_text = "  •  ".join(contact_items)
             run = contact_p.add_run(contact_text)
             run.font.size = Pt(9.5)
@@ -120,7 +184,7 @@ class GenerateDocumentService:
             run.font.color.rgb = self.slate_600
             contact_p.paragraph_format.space_after = Pt(16)
         elif self.template == 'minimal':
-            contact_p = self.doc.add_paragraph()
+            contact_p = info_container.add_paragraph() if has_photo else self.doc.add_paragraph()
             contact_text = "  |  ".join(contact_items)
             run = contact_p.add_run(contact_text)
             run.font.size = Pt(9)
@@ -129,7 +193,7 @@ class GenerateDocumentService:
             contact_p.paragraph_format.space_after = Pt(12)
         else: # Modern
             for i, item in enumerate(contact_items):
-                p = self.doc.add_paragraph()
+                p = info_container.add_paragraph() if has_photo else self.doc.add_paragraph()
                 run = p.add_run(item)
                 run.font.size = Pt(9.5)
                 run.font.name = self.font_name
@@ -140,6 +204,13 @@ class GenerateDocumentService:
                     p.paragraph_format.space_after = Pt(16)
                 else:
                     p.paragraph_format.space_after = Pt(2)
+
+        # Add spacing after header if we used a table
+        if has_photo:
+            spacer_p = self.doc.add_paragraph()
+            spacer_p.paragraph_format.space_before = Pt(0)
+            spacer_p.paragraph_format.space_after = Pt(12)
+            spacer_p.paragraph_format.line_spacing = Pt(1)
 
         # Professional Summary
         if context.get('skill_description'):

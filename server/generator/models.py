@@ -20,6 +20,8 @@ class Resume(models.Model):
     
     # Final generated asset
     file = models.FileField(upload_to='resumes/', null=True, blank=True)
+    photo = models.ImageField(upload_to='photos/', null=True, blank=True)
+
     
     status = models.CharField(
         max_length=20, 
