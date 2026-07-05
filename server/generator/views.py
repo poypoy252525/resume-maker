@@ -49,7 +49,8 @@ class ResumeViewSet(viewsets.ModelViewSet):
         data_serializer = ResumeDataSerializer(data=request.data)
         if data_serializer.is_valid():
             user_id = request.user.id if request.user.is_authenticated else None
-            task = generate_document_task.delay(data_serializer.validated_data, user_id=user_id)
+            is_preview = request.query_params.get('preview', 'false').lower() == 'true'
+            task = generate_document_task.delay(data_serializer.validated_data, user_id=user_id, is_preview=is_preview)
             
             return Response({
                 "message": "Resume generation started.",
@@ -69,10 +70,12 @@ class ResumeViewSet(viewsets.ModelViewSet):
             resume.save()
             
             user_id = request.user.id if request.user.is_authenticated else None
+            is_preview = request.query_params.get('preview', 'false').lower() == 'true'
             task = generate_document_task.delay(
                 data_serializer.validated_data, 
                 user_id=user_id,
-                resume_id=str(resume.id)
+                resume_id=str(resume.id),
+                is_preview=is_preview
             )
             
             return Response({

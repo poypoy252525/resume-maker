@@ -8,7 +8,7 @@ from .services.ai_service import AIService
 logger = logging.getLogger(__name__)
 
 @shared_task
-def generate_document_task(context, user_id=None, resume_id=None):
+def generate_document_task(context, user_id=None, resume_id=None, is_preview=False):
     logger.info(f"Starting resume generation task for {context.get('full_name')}")
     try:
         service = GenerateDocumentService()
@@ -25,7 +25,7 @@ def generate_document_task(context, user_id=None, resume_id=None):
             except Exception as e:
                 logger.error(f"Failed to update resume object: {str(e)}", exc_info=True)
 
-        if user_id:
+        if user_id and not is_preview:
             try:
                 from django.contrib.auth import get_user_model
                 from .models import Activity

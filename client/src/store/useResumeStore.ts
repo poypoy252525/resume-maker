@@ -553,7 +553,7 @@ export const useResumeStore = create<ResumeState>()(
             }
           });
 
-          const result = await generateResume(cleanedData);
+          const result = await generateResume(cleanedData, true);
           const taskId = result.task_id;
 
           // Poll until success

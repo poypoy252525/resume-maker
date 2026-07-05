@@ -240,6 +240,75 @@ class ResumeImportTestCase(TestCase):
         self.assertEqual(response.json()["skills"], ["Python", "Django"])
 
 
+class ResumePreviewDownloadActivityTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="password")
+        from rest_framework.authtoken.models import Token
+        self.token = Token.objects.create(user=self.user)
+
+    @patch('generator.tasks.GenerateDocumentService')
+    def test_generate_document_task_non_preview_logs_activity(self, mock_service_class):
+        mock_instance = mock_service_class.return_value
+        mock_instance.generate.return_value = "john_doe"
+        
+        from generator.tasks import generate_document_task
+        from generator.models import Activity
+        
+        generate_document_task(
+            context={"full_name": "John Doe"},
+            user_id=self.user.id,
+            resume_id=None,
+            is_preview=False
+        )
+        
+        self.assertTrue(Activity.objects.filter(user=self.user, activity_type='download').exists())
+
+    @patch('generator.tasks.GenerateDocumentService')
+    def test_generate_document_task_preview_does_not_log_activity(self, mock_service_class):
+        mock_instance = mock_service_class.return_value
+        mock_instance.generate.return_value = "john_doe"
+        
+        from generator.tasks import generate_document_task
+        from generator.models import Activity
+        
+        generate_document_task(
+            context={"full_name": "John Doe"},
+            user_id=self.user.id,
+            resume_id=None,
+            is_preview=True
+        )
+        
+        self.assertFalse(Activity.objects.filter(user=self.user, activity_type='download').exists())
+
+    @patch('generator.views.generate_document_task')
+    def test_generate_endpoint_with_preview_param(self, mock_task):
+        class DummyTask:
+            id = "dummy-task-id"
+        mock_task.delay.return_value = DummyTask()
+        
+        url = reverse('resume-generate-no-id') + "?preview=true"
+        payload = {
+            "full_name": "John Doe",
+            "email": "john@example.com",
+            "phone_number": "123456",
+            "location": "SF",
+            "has_skill": False,
+            "has_experience": False,
+            "has_education": False
+        }
+        
+        response = self.client.post(
+            url,
+            payload,
+            content_type='application/json',
+            HTTP_AUTHORIZATION=f"Token {self.token.key}"
+        )
+        self.assertEqual(response.status_code, 202)
+        mock_task.delay.assert_called_once()
+        kwargs = mock_task.delay.call_args[1]
+        self.assertEqual(kwargs.get('is_preview'), True)
+
+
 
 
 

@@ -56,8 +56,9 @@ export interface ResumeData {
   template?: "modern" | "classic" | "minimal";
 }
 
-export const generateResume = async (data: ResumeData) => {
-  const response = await fetch(`${API_BASE_URL}/resumes/generate/`, {
+export const generateResume = async (data: ResumeData, isPreview = false) => {
+  const url = isPreview ? `${API_BASE_URL}/resumes/generate/?preview=true` : `${API_BASE_URL}/resumes/generate/`;
+  const response = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
