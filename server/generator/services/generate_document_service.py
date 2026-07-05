@@ -4,6 +4,7 @@ import logging
 import base64
 import io
 import urllib.parse
+from PIL import Image
 from docx import Document
 from docx.shared import Pt, RGBColor, Inches
 from docx.enum.text import WD_ALIGN_PARAGRAPH
@@ -126,6 +127,25 @@ class GenerateDocumentService:
 
         # Set up header container if photo is present
         if has_photo:
+            try:
+                # Open with Pillow, crop to a 1:1 square from the center, and write to a BytesIO stream
+                img = Image.open(image_stream)
+                width, height = img.size
+                min_dim = min(width, height)
+                left = (width - min_dim) / 2
+                top = (height - min_dim) / 2
+                right = (width + min_dim) / 2
+                bottom = (height + min_dim) / 2
+                img_cropped = img.crop((left, top, right, bottom))
+                
+                cropped_stream = io.BytesIO()
+                img_format = img.format if img.format else 'JPEG'
+                img_cropped.save(cropped_stream, format=img_format)
+                cropped_stream.seek(0)
+                image_stream = cropped_stream
+            except Exception as e:
+                logger.error(f"Failed to crop profile picture to square: {e}")
+
             # Create a 3-column table: Info, Spacer, Photo
             header_table = self.doc.add_table(rows=1, cols=3)
             header_table.autofit = False
@@ -148,7 +168,7 @@ class GenerateDocumentService:
             p_photo.paragraph_format.space_after = Pt(0)
             run_photo = p_photo.add_run()
             try:
-                run_photo.add_picture(image_stream, width=Inches(1.0))
+                run_photo.add_picture(image_stream, width=Inches(1.0), height=Inches(1.0))
             except Exception as e:
                 logger.error(f"Failed to insert photo in docx: {e}")
         else:
